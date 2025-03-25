@@ -116,6 +116,48 @@
       alert(`Поиск рейсов: ${from} ➡️ ${to} на ${date}`);
       // здесь можно вставить fetch() к API
     });
+
+document.getElementById("hotelForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const city = document.getElementById("hotelCity").value;
+  const checkIn = document.getElementById("checkIn").value;
+  const checkOut = document.getElementById("checkOut").value;
+  const guests = document.getElementById("guests").value;
+
+  const mockHotels = [
+    { name: "Hotel Sunrise", price: 85, city, rating: 8.9 },
+    { name: "Ocean View", price: 120, city, rating: 9.1 },
+    { name: "Budget Stay", price: 40, city, rating: 7.5 },
+  ];
+
+  const resultBlock = document.getElementById("hotelsResult");
+  resultBlock.innerHTML = "<h3>Результаты:</h3>" + mockHotels.map(
+    (hotel) => `
+      <div style="border: 1px solid #ddd; padding: 10px; border-radius: 12px; margin-bottom: 10px;">
+        <strong>${hotel.name}</strong> (${hotel.city})<br>
+        Цена: $${hotel.price} / ночь<br>
+        Рейтинг: ${hotel.rating}
+      </div>`
+  ).join("");
+});
+
+// 🔥 Горячие предложения
+const hotDeals = [
+  { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
+  { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
+  { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
+];
+
+document.getElementById("hotDeals").innerHTML = hotDeals.map(
+  (deal) => `
+    <div style="border: 1px solid #ccc; border-radius: 10px; padding: 10px; width: 180px;">
+      ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
+      <span>📅 ${deal.date}</span><br>
+      <span style="color: red;">$${deal.price}</span>
+    </div>`
+).join("");
+
+    
   </script>
 </body>
 </html>
