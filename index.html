@@ -37,20 +37,20 @@
       <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
         <input type="text" name="from" placeholder="Откуда" class="input" required />
         <input type="text" name="to" placeholder="Куда" class="input" required />
+        <label class="flex items-center gap-2">
+          <input type="checkbox" id="roundTrip" />
+          <span>Туда и обратно</span>
+        </label>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="label block mb-1" for="date">Дата вылета</label>
-            <input type="date" name="date" id="date" class="input" required />
+            <label class="label block mb-1" for="departureDate">Дата вылета</label>
+            <input type="date" name="departureDate" id="departureDate" class="input" required />
           </div>
           <div>
             <label class="label block mb-1" for="returnDate">Дата возвращения</label>
             <input type="date" name="returnDate" id="returnDate" class="input hidden" />
           </div>
         </div>
-        <label class="inline-flex items-center mt-2">
-          <input type="checkbox" id="roundTripToggle" class="mr-2">
-          <span class="text-sm">Туда и обратно</span>
-        </label>
         <button type="submit" class="btn w-full mt-2">Найти рейсы</button>
       </form>
       <div id="flights-container" class="space-y-4"></div>
@@ -97,16 +97,10 @@
 
   <script>
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-    console.log("User ID:", userId);
-
-    document.getElementById("roundTripToggle").addEventListener("change", (e) => {
-      const returnInput = document.getElementById("returnDate");
-      returnInput.classList.toggle("hidden", !e.target.checked);
-    });
 
     const flights = [
-      { airline: 'Ryanair', from: 'Kyiv', to: 'Lisbon', price: 140, duration: '5h', transfers: 1 },
-      { airline: 'WizzAir', from: 'Lviv', to: 'Barcelona', price: 120, duration: '4h 30m', transfers: 0 },
+      { airline: 'Ryanair', from: 'Kyiv', to: 'Lisbon', price: 140, transfers: 1 },
+      { airline: 'WizzAir', from: 'Lviv', to: 'Barcelona', price: 120, transfers: 0 },
     ];
 
     function renderFlights(data) {
@@ -138,11 +132,10 @@
       e.preventDefault();
       const from = e.target.from.value;
       const to = e.target.to.value;
-      const date = e.target.date.value;
+      const departureDate = document.getElementById("departureDate").value;
       const returnDate = document.getElementById("returnDate").value;
-      const isRoundTrip = document.getElementById("roundTripToggle").checked;
-      console.log("Поиск рейсов:", { from, to, date, returnDate, isRoundTrip, userId });
-      alert(`Поиск: ${from} → ${to}${isRoundTrip ? ` (обратно ${returnDate})` : ''} на ${date}`);
+      const isRoundTrip = document.getElementById("roundTrip").checked;
+      alert(`Поиск: ${from} → ${to}${isRoundTrip ? ` (обратно ${returnDate})` : ''} на ${departureDate}`);
     });
 
     document.getElementById("hotelForm").addEventListener("submit", (e) => {
@@ -167,6 +160,20 @@
             Рейтинг: ${hotel.rating}
           </div>`
       ).join("");
+    });
+
+    const roundTripCheckbox = document.getElementById("roundTrip");
+    const returnDateInput = document.getElementById("returnDate");
+
+    roundTripCheckbox.addEventListener("change", () => {
+      if (roundTripCheckbox.checked) {
+        returnDateInput.classList.remove("hidden");
+        returnDateInput.required = true;
+      } else {
+        returnDateInput.classList.add("hidden");
+        returnDateInput.required = false;
+        returnDateInput.value = "";
+      }
     });
   </script>
 </body>
