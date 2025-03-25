@@ -23,7 +23,7 @@
 </head>
 <body class="bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4">
   <div class="max-w-2xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-center mb-4">
       <h1 class="text-3xl font-bold">Go Travel ✈️</h1>
       <select id="langSwitcher" class="text-sm border rounded px-2 py-1">
         <option value="ru" selected>RU</option>
@@ -43,20 +43,23 @@
       <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
         <input type="text" name="from" placeholder="Откуда" class="input" required />
         <input type="text" name="to" placeholder="Куда" class="input" required />
-        <label class="flex items-center gap-2" for="roundTrip">
+
+        <label class="flex items-center gap-2 mb-2" id="roundTripLabel">
           <input type="checkbox" id="roundTrip" />
-          <span>Туда и обратно</span>
+          <span id="roundTripText">Туда и обратно</span>
         </label>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="label block mb-1" for="departureDate">Дата вылета</label>
             <input type="date" name="departureDate" id="departureDate" class="input" required />
           </div>
           <div id="returnDateWrapper" class="hidden">
-            <label class="label block mb-1" for="returnDate">Дата возвращения</label>
+            <label class="label block mb-1" for="returnDate" id="returnDateLabel">Дата возвращения</label>
             <input type="date" name="returnDate" id="returnDate" class="input" />
           </div>
         </div>
+
         <button type="submit" class="btn w-full mt-2">Найти рейсы</button>
       </form>
       <div id="flights-container" class="space-y-4"></div>
@@ -211,8 +214,8 @@
       document.querySelector('[onclick*="sights"]').textContent = t.sights;
       document.querySelector('button[type="submit"]').textContent = t.findFlights;
       document.querySelector('label[for="departureDate"]').textContent = t.departure;
-      document.querySelector('label[for="returnDate"]').textContent = t.return;
-      document.querySelector('label[for="roundTrip"]').nextElementSibling.textContent = t.roundTrip;
+      document.getElementById("returnDateLabel").textContent = t.return;
+      document.getElementById("roundTripText").textContent = t.roundTrip;
     }
 
     document.getElementById("langSwitcher").addEventListener("change", (e) => {
