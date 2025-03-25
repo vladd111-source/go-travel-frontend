@@ -3,127 +3,125 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Go Travel ✈️</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .input {
-      @apply w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm text-sm;
-    }
-    .btn {
-      @apply bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-600;
-    }
+    body { font-family: 'Inter', sans-serif; }
   </style>
 </head>
 <body class="bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4">
   <div class="max-w-2xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-center">Go Travel ✈️</h1>
-
-    <!-- Tabs -->
-    <div class="flex justify-center mb-4 gap-2">
-      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('flights')">✈️ Авиабилеты</button>
-      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('hotels')">🏨 Отели</button>
-      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('sights')">🌍 Места</button>
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-3xl font-bold">Go Travel ✈️</h1>
+      <select id="lang" class="border border-gray-300 px-2 py-1 rounded text-sm">
+        <option value="ru">RU</option>
+        <option value="en">EN</option>
+      </select>
     </div>
 
-    <!-- Flights Tab -->
+    <div class="flex justify-center gap-2 mb-4">
+      <button onclick="showTab('flights')" class="tab-btn bg-white px-4 py-2 rounded shadow">✈️ <span data-i18n="flights">Авиабилеты</span></button>
+      <button onclick="showTab('hotels')" class="tab-btn bg-white px-4 py-2 rounded shadow">🏨 <span data-i18n="hotels">Отели</span></button>
+      <button onclick="showTab('sights')" class="tab-btn bg-white px-4 py-2 rounded shadow">🌍 <span data-i18n="sights">Места</span></button>
+    </div>
+
     <div id="flights" class="tab">
-      <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-2">
-        <input type="text" name="from" placeholder="Откуда" class="input" required />
-        <input type="text" name="to" placeholder="Куда" class="input" required />
-        <input type="date" name="date" class="input" required />
-        <div class="flex items-center gap-2">
-          <label><input type="radio" name="tripType" value="oneway" checked /> В одну сторону</label>
-          <label><input type="radio" name="tripType" value="round" /> Туда и обратно</label>
-        </div>
-        <button type="submit" class="btn w-full">Найти рейсы</button>
+      <form id="search-form" class="bg-white p-4 rounded shadow space-y-2 mb-6">
+        <input type="text" name="from" placeholder="Откуда" class="w-full p-2 border rounded" required />
+        <input type="text" name="to" placeholder="Куда" class="w-full p-2 border rounded" required />
+        <input type="date" name="date" class="w-full p-2 border rounded" required />
+        <label class="block text-sm mt-2"><input type="checkbox" id="roundTrip" /> Туда-обратно</label>
+        <button class="bg-indigo-500 text-white px-4 py-2 rounded w-full" type="submit">Найти рейсы</button>
       </form>
 
-      <h2 class="text-lg font-semibold mt-6 mb-2">🔥 Горячие предложения</h2>
-      <div id="hotDeals" class="flex flex-wrap gap-3 mb-6"></div>
+      <div id="flights-container" class="space-y-3"></div>
 
-      <div id="flights-container" class="space-y-4"></div>
-    </div>
-
-    <!-- Hotels Tab -->
-    <div id="hotels" class="tab hidden">
-      <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-2">
-        <input type="text" placeholder="Город" id="hotelCity" class="input" required />
-        <input type="date" id="checkIn" class="input" />
-        <input type="date" id="checkOut" class="input" />
-        <input type="number" placeholder="Гостей" id="guests" min="1" class="input" />
-        <button type="submit" class="btn w-full">Найти отель</button>
+      <h2 class="text-xl font-semibold mt-6 mb-2">🏨 Найти отель</h2>
+      <form id="hotelForm" class="bg-white p-4 rounded shadow space-y-2 mb-4">
+        <input type="text" id="hotelCity" placeholder="Город" class="w-full p-2 border rounded" required />
+        <label>Заселение: <input type="date" id="checkIn" class="p-2 border rounded" /></label>
+        <label>Выселение: <input type="date" id="checkOut" class="p-2 border rounded" /></label>
+        <input type="number" id="guests" min="1" placeholder="Гостей" class="w-full p-2 border rounded" />
+        <button class="bg-indigo-500 text-white px-4 py-2 rounded w-full" type="submit">Найти отель</button>
       </form>
-      <div id="hotelsResult"></div>
+      <div id="hotelsResult" class="space-y-2"></div>
+
+      <h2 class="text-xl font-semibold mt-6 mb-2">🔥 Горячие предложения</h2>
+      <div id="hotDeals" class="flex flex-wrap gap-3"></div>
     </div>
 
-    <!-- Sights Tab -->
-    <div id="sights" class="tab hidden">
-      <p class="text-center text-gray-500">Достопримечательности появятся позже 🏞️</p>
-    </div>
+    <div id="hotels" class="tab hidden text-center text-gray-500">Скоро...</div>
+    <div id="sights" class="tab hidden text-center text-gray-500">В разработке...</div>
 
-    <!-- Back to Telegram -->
-    <div class="text-center mt-10">
-      <a href="https://t.me" class="text-sm text-gray-500 hover:underline">← Назад в Telegram</a>
+    <div class="text-center mt-8">
+      <button onclick="Telegram.WebApp.close()" class="text-sm text-gray-600">← Назад в Telegram</button>
     </div>
   </div>
 
-<script>
-const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-console.log("User ID:", userId);
+  <script>
+    const translations = {
+      ru: { flights: "Авиабилеты", hotels: "Отели", sights: "Места" },
+      en: { flights: "Flights", hotels: "Hotels", sights: "Sights" }
+    };
 
-function showTab(id) {
-  document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-}
+    document.getElementById("lang").addEventListener("change", (e) => {
+      const lang = e.target.value;
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        el.textContent = translations[lang][el.dataset.i18n];
+      });
+    });
 
-document.getElementById('search-form').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const { from, to, date, tripType } = Object.fromEntries(new FormData(e.target).entries());
-  alert(\`Ищем рейсы: \${from} → \${to}, дата: \${date}, тип: \${tripType}\`);
-});
+    function showTab(tab) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.add("hidden"));
+      document.getElementById(tab).classList.remove("hidden");
+    }
 
-document.getElementById("hotelForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const city = document.getElementById("hotelCity").value;
-  const checkIn = document.getElementById("checkIn").value;
-  const checkOut = document.getElementById("checkOut").value;
-  const guests = document.getElementById("guests").value;
+    document.getElementById("search-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const flights = [
+        { airline: "Ryanair", from: "Kyiv", to: "Lisbon", price: 140, transfers: 1 },
+        { airline: "WizzAir", from: "Lviv", to: "Barcelona", price: 120, transfers: 0 }
+      ];
+      const container = document.getElementById("flights-container");
+      container.innerHTML = "";
+      flights.forEach(f => {
+        container.innerHTML += `
+          <div class="bg-white p-3 rounded shadow">
+            <div class="flex justify-between"><strong>${f.airline}</strong><span>$${f.price}</span></div>
+            <div>${f.from} ✈️ ${f.to}</div>
+            <div class="text-sm text-gray-500">Пересадок: ${f.transfers}</div>
+          </div>`;
+      });
+    });
 
-  const hotels = [
-    { name: "Hotel Sunrise", price: 85, city, rating: 8.9 },
-    { name: "Ocean View", price: 120, city, rating: 9.1 },
-    { name: "Budget Stay", price: 40, city, rating: 7.5 },
-  ];
+    document.getElementById("hotelForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const city = document.getElementById("hotelCity").value;
+      const result = document.getElementById("hotelsResult");
+      const hotels = [
+        { name: "Hotel A", price: 70, rating: 8.5 },
+        { name: "Hotel B", price: 90, rating: 9.2 }
+      ];
+      result.innerHTML = hotels.map(h => `
+        <div class="bg-white p-3 rounded shadow">
+          <strong>${h.name}</strong> (${city})<br>
+          Цена: $${h.price} / ночь<br>
+          Рейтинг: ${h.rating}
+        </div>`).join("");
+    });
 
-  document.getElementById("hotelsResult").innerHTML = hotels.map(
-    h => \`
-      <div class="bg-white p-4 mb-3 rounded-xl shadow">
-        <strong>\${h.name}</strong> (\${h.city})<br>
-        Цена: $\${h.price} / ночь<br>
-        Рейтинг: \${h.rating}
-      </div>\`
-  ).join("");
-});
-
-const hotDeals = [
-  { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
-  { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
-  { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
-];
-
-document.getElementById("hotDeals").innerHTML = hotDeals.map(
-  d => \`
-    <div class="bg-white border border-gray-300 rounded-xl p-3 w-40 shadow text-sm">
-      ✈️ <strong>\${d.from}</strong> → <strong>\${d.to}</strong><br>
-      📅 \${d.date}<br>
-      <span class="text-red-500 font-semibold">\${d.price} $</span>
-    </div>\`
-).join("");
-</script>
+    const hotDeals = [
+      { from: "Киев", to: "Париж", price: 59, date: "01.04" },
+      { from: "Варшава", to: "Милан", price: 69, date: "05.04" }
+    ];
+    document.getElementById("hotDeals").innerHTML = hotDeals.map(d => `
+      <div class="bg-white p-3 rounded shadow w-40">
+        ✈️ <strong>${d.from}</strong> → <strong>${d.to}</strong><br>
+        📅 ${d.date}<br>
+        <span class="text-red-500 font-bold">$${d.price}</span>
+      </div>`).join("");
+  </script>
 </body>
 </html>
