@@ -23,7 +23,13 @@
 </head>
 <body class="bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4">
   <div class="max-w-2xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-center">Go Travel ✈️</h1>
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">Go Travel ✈️</h1>
+      <select id="langSwitcher" class="text-sm border rounded px-2 py-1">
+        <option value="ru" selected>RU</option>
+        <option value="en">EN</option>
+      </select>
+    </div>
 
     <!-- Tabs -->
     <div class="flex justify-center mb-4 gap-2">
@@ -37,7 +43,7 @@
       <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
         <input type="text" name="from" placeholder="Откуда" class="input" required />
         <input type="text" name="to" placeholder="Куда" class="input" required />
-        <label class="flex items-center gap-2">
+        <label class="flex items-center gap-2" for="roundTrip">
           <input type="checkbox" id="roundTrip" />
           <span>Туда и обратно</span>
         </label>
@@ -175,6 +181,44 @@
         returnDateInput.value = "";
       }
     });
+
+    const translations = {
+      ru: {
+        flights: "✈️ Авиабилеты",
+        hotels: "🏨 Отели",
+        sights: "🌍 Места",
+        findFlights: "Найти рейсы",
+        roundTrip: "Туда и обратно",
+        departure: "Дата вылета",
+        return: "Дата возвращения"
+      },
+      en: {
+        flights: "✈️ Flights",
+        hotels: "🏨 Hotels",
+        sights: "🌍 Places",
+        findFlights: "Search Flights",
+        roundTrip: "Round Trip",
+        departure: "Departure Date",
+        return: "Return Date"
+      }
+    };
+
+    function applyTranslations(lang) {
+      const t = translations[lang];
+      document.querySelector('[onclick*="flights"]').textContent = t.flights;
+      document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
+      document.querySelector('[onclick*="sights"]').textContent = t.sights;
+      document.querySelector('button[type="submit"]').textContent = t.findFlights;
+      document.querySelector('label[for="departureDate"]').textContent = t.departure;
+      document.querySelector('label[for="returnDate"]').textContent = t.return;
+      document.querySelector('label[for="roundTrip"]').nextElementSibling.textContent = t.roundTrip;
+    }
+
+    document.getElementById("langSwitcher").addEventListener("change", (e) => {
+      applyTranslations(e.target.value);
+    });
+
+    applyTranslations("ru");
   </script>
 </body>
 </html>
