@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,6 +16,9 @@
     .btn {
       @apply bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-600;
     }
+    .label {
+      @apply text-sm font-medium;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4">
@@ -31,34 +34,41 @@
 
     <!-- Flights -->
     <div id="flights" class="tab">
-      <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-2">
+      <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
         <input type="text" name="from" placeholder="Откуда" class="input" required />
         <input type="text" name="to" placeholder="Куда" class="input" required />
-        <input type="date" name="date" class="input" required />
-
-        <div class="flex items-center gap-2">
-          <input type="checkbox" id="roundTripToggle" class="accent-indigo-500" />
-          <label for="roundTripToggle" class="text-sm">Туда и обратно</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="label block mb-1" for="date">Дата вылета</label>
+            <input type="date" name="date" id="date" class="input" required />
+          </div>
+          <div>
+            <label class="label block mb-1" for="returnDate">Дата возвращения</label>
+            <input type="date" name="returnDate" id="returnDate" class="input hidden" />
+          </div>
         </div>
-        <input type="date" id="returnDate" name="returnDate" class="input hidden" />
-
-        <button type="submit" class="btn w-full">Найти рейсы</button>
+        <label class="inline-flex items-center mt-2">
+          <input type="checkbox" id="roundTripToggle" class="mr-2">
+          <span class="text-sm">Туда и обратно</span>
+        </label>
+        <button type="submit" class="btn w-full mt-2">Найти рейсы</button>
       </form>
-
-      <h2 class="text-xl font-semibold mb-2 mt-6">🔥 Горячие предложения</h2>
-      <div id="hotDeals" class="flex flex-wrap gap-3"></div>
-
-      <div id="flights-container" class="space-y-4 mt-4"></div>
+      <div id="flights-container" class="space-y-4"></div>
     </div>
 
     <!-- Hotels -->
     <div id="hotels" class="tab hidden">
-      <h2 class="text-xl font-semibold mb-2">🏨 Найти отель</h2>
       <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-2">
         <input type="text" placeholder="Город" id="hotelCity" class="input" required />
-        <div class="flex gap-2">
-          <input type="date" id="checkIn" class="input w-1/2" />
-          <input type="date" id="checkOut" class="input w-1/2" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="label block mb-1" for="checkIn">Дата заезда</label>
+            <input type="date" id="checkIn" class="input" />
+          </div>
+          <div>
+            <label class="label block mb-1" for="checkOut">Дата выезда</label>
+            <input type="date" id="checkOut" class="input" />
+          </div>
         </div>
         <input type="number" placeholder="Гостей" id="guests" min="1" class="input" />
         <button type="submit" class="btn w-full">Найти отель</button>
@@ -68,19 +78,18 @@
 
     <!-- Sights -->
     <div id="sights" class="tab hidden">
-      <h2 class="text-xl font-semibold mb-2">🌍 Достопримечательности</h2>
-      <div id="sightsList" class="space-y-3">
+      <div class="grid gap-4">
         <div class="bg-white p-4 rounded-xl shadow">
-          <h3 class="font-semibold">Саграда Фамилия, Барселона</h3>
-          <p class="text-sm text-gray-600">Рейтинг: ⭐ 4.8</p>
+          <h3 class="text-lg font-semibold">Castelo de São Jorge</h3>
+          <p class="text-sm text-gray-500">⭐ 4.7 | Лиссабон</p>
         </div>
         <div class="bg-white p-4 rounded-xl shadow">
-          <h3 class="font-semibold">Эйфелева башня, Париж</h3>
-          <p class="text-sm text-gray-600">Рейтинг: ⭐ 4.7</p>
+          <h3 class="text-lg font-semibold">Miradouro da Senhora do Monte</h3>
+          <p class="text-sm text-gray-500">⭐ 4.8 | Панорамный вид</p>
         </div>
         <div class="bg-white p-4 rounded-xl shadow">
-          <h3 class="font-semibold">Колизей, Рим</h3>
-          <p class="text-sm text-gray-600">Рейтинг: ⭐ 4.6</p>
+          <h3 class="text-lg font-semibold">Oceanário de Lisboa</h3>
+          <p class="text-sm text-gray-500">⭐ 4.6 | Один из лучших океанариумов Европы</p>
         </div>
       </div>
     </div>
@@ -90,18 +99,18 @@
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
     console.log("User ID:", userId);
 
-    function showTab(id) {
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-    }
+    document.getElementById("roundTripToggle").addEventListener("change", (e) => {
+      const returnInput = document.getElementById("returnDate");
+      returnInput.classList.toggle("hidden", !e.target.checked);
+    });
 
-    const container = document.getElementById('flights-container');
     const flights = [
-      { airline: 'Ryanair', from: 'Kyiv', to: 'Lisbon', price: 140, transfers: 1 },
-      { airline: 'WizzAir', from: 'Lviv', to: 'Barcelona', price: 120, transfers: 0 },
+      { airline: 'Ryanair', from: 'Kyiv', to: 'Lisbon', price: 140, duration: '5h', transfers: 1 },
+      { airline: 'WizzAir', from: 'Lviv', to: 'Barcelona', price: 120, duration: '4h 30m', transfers: 0 },
     ];
 
     function renderFlights(data) {
+      const container = document.getElementById('flights-container');
       container.innerHTML = '';
       data.forEach((flight) => {
         const card = document.createElement('div');
@@ -120,18 +129,20 @@
 
     renderFlights(flights);
 
+    function showTab(id) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    }
+
     document.getElementById('search-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const from = e.target.from.value;
       const to = e.target.to.value;
       const date = e.target.date.value;
-      const returnDate = document.getElementById('roundTripToggle').checked ? document.getElementById('returnDate').value : null;
-      alert(`Поиск рейсов: ${from} ➡️ ${to} на ${date}${returnDate ? ` и обратно ${returnDate}` : ''}`);
-    });
-
-    document.getElementById("roundTripToggle").addEventListener("change", function () {
-      const returnDateInput = document.getElementById("returnDate");
-      returnDateInput.classList.toggle("hidden", !this.checked);
+      const returnDate = document.getElementById("returnDate").value;
+      const isRoundTrip = document.getElementById("roundTripToggle").checked;
+      console.log("Поиск рейсов:", { from, to, date, returnDate, isRoundTrip, userId });
+      alert(`Поиск: ${from} → ${to}${isRoundTrip ? ` (обратно ${returnDate})` : ''} на ${date}`);
     });
 
     document.getElementById("hotelForm").addEventListener("submit", (e) => {
@@ -148,30 +159,15 @@
       ];
 
       const resultBlock = document.getElementById("hotelsResult");
-      resultBlock.innerHTML = "<h3 class='text-lg font-semibold mb-2'>Результаты:</h3>" + mockHotels.map(
+      resultBlock.innerHTML = "<h3 class='font-semibold mb-2'>Результаты:</h3>" + mockHotels.map(
         (hotel) => `
-          <div class="border border-gray-300 rounded-xl p-4 mb-3">
+          <div class="bg-white border p-4 rounded-xl mb-2">
             <strong>${hotel.name}</strong> (${hotel.city})<br>
             Цена: $${hotel.price} / ночь<br>
             Рейтинг: ${hotel.rating}
           </div>`
       ).join("");
     });
-
-    const hotDeals = [
-      { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
-      { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
-      { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
-    ];
-
-    document.getElementById("hotDeals").innerHTML = hotDeals.map(
-      (deal) => `
-        <div class="border border-gray-300 rounded-xl p-3 w-44 bg-white shadow">
-          ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
-          <span>📅 ${deal.date}</span><br>
-          <span class="text-red-500 font-semibold">$${deal.price}</span>
-        </div>`
-    ).join("");
   </script>
 </body>
 </html>
