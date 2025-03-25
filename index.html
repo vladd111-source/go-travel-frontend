@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,29 +8,122 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .input { @apply w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm text-sm; }
-    .btn { @apply bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-600; }
-    .fade { transition: all 0.3s ease-in-out; }
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .input {
+      @apply w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm text-sm;
+    }
+    .btn {
+      @apply bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-600;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4">
   <div class="max-w-2xl mx-auto">
-    <div class="flex justify-between items-center">
-      <h1 class="text-3xl font-bold mb-4">Go Travel ✈️</h1>
-      <select id="langSwitch" class="text-sm px-2 py-1 rounded">
-        <option value="ru">RU</option>
-        <option value="en">EN</option>
-      </select>
+    <h1 class="text-3xl font-bold mb-6 text-center">Go Travel ✈️</h1>
+
+    <!-- Tabs -->
+    <div class="flex justify-center mb-4 gap-2">
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('flights')">✈️ Авиабилеты</button>
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('hotels')">🏨 Отели</button>
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('sights')">🌍 Места</button>
     </div>
-    <p class="text-center text-gray-500 my-10">[Полный HTML будет восстановлен]</p>
+
+    <!-- Flights Tab -->
+    <div id="flights" class="tab">
+      <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-2">
+        <input type="text" name="from" placeholder="Откуда" class="input" required />
+        <input type="text" name="to" placeholder="Куда" class="input" required />
+        <input type="date" name="date" class="input" required />
+        <div class="flex items-center gap-2">
+          <label><input type="radio" name="tripType" value="oneway" checked /> В одну сторону</label>
+          <label><input type="radio" name="tripType" value="round" /> Туда и обратно</label>
+        </div>
+        <button type="submit" class="btn w-full">Найти рейсы</button>
+      </form>
+
+      <h2 class="text-lg font-semibold mt-6 mb-2">🔥 Горячие предложения</h2>
+      <div id="hotDeals" class="flex flex-wrap gap-3 mb-6"></div>
+
+      <div id="flights-container" class="space-y-4"></div>
+    </div>
+
+    <!-- Hotels Tab -->
+    <div id="hotels" class="tab hidden">
+      <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-2">
+        <input type="text" placeholder="Город" id="hotelCity" class="input" required />
+        <input type="date" id="checkIn" class="input" />
+        <input type="date" id="checkOut" class="input" />
+        <input type="number" placeholder="Гостей" id="guests" min="1" class="input" />
+        <button type="submit" class="btn w-full">Найти отель</button>
+      </form>
+      <div id="hotelsResult"></div>
+    </div>
+
+    <!-- Sights Tab -->
+    <div id="sights" class="tab hidden">
+      <p class="text-center text-gray-500">Достопримечательности появятся позже 🏞️</p>
+    </div>
+
+    <!-- Back to Telegram -->
+    <div class="text-center mt-10">
+      <a href="https://t.me" class="text-sm text-gray-500 hover:underline">← Назад в Telegram</a>
+    </div>
   </div>
 
-  <!-- Кнопка Назад в Telegram -->
-  <div class="fixed bottom-4 left-0 right-0 flex justify-center">
-    <button onclick="Telegram.WebApp.close()" class="btn w-auto px-6">
-      🔙 Назад в Telegram
-    </button>
-  </div>
+<script>
+const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+console.log("User ID:", userId);
+
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+document.getElementById('search-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const { from, to, date, tripType } = Object.fromEntries(new FormData(e.target).entries());
+  alert(\`Ищем рейсы: \${from} → \${to}, дата: \${date}, тип: \${tripType}\`);
+});
+
+document.getElementById("hotelForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const city = document.getElementById("hotelCity").value;
+  const checkIn = document.getElementById("checkIn").value;
+  const checkOut = document.getElementById("checkOut").value;
+  const guests = document.getElementById("guests").value;
+
+  const hotels = [
+    { name: "Hotel Sunrise", price: 85, city, rating: 8.9 },
+    { name: "Ocean View", price: 120, city, rating: 9.1 },
+    { name: "Budget Stay", price: 40, city, rating: 7.5 },
+  ];
+
+  document.getElementById("hotelsResult").innerHTML = hotels.map(
+    h => \`
+      <div class="bg-white p-4 mb-3 rounded-xl shadow">
+        <strong>\${h.name}</strong> (\${h.city})<br>
+        Цена: $\${h.price} / ночь<br>
+        Рейтинг: \${h.rating}
+      </div>\`
+  ).join("");
+});
+
+const hotDeals = [
+  { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
+  { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
+  { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
+];
+
+document.getElementById("hotDeals").innerHTML = hotDeals.map(
+  d => \`
+    <div class="bg-white border border-gray-300 rounded-xl p-3 w-40 shadow text-sm">
+      ✈️ <strong>\${d.from}</strong> → <strong>\${d.to}</strong><br>
+      📅 \${d.date}<br>
+      <span class="text-red-500 font-semibold">\${d.price} $</span>
+    </div>\`
+).join("");
+</script>
 </body>
 </html>
