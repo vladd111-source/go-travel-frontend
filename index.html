@@ -10,6 +10,12 @@
     body {
       font-family: 'Inter', sans-serif;
     }
+    .input {
+      @apply w-full px-3 py-2 rounded-xl border border-gray-300 shadow-sm text-sm;
+    }
+    .btn {
+      @apply bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-600;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4">
@@ -25,6 +31,15 @@
 
     <!-- Flights -->
     <div id="flights" class="tab">
+      <!-- Search Form -->
+      <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-2">
+        <input type="text" name="from" placeholder="Откуда" class="input" required />
+        <input type="text" name="to" placeholder="Куда" class="input" required />
+        <input type="date" name="date" class="input" required />
+        <button type="submit" class="btn w-full">Найти рейсы</button>
+      </form>
+
+      <!-- Results -->
       <div id="flights-container" class="space-y-4"></div>
     </div>
 
@@ -43,32 +58,47 @@
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
     console.log("User ID:", userId);
 
-    // Mock data (можно заменить fetch)
+    const container = document.getElementById('flights-container');
+
     const flights = [
       { airline: 'Ryanair', from: 'Kyiv', to: 'Lisbon', price: 140, duration: '5h', transfers: 1 },
       { airline: 'WizzAir', from: 'Lviv', to: 'Barcelona', price: 120, duration: '4h 30m', transfers: 0 },
     ];
 
-    const container = document.getElementById('flights-container');
-    flights.forEach((flight, i) => {
-      const card = document.createElement('div');
-      card.className = 'bg-white shadow rounded-xl p-4';
-      card.innerHTML = `
-        <div class="flex justify-between items-center mb-1">
-          <span class="text-sm font-semibold">${flight.airline}</span>
-          <span class="text-sm text-indigo-500">$${flight.price}</span>
-        </div>
-        <div class="text-sm">${flight.from} ✈️ ${flight.to}</div>
-        <div class="text-xs text-gray-500">Duration: ${flight.duration} | Transfers: ${flight.transfers}</div>
-      `;
-      container.appendChild(card);
-    });
+    function renderFlights(data) {
+      container.innerHTML = '';
+      data.forEach((flight) => {
+        const card = document.createElement('div');
+        card.className = 'bg-white shadow rounded-xl p-4';
+        card.innerHTML = `
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-sm font-semibold">${flight.airline}</span>
+            <span class="text-sm text-indigo-500">$${flight.price}</span>
+          </div>
+          <div class="text-sm">${flight.from} ✈️ ${flight.to}</div>
+          <div class="text-xs text-gray-500">Duration: ${flight.duration} | Transfers: ${flight.transfers}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    renderFlights(flights);
 
     function showTab(id) {
       document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
       document.getElementById(id).classList.remove('hidden');
       console.log("Switched to:", id, "User ID:", userId);
     }
+
+    document.getElementById('search-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const from = e.target.from.value;
+      const to = e.target.to.value;
+      const date = e.target.date.value;
+      console.log("Поиск рейсов:", { from, to, date, userId });
+      alert(`Поиск рейсов: ${from} ➡️ ${to} на ${date}`);
+      // здесь можно вставить fetch() к API
+    });
   </script>
 </body>
 </html>
