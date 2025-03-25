@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -44,11 +45,6 @@
         <input type="text" name="from" placeholder="Откуда" class="input" required />
         <input type="text" name="to" placeholder="Куда" class="input" required />
 
-        <label class="flex items-center gap-2 mb-2" id="roundTripLabel">
-          <input type="checkbox" id="roundTrip" />
-          <span id="roundTripText">Туда и обратно</span>
-        </label>
-
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="label block mb-1" for="departureDate">Дата вылета</label>
@@ -59,6 +55,11 @@
             <input type="date" name="returnDate" id="returnDate" class="input" />
           </div>
         </div>
+
+        <label class="flex items-center gap-2" id="roundTripLabel">
+          <input type="checkbox" id="roundTrip" />
+          <span id="roundTripText">Туда и обратно</span>
+        </label>
 
         <button type="submit" class="btn w-full mt-2">Найти рейсы</button>
       </form>
