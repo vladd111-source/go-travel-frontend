@@ -16,58 +16,67 @@
     .btn {
       @apply bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-600;
     }
+    .fade {
+      transition: all 0.3s ease-in-out;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4">
   <div class="max-w-2xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-center">Go Travel ✈️</h1>
+    <div class="flex justify-between items-center">
+      <h1 class="text-3xl font-bold mb-4">Go Travel ✈️</h1>
+      <select id="langSwitch" class="text-sm px-2 py-1 rounded">
+        <option value="ru">RU</option>
+        <option value="en">EN</option>
+      </select>
+    </div>
 
     <!-- Tabs -->
     <div class="flex justify-center mb-4 gap-2">
-      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('flights')">✈️ Авиабилеты</button>
-      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('hotels')">🏨 Отели</button>
-      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('sights')">🌍 Места</button>
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('flights')">✈️ <span data-ru="Авиабилеты" data-en="Flights">Авиабилеты</span></button>
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('hotels')">🏨 <span data-ru="Отели" data-en="Hotels">Отели</span></button>
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('sights')">🌍 <span data-ru="Места" data-en="Places">Места</span></button>
     </div>
 
     <!-- Flights -->
-    <div id="flights" class="tab">
-      <!-- Search Form -->
+    <div id="flights" class="tab fade">
       <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-2">
         <input type="text" name="from" placeholder="Откуда" class="input" required />
         <input type="text" name="to" placeholder="Куда" class="input" required />
         <input type="date" name="date" class="input" required />
+        <div class="flex gap-2">
+          <select name="sortPrice" class="input">
+            <option value="none">Сортировать по цене</option>
+            <option value="asc">По возрастанию</option>
+            <option value="desc">По убыванию</option>
+          </select>
+          <input type="number" name="maxDuration" placeholder="Макс. длит. (мин)" class="input" />
+        </div>
+        <label class="inline-flex items-center gap-2 text-sm">
+          <input type="checkbox" name="directOnly" /> Только прямые
+        </label>
         <button type="submit" class="btn w-full">Найти рейсы</button>
       </form>
-
-
-      
-<h2 style="margin-top: 40px;">🏨 Найти отель</h2>
-<form id="hotelForm" style="margin-bottom: 30px;">
-  <input type="text" placeholder="Город" id="hotelCity" required />
-  <input type="date" id="checkIn" />
-  <input type="date" id="checkOut" />
-  <input type="number" placeholder="Гостей" id="guests" min="1" />
-  <button type="submit">Найти отель</button>
-</form>
-
-<div id="hotelsResult"></div>
-
-<h2 style="margin-top: 50px;">🔥 Горячие предложения</h2>
-<div id="hotDeals" style="display: flex; flex-wrap: wrap; gap: 12px;"></div>
-      <!-- Results -->
       <div id="flights-container" class="space-y-4"></div>
     </div>
 
-    
-
-    <!-- Hotels (заглушка) -->
-    <div id="hotels" class="tab hidden">
-      <p class="text-center text-gray-500">Функция отелей появится скоро ⏳</p>
+    <!-- Hotels -->
+    <div id="hotels" class="tab hidden fade">
+      <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-2">
+        <input type="text" placeholder="Город" id="hotelCity" class="input" required />
+        <input type="date" id="checkIn" class="input" />
+        <input type="date" id="checkOut" class="input" />
+        <input type="number" placeholder="Гостей" id="guests" class="input" min="1" />
+        <input type="number" placeholder="Цена до ($)" id="maxHotelPrice" class="input" />
+        <input type="number" placeholder="Мин. рейтинг (0-10)" id="minRating" class="input" step="0.1" />
+        <button type="submit" class="btn w-full">Найти отель</button>
+      </form>
+      <div id="hotelsResult"></div>
     </div>
 
-    <!-- Sights (заглушка) -->
-    <div id="sights" class="tab hidden">
-      <p class="text-center text-gray-500">Достопримечательности в разработке ⚖️</p>
+    <!-- Sights -->
+    <div id="sights" class="tab hidden fade">
+      <p class="text-center text-gray-500">🌍 Достопримечательности появятся скоро</p>
     </div>
   </div>
 
@@ -75,89 +84,90 @@
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
     console.log("User ID:", userId);
 
-    const container = document.getElementById('flights-container');
-
-    const flights = [
-      { airline: 'Ryanair', from: 'Kyiv', to: 'Lisbon', price: 140, duration: '5h', transfers: 1 },
-      { airline: 'WizzAir', from: 'Lviv', to: 'Barcelona', price: 120, duration: '4h 30m', transfers: 0 },
+    const flightsData = [
+      { airline: 'Ryanair', from: 'Kyiv', to: 'Lisbon', price: 140, duration: 300, transfers: 1 },
+      { airline: 'WizzAir', from: 'Lviv', to: 'Barcelona', price: 120, duration: 270, transfers: 0 },
+      { airline: 'SkyUp', from: 'Kyiv', to: 'Paris', price: 200, duration: 240, transfers: 1 },
     ];
 
     function renderFlights(data) {
-      container.innerHTML = '';
-      data.forEach((flight) => {
-        const card = document.createElement('div');
-        card.className = 'bg-white shadow rounded-xl p-4';
-        card.innerHTML = `
-          <div class="flex justify-between items-center mb-1">
-            <span class="text-sm font-semibold">${flight.airline}</span>
-            <span class="text-sm text-indigo-500">$${flight.price}</span>
+      const container = document.getElementById('flights-container');
+      container.innerHTML = `<div class='text-sm text-gray-600 mb-2'>Найдено: ${data.length}</div>`;
+      if (!data.length) {
+        container.innerHTML = '<p class="text-center text-gray-500">Ничего не найдено.</p>';
+        return;
+      }
+      data.forEach((f) => {
+        container.innerHTML += `
+          <div class="bg-white p-4 rounded-xl shadow">
+            <div class="flex justify-between">
+              <strong>${f.airline}</strong>
+              <span class="text-indigo-500">$${f.price}</span>
+            </div>
+            <div class="text-sm">${f.from} ✈️ ${f.to}</div>
+            <div class="text-xs text-gray-500">${Math.floor(f.duration/60)}ч • Пересадки: ${f.transfers}</div>
           </div>
-          <div class="text-sm">${flight.from} ✈️ ${flight.to}</div>
-          <div class="text-xs text-gray-500">Duration: ${flight.duration} | Transfers: ${flight.transfers}</div>
         `;
-        container.appendChild(card);
       });
     }
 
-    renderFlights(flights);
-
-    function showTab(id) {
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-      console.log("Switched to:", id, "User ID:", userId);
-    }
-
-    document.getElementById('search-form').addEventListener('submit', (e) => {
+    document.getElementById("search-form").addEventListener("submit", (e) => {
       e.preventDefault();
-      const from = e.target.from.value;
-      const to = e.target.to.value;
-      const date = e.target.date.value;
-      console.log("Поиск рейсов:", { from, to, date, userId });
-      alert(`Поиск рейсов: ${from} ➡️ ${to} на ${date}`);
-      // здесь можно вставить fetch() к API
+      const form = e.target;
+      const from = form.from.value.toLowerCase();
+      const to = form.to.value.toLowerCase();
+      const maxDuration = parseInt(form.maxDuration.value);
+      const directOnly = form.directOnly.checked;
+      const sort = form.sortPrice.value;
+
+      let results = flightsData.filter(f => f.from.toLowerCase().includes(from) && f.to.toLowerCase().includes(to));
+      if (directOnly) results = results.filter(f => f.transfers === 0);
+      if (!isNaN(maxDuration)) results = results.filter(f => f.duration <= maxDuration);
+      if (sort === 'asc') results.sort((a,b) => a.price - b.price);
+      if (sort === 'desc') results.sort((a,b) => b.price - a.price);
+
+      renderFlights(results);
     });
 
-document.getElementById("hotelForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const city = document.getElementById("hotelCity").value;
-  const checkIn = document.getElementById("checkIn").value;
-  const checkOut = document.getElementById("checkOut").value;
-  const guests = document.getElementById("guests").value;
+    const hotelMock = [
+      { name: "Hotel A", city: "Kyiv", price: 90, rating: 8.5 },
+      { name: "Budget B", city: "Kyiv", price: 60, rating: 7.9 },
+      { name: "Premium C", city: "Kyiv", price: 150, rating: 9.2 },
+    ];
 
-  const mockHotels = [
-    { name: "Hotel Sunrise", price: 85, city, rating: 8.9 },
-    { name: "Ocean View", price: 120, city, rating: 9.1 },
-    { name: "Budget Stay", price: 40, city, rating: 7.5 },
-  ];
+    document.getElementById("hotelForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const city = document.getElementById("hotelCity").value.toLowerCase();
+      const maxPrice = parseFloat(document.getElementById("maxHotelPrice").value);
+      const minRating = parseFloat(document.getElementById("minRating").value);
+      let results = hotelMock.filter(h => h.city.toLowerCase().includes(city));
+      if (!isNaN(maxPrice)) results = results.filter(h => h.price <= maxPrice);
+      if (!isNaN(minRating)) results = results.filter(h => h.rating >= minRating);
 
-  const resultBlock = document.getElementById("hotelsResult");
-  resultBlock.innerHTML = "<h3>Результаты:</h3>" + mockHotels.map(
-    (hotel) => `
-      <div style="border: 1px solid #ddd; padding: 10px; border-radius: 12px; margin-bottom: 10px;">
-        <strong>${hotel.name}</strong> (${hotel.city})<br>
-        Цена: $${hotel.price} / ночь<br>
-        Рейтинг: ${hotel.rating}
-      </div>`
-  ).join("");
-});
+      const block = document.getElementById("hotelsResult");
+      block.innerHTML = `<div class='text-sm text-gray-600 mb-2'>Найдено: ${results.length}</div>`;
+      results.forEach(h => {
+        block.innerHTML += `
+          <div class="bg-white p-4 rounded-xl shadow mb-2">
+            <strong>${h.name}</strong> (${h.city})<br>
+            Цена: $${h.price} / ночь<br>
+            Рейтинг: ${h.rating}
+          </div>
+        `;
+      });
+    });
 
-// 🔥 Горячие предложения
-const hotDeals = [
-  { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
-  { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
-  { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
-];
+    function showTab(id) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    }
 
-document.getElementById("hotDeals").innerHTML = hotDeals.map(
-  (deal) => `
-    <div style="border: 1px solid #ccc; border-radius: 10px; padding: 10px; width: 180px;">
-      ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
-      <span>📅 ${deal.date}</span><br>
-      <span style="color: red;">$${deal.price}</span>
-    </div>`
-).join("");
-
-    
+    document.getElementById("langSwitch").addEventListener("change", (e) => {
+      const lang = e.target.value;
+      document.querySelectorAll('[data-ru]').forEach(el => {
+        el.textContent = el.getAttribute(`data-${lang}`);
+      });
+    });
   </script>
 </body>
 </html>
