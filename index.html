@@ -52,9 +52,9 @@
             <label class="label block mb-1" for="departureDate">Дата вылета</label>
             <input type="date" name="departureDate" id="departureDate" class="input" required />
           </div>
-          <div>
+          <div id="returnDateWrapper" class="hidden">
             <label class="label block mb-1" for="returnDate">Дата возвращения</label>
-            <input type="date" name="returnDate" id="returnDate" class="input hidden" />
+            <input type="date" name="returnDate" id="returnDate" class="input" />
           </div>
         </div>
         <button type="submit" class="btn w-full mt-2">Найти рейсы</button>
@@ -170,13 +170,14 @@
 
     const roundTripCheckbox = document.getElementById("roundTrip");
     const returnDateInput = document.getElementById("returnDate");
+    const returnDateWrapper = document.getElementById("returnDateWrapper");
 
     roundTripCheckbox.addEventListener("change", () => {
       if (roundTripCheckbox.checked) {
-        returnDateInput.classList.remove("hidden");
+        returnDateWrapper.classList.remove("hidden");
         returnDateInput.required = true;
       } else {
-        returnDateInput.classList.add("hidden");
+        returnDateWrapper.classList.add("hidden");
         returnDateInput.required = false;
         returnDateInput.value = "";
       }
