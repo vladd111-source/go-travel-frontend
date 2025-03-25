@@ -39,9 +39,26 @@
         <button type="submit" class="btn w-full">Найти рейсы</button>
       </form>
 
+
+      
+<h2 style="margin-top: 40px;">🏨 Найти отель</h2>
+<form id="hotelForm" style="margin-bottom: 30px;">
+  <input type="text" placeholder="Город" id="hotelCity" required />
+  <input type="date" id="checkIn" />
+  <input type="date" id="checkOut" />
+  <input type="number" placeholder="Гостей" id="guests" min="1" />
+  <button type="submit">Найти отель</button>
+</form>
+
+<div id="hotelsResult"></div>
+
+<h2 style="margin-top: 50px;">🔥 Горячие предложения</h2>
+<div id="hotDeals" style="display: flex; flex-wrap: wrap; gap: 12px;"></div>
       <!-- Results -->
       <div id="flights-container" class="space-y-4"></div>
     </div>
+
+    
 
     <!-- Hotels (заглушка) -->
     <div id="hotels" class="tab hidden">
