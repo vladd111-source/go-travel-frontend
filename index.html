@@ -2,11 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Go Travel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Go Travel ✈️</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
-<body>
-  <div id="root"></div>
-  <script type="module" src="/main.jsx"></script>
+<body class="bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center">Go Travel ✈️</h1>
+
+    <!-- Tabs -->
+    <div class="flex justify-center mb-4 gap-2">
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('flights')">✈️ Авиабилеты</button>
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('hotels')">🏨 Отели</button>
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('sights')">🌍 Места</button>
+    </div>
+
+    <!-- Flights -->
+    <div id="flights" class="tab">
+      <div id="flights-container" class="space-y-4"></div>
+    </div>
+
+    <!-- Hotels (заглушка) -->
+    <div id="hotels" class="tab hidden">
+      <p class="text-center text-gray-500">Функция отелей появится скоро ⏳</p>
+    </div>
+
+    <!-- Sights (заглушка) -->
+    <div id="sights" class="tab hidden">
+      <p class="text-center text-gray-500">Достопримечательности в разработке ⚖️</p>
+    </div>
+  </div>
+
+  <script>
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    console.log("User ID:", userId);
+
+    // Mock data (можно заменить fetch)
+    const flights = [
+      { airline: 'Ryanair', from: 'Kyiv', to: 'Lisbon', price: 140, duration: '5h', transfers: 1 },
+      { airline: 'WizzAir', from: 'Lviv', to: 'Barcelona', price: 120, duration: '4h 30m', transfers: 0 },
+    ];
+
+    const container = document.getElementById('flights-container');
+    flights.forEach((flight, i) => {
+      const card = document.createElement('div');
+      card.className = 'bg-white shadow rounded-xl p-4';
+      card.innerHTML = `
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-sm font-semibold">${flight.airline}</span>
+          <span class="text-sm text-indigo-500">$${flight.price}</span>
+        </div>
+        <div class="text-sm">${flight.from} ✈️ ${flight.to}</div>
+        <div class="text-xs text-gray-500">Duration: ${flight.duration} | Transfers: ${flight.transfers}</div>
+      `;
+      container.appendChild(card);
+    });
+
+    function showTab(id) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      console.log("Switched to:", id, "User ID:", userId);
+    }
+  </script>
 </body>
 </html>
