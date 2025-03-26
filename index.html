@@ -257,22 +257,44 @@ document.getElementById("hotDeals").innerHTML = hotDeals.map(
       }
     };
 
-    function applyTranslations(lang) {
-      const t = translations[lang];
-      document.querySelector('[onclick*="flights"]').textContent = t.flights;
-      document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
-      document.querySelector('[onclick*="sights"]').textContent = t.sights;
-      document.querySelector('button[type="submit"]').textContent = t.findFlights;
-      document.querySelector('label[for="departureDate"]').textContent = t.departure;
-      document.getElementById("returnDateLabel").textContent = t.return;
-      document.getElementById("roundTripText").textContent = t.roundTrip;
-    }
+<script>
+  function applyTranslations(lang) {
+    const t = translations[lang];
+    document.querySelector('[onclick*="flights"]').textContent = t.flights;
+    document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
+    document.querySelector('[onclick*="sights"]').textContent = t.sights;
+    document.querySelector('button[type="submit"]').textContent = t.findFlights;
+    document.querySelector('label[for="departureDate"]').textContent = t.departure;
+    document.getElementById("returnDateLabel").textContent = t.return;
+    document.getElementById("roundTripText").textContent = t.roundTrip;
+  }
 
+  document.addEventListener("DOMContentLoaded", function () {
+    const roundTripCheckbox = document.getElementById("roundTrip");
+    const returnDateWrapper = document.getElementById("returnDateWrapper");
+    const returnDateInput = document.getElementById("returnDate");
+
+    roundTripCheckbox.addEventListener("change", () => {
+      if (roundTripCheckbox.checked) {
+        returnDateWrapper.classList.remove("hidden");
+        returnDateInput.required = true;
+      } else {
+        returnDateWrapper.classList.add("hidden");
+        returnDateInput.required = false;
+        returnDateInput.value = "";
+      }
+    });
+
+    // Сразу применяем локализацию по умолчанию
+    applyTranslations("ru");
+
+    // Обработчик смены языка
     document.getElementById("langSwitcher").addEventListener("change", (e) => {
       applyTranslations(e.target.value);
     });
+  });
+</script>
 
-    applyTranslations("ru");
-  </script>
+
 </body>
 </html>
