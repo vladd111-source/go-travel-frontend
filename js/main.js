@@ -1,3 +1,30 @@
+let currentLang = "ru";
+
+const translations = {
+  ru: {
+    flights: "✈️ Авиабилеты",
+    hotels: "🏨 Отели",
+    sights: "🌍 Места",
+    findFlights: "Найти рейсы",
+    roundTrip: "Туда и обратно",
+    departure: "Дата вылета",
+    return: "Дата возвращения",
+    hotelResults: "Результаты:",
+    noHotelsFound: "Ничего не найдено по заданным фильтрам."
+  },
+  en: {
+    flights: "✈️ Flights",
+    hotels: "🏨 Hotels",
+    sights: "🌍 Places",
+    findFlights: "Search Flights",
+    roundTrip: "Round Trip",
+    departure: "Departure Date",
+    return: "Return Date",
+    hotelResults: "Results:",
+    noHotelsFound: "Nothing found for the selected filters."
+  }
+};
+
 document.addEventListener("DOMContentLoaded", function () {
   const hotDeals = [
     { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
@@ -9,7 +36,6 @@ document.addEventListener("DOMContentLoaded", function () {
     { from: "Мюнхен", to: "Мадрид", price: 72, date: "29.05" }
   ];
 
-  // Рендерим горячие предложения
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
     hotDealsContainer.innerHTML = hotDeals.map((deal) => `
@@ -22,13 +48,11 @@ document.addEventListener("DOMContentLoaded", function () {
     `).join("");
   }
 
-  // Переключение вкладок
   window.showTab = function (id) {
     document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
   };
 
-  // Скрытие / показ "Дата возвращения"
   const roundTripCheckbox = document.getElementById("roundTrip");
   if (roundTripCheckbox) {
     roundTripCheckbox.addEventListener("change", function () {
@@ -45,28 +69,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Локализация
-  const translations = {
-    ru: {
-      flights: "✈️ Авиабилеты",
-      hotels: "🏨 Отели",
-      sights: "🌍 Места",
-      findFlights: "Найти рейсы",
-      roundTrip: "Туда и обратно",
-      departure: "Дата вылета",
-      return: "Дата возвращения"
-    },
-    en: {
-      flights: "✈️ Flights",
-      hotels: "🏨 Hotels",
-      sights: "🌍 Places",
-      findFlights: "Search Flights",
-      roundTrip: "Round Trip",
-      departure: "Departure Date",
-      return: "Return Date"
-    }
-  };
-
   function applyTranslations(lang) {
     const t = translations[lang];
     document.querySelector('[onclick*="flights"]').textContent = t.flights;
@@ -80,12 +82,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const langSwitcher = document.getElementById("langSwitcher");
   langSwitcher.addEventListener("change", (e) => {
-    applyTranslations(e.target.value);
+    currentLang = e.target.value;
+    applyTranslations(currentLang);
   });
 
-  applyTranslations("ru");
+  applyTranslations(currentLang);
 });
-// Форма отелей
+
 const hotelForm = document.getElementById("hotelForm");
 hotelForm?.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -112,8 +115,9 @@ hotelForm?.addEventListener("submit", (e) => {
     h.rating >= minRating
   );
 
+  const t = translations[currentLang];
   const resultBlock = document.getElementById("hotelsResult");
-  resultBlock.innerHTML = "<h3 class='font-semibold mb-2'>Результаты:</h3>" + (
+  resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
     filtered.length
       ? filtered.map(hotel => `
           <div class="bg-white border p-4 rounded-xl mb-2">
@@ -121,6 +125,6 @@ hotelForm?.addEventListener("submit", (e) => {
             Цена: $${hotel.price} / ночь<br>
             Рейтинг: ${hotel.rating}
           </div>`).join("")
-      : "<p class='text-sm text-gray-500'>Ничего не найдено по заданным фильтрам.</p>"
+      : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
   );
 });
