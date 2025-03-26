@@ -126,11 +126,11 @@ hotelForm?.addEventListener("submit", (e) => {
   resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
     filtered.length
       ? filtered.map(hotel => `
-          <div class="bg-white border p-4 rounded-xl mb-2">
-            <strong>${hotel.name}</strong> (${hotel.city})<br>
-            Цена: $${hotel.price} / ночь<br>
-            Рейтинг: ${hotel.rating}
-          </div>`).join("")
+        <div class="bg-white border p-4 rounded-xl mb-2">
+          <strong>${hotel.name}</strong> (${hotel.city})<br>
+          Цена: $${hotel.price} / ночь<br>
+          Рейтинг: ${hotel.rating}
+        </div>`).join("")
       : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
   );
 });
