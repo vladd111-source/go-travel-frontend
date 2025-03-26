@@ -2,12 +2,40 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentLang = "ru";
 
   const translations = {
-    ru: { flights: "✈️ Авиабилеты", hotels: "🏨 Отели", sights: "🌍 Места", findFlights: "Найти рейсы", roundTrip: "Туда и обратно", departure: "Дата вылета", return: "Дата возвращения", hotelResults: "Результаты:", noHotelsFound: "Ничего не найдено по заданным фильтрам." },
-    en: { flights: "✈️ Flights", hotels: "🏨 Hotels", sights: "🌍 Places", findFlights: "Search Flights", roundTrip: "Round Trip", departure: "Departure Date", return: "Return Date", hotelResults: "Results:", noHotelsFound: "Nothing found for the selected filters." }
+    ru: {
+      flights: "✈️ Авиабилеты",
+      hotels: "🏨 Отели",
+      sights: "🌍 Места",
+      findFlights: "Найти рейсы",
+      roundTrip: "Туда и обратно",
+      departure: "Дата вылета",
+      return: "Дата возвращения",
+      hotelResults: "Результаты:",
+      noHotelsFound: "Ничего не найдено по заданным фильтрам."
+    },
+    en: {
+      flights: "✈️ Flights",
+      hotels: "🏨 Hotels",
+      sights: "🌍 Places",
+      findFlights: "Search Flights",
+      roundTrip: "Round Trip",
+      departure: "Departure Date",
+      return: "Return Date",
+      hotelResults: "Results:",
+      noHotelsFound: "Nothing found for the selected filters."
+    }
   };
 
-  const hotDeals = [ /* тут твои hotDeals */ ];
-  
+  const hotDeals = [
+    { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
+    { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
+    { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
+    { from: "Берлин", to: "Милан", price: 49, date: "10.05" },
+    { from: "Прага", to: "Амстердам", price: 59, date: "17.05" },
+    { from: "Вена", to: "Лондон", price: 68, date: "22.05" },
+    { from: "Мюнхен", to: "Мадрид", price: 72, date: "29.05" }
+  ];
+
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
     hotDealsContainer.innerHTML = hotDeals.map((deal) => `
@@ -71,9 +99,11 @@ document.addEventListener("DOMContentLoaded", function () {
     ];
 
     const filtered = mockHotels.filter(h =>
-      h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
+      h.price >= minPrice &&
+      h.price <= maxPrice &&
+      h.rating >= minRating
     );
-    
+
     const t = translations[currentLang];
     const resultBlock = document.getElementById("hotelsResult");
     resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
@@ -86,8 +116,8 @@ document.addEventListener("DOMContentLoaded", function () {
       `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
     );
   });
-});
-window.addEventListener("DOMContentLoaded", function () {
-  showTab("hotels");
-});
 
+  // ⬇️ Активируем вкладку "Отели" и скроллим к фильтрам
+  showTab("hotels");
+  document.getElementById("hotelForm")?.scrollIntoView({ behavior: "smooth" });
+});
