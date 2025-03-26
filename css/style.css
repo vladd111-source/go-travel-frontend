@@ -1,33 +1,55 @@
 /* Base styles */
 body {
   font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f7f7f7; /* Можно добавить светлый фон */
 }
 
 /* Кастомные стили без @apply */
 .input {
   width: 100%;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem 1rem; /* Увеличены отступы */
+  margin-bottom: 1rem; /* Добавлены отступы снизу */
   border-radius: 0.75rem;
   border: 1px solid #d1d5db; /* gray-300 */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* shadow-sm */
   font-size: 0.875rem; /* text-sm */
 }
 
+/* Кнопка */
 .btn {
   background-color: #6366f1; /* indigo-500 */
   color: white;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem; /* Увеличены отступы */
   border-radius: 0.75rem;
-  font-size: 0.875rem; /* text-sm */
+  font-size: 1rem; /* Увеличен шрифт */
   font-weight: 600;
   transition: background-color 0.2s ease;
+  width: 100%; /* Кнопка теперь на всю ширину */
 }
 
+/* При наведении на кнопку */
 .btn:hover {
   background-color: #4f46e5; /* indigo-600 */
 }
 
+/* Подписи */
 .label {
-  font-size: 0.875rem; /* text-sm */
+  font-size: 1rem; /* Увеличен шрифт */
   font-weight: 500;
+  margin-bottom: 0.5rem; /* Добавлен отступ снизу */
+  display: block;
+}
+
+/* Для улучшения отображения */
+hr {
+  border: 0;
+  border-top: 1px solid #d1d5db;
+  margin: 1rem 0; /* Увеличен отступ сверху и снизу */
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
 }
