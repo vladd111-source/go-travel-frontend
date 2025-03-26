@@ -48,10 +48,10 @@ document.addEventListener("DOMContentLoaded", function () {
     `).join("");
   }
 
-  window.showTab = function (id) {
-    document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-  };
+window.showTab = function (id) {
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+};
 
   const roundTripCheckbox = document.getElementById("roundTrip");
   if (roundTripCheckbox) {
