@@ -52,8 +52,8 @@ window.showTab = function (id) {
   document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
 };
-};
-  const roundTripCheckbox = document.getElementById("roundTrip");
+
+const roundTripCheckbox = document.getElementById("roundTrip");
   if (roundTripCheckbox) {
     roundTripCheckbox.addEventListener("change", function () {
       const wrapper = document.getElementById("returnDateWrapper");
