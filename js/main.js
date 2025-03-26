@@ -49,10 +49,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 window.showTab = function (id) {
-  // Скрываем все вкладки
   document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-  // Показываем вкладку с нужным id
   document.getElementById(id).classList.remove('hidden');
+};
 };
   const roundTripCheckbox = document.getElementById("roundTrip");
   if (roundTripCheckbox) {
