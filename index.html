@@ -20,7 +20,7 @@
 
     <div class="flex justify-center mb-4 gap-2">
       <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('flights')">✈️ Авиабилеты</button>
-      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('hotels')">🏨 Отели</button>
+     <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('hotels')">🏨 Отели</button>
       <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('sights')">🌍 Места</button>
     </div>
 
@@ -48,13 +48,10 @@
       <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
     </div>
 
-   <div id="hotels" class="tab"> <!-- Уберите hidden -->
+  <div id="hotels" class="tab">
   <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
     <h3 class="text-base font-semibold mb-2">🔎 Фильтры поиска</h3>
-
-    <!-- Поле для ввода города -->
     <input type="text" placeholder="Город" id="hotelCity" class="input" required />
-
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <label class="label block mb-1" for="checkIn">Дата заезда</label>
@@ -65,9 +62,7 @@
         <input type="date" id="checkOut" class="input" />
       </div>
     </div>
-
     <hr class="my-2 border-gray-300" />
-
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <label class="label block mb-1" for="minPrice">Цена от</label>
@@ -78,21 +73,16 @@
         <input type="number" id="maxPrice" class="input" placeholder="до, $" min="0" />
       </div>
     </div>
-
     <div>
       <label class="label block mb-1" for="minRating">Минимальный рейтинг</label>
       <input type="number" id="minRating" class="input" placeholder="например, 8.0" min="0" max="10" step="0.1" />
     </div>
-
     <div>
       <label class="label block mb-1" for="guests">Гостей</label>
       <input type="number" placeholder="Количество гостей" id="guests" min="1" class="input" />
     </div>
-
     <button type="submit" class="btn w-full mt-2">Найти отель</button>
   </form>
-
-  <!-- Результаты поиска отелей -->
   <div id="hotelsResult"></div>
 </div>
     <div id="sights" class="tab hidden">
