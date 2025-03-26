@@ -65,8 +65,35 @@
       
      <h2 class="text-lg font-semibold mt-6">🔥 Горячие предложения</h2>
 <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
-    </div>
 
+    </div>
+<script>
+    const hotDeals = [
+      { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
+      { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
+      { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
+      { from: "Берлин", to: "Милан", price: 49, date: "10.05" },
+      { from: "Прага", to: "Амстердам", price: 59, date: "17.05" },
+      { from: "Вена", to: "Лондон", price: 68, date: "22.05" },
+      { from: "Мюнхен", to: "Мадрид", price: 72, date: "29.05" }
+    ];
+
+    document.getElementById("hotDeals").innerHTML = hotDeals.map(
+      (deal) => `
+        <div class="bg-white p-4 rounded-xl shadow">
+          ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
+          📅 ${deal.date}<br>
+          <span class="text-red-600 font-semibold">$${deal.price}</span><br>
+          <button class="btn mt-2 w-full">Забронировать</button>
+        </div>`
+    ).join("");
+
+    function showTab(id) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    }
+  </script>
+    
     
     <!-- Hotels -->
     <div id="hotels" class="tab hidden">
