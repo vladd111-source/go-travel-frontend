@@ -258,43 +258,65 @@ document.getElementById("hotDeals").innerHTML = hotDeals.map(
     };
 
 <script>
-  function applyTranslations(lang) {
-    const t = translations[lang];
-    document.querySelector('[onclick*="flights"]').textContent = t.flights;
-    document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
-    document.querySelector('[onclick*="sights"]').textContent = t.sights;
-    document.querySelector('button[type="submit"]').textContent = t.findFlights;
-    document.querySelector('label[for="departureDate"]').textContent = t.departure;
-    document.getElementById("returnDateLabel").textContent = t.return;
-    document.getElementById("roundTripText").textContent = t.roundTrip;
-  }
-
   document.addEventListener("DOMContentLoaded", function () {
+    const translations = {
+      ru: {
+        flights: "✈️ Авиабилеты",
+        hotels: "🏨 Отели",
+        sights: "🌍 Места",
+        findFlights: "Найти рейсы",
+        roundTrip: "Туда и обратно",
+        departure: "Дата вылета",
+        return: "Дата возвращения"
+      },
+      en: {
+        flights: "✈️ Flights",
+        hotels: "🏨 Hotels",
+        sights: "🌍 Places",
+        findFlights: "Search Flights",
+        roundTrip: "Round Trip",
+        departure: "Departure Date",
+        return: "Return Date"
+      }
+    };
+
+    function applyTranslations(lang) {
+      const t = translations[lang];
+      document.querySelector('[onclick*="flights"]').textContent = t.flights;
+      document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
+      document.querySelector('[onclick*="sights"]').textContent = t.sights;
+      document.querySelector('button[type="submit"]').textContent = t.findFlights;
+      document.querySelector('label[for="departureDate"]').textContent = t.departure;
+      document.getElementById("returnDateLabel").textContent = t.return;
+      document.getElementById("roundTripText").textContent = t.roundTrip;
+    }
+
     const roundTripCheckbox = document.getElementById("roundTrip");
     const returnDateWrapper = document.getElementById("returnDateWrapper");
     const returnDateInput = document.getElementById("returnDate");
 
-    roundTripCheckbox.addEventListener("change", () => {
-      if (roundTripCheckbox.checked) {
-        returnDateWrapper.classList.remove("hidden");
-        returnDateInput.required = true;
-      } else {
-        returnDateWrapper.classList.add("hidden");
-        returnDateInput.required = false;
-        returnDateInput.value = "";
-      }
-    });
+    if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
+      roundTripCheckbox.addEventListener("change", () => {
+        if (roundTripCheckbox.checked) {
+          returnDateWrapper.classList.remove("hidden");
+          returnDateInput.required = true;
+        } else {
+          returnDateWrapper.classList.add("hidden");
+          returnDateInput.required = false;
+          returnDateInput.value = "";
+        }
+      });
+    }
 
-    // Сразу применяем локализацию по умолчанию
+    // Применяем локализацию по умолчанию
     applyTranslations("ru");
 
     // Обработчик смены языка
-    document.getElementById("langSwitcher").addEventListener("change", (e) => {
+    const langSwitcher = document.getElementById("langSwitcher");
+    langSwitcher.addEventListener("change", (e) => {
       applyTranslations(e.target.value);
     });
   });
 </script>
-
-
 </body>
 </html>
