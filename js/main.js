@@ -118,8 +118,10 @@ hotelForm?.addEventListener("submit", (e) => {
     h.rating >= minRating
   );
 
+  // Локализация
+  const t = translations[currentLang];
+
   // Выводим результаты на экран
-  const t = translations[currentLang]; // Локализация
   const resultBlock = document.getElementById("hotelsResult");
   resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
     filtered.length
