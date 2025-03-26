@@ -26,15 +26,14 @@ const translations = {
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-  const hotDeals = [
-    { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
-    { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
-    { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
-    { from: "Берлин", to: "Милан", price: 49, date: "10.05" },
-    { from: "Прага", to: "Амстердам", price: 59, date: "17.05" },
-    { from: "Вена", to: "Лондон", price: 68, date: "22.05" },
-    { from: "Мюнхен", to: "Мадрид", price: 72, date: "29.05" }
-  ];
+  let currentLang = "ru";
+
+  const translations = {
+    ru: { flights: "✈️ Авиабилеты", hotels: "🏨 Отели", sights: "🌍 Места", findFlights: "Найти рейсы", roundTrip: "Туда и обратно", departure: "Дата вылета", return: "Дата возвращения", hotelResults: "Результаты:", noHotelsFound: "Ничего не найдено по заданным фильтрам." },
+    en: { flights: "✈️ Flights", hotels: "🏨 Hotels", sights: "🌍 Places", findFlights: "Search Flights", roundTrip: "Round Trip", departure: "Departure Date", return: "Return Date", hotelResults: "Results:", noHotelsFound: "Nothing found for the selected filters." }
+  };
+
+  const hotDeals = [ /* тут твои hotDeals */ ];
 
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
@@ -44,28 +43,22 @@ document.addEventListener("DOMContentLoaded", function () {
         📅 ${deal.date}<br>
         <span class="text-red-600 font-semibold">$${deal.price}</span><br>
         <button class="btn mt-2 w-full">Забронировать</button>
-      </div>
-    `).join("");
+      </div>`).join("");
   }
 
-window.showTab = function (id) {
-  document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-};
+  window.showTab = function (id) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+  };
 
-const roundTripCheckbox = document.getElementById("roundTrip");
+  const roundTripCheckbox = document.getElementById("roundTrip");
   if (roundTripCheckbox) {
     roundTripCheckbox.addEventListener("change", function () {
       const wrapper = document.getElementById("returnDateWrapper");
       const input = document.getElementById("returnDate");
-      if (this.checked) {
-        wrapper.classList.remove("hidden");
-        input.required = true;
-      } else {
-        wrapper.classList.add("hidden");
-        input.required = false;
-        input.value = "";
-      }
+      wrapper.classList.toggle("hidden", !this.checked);
+      input.required = this.checked;
+      if (!this.checked) input.value = "";
     });
   }
 
@@ -74,63 +67,50 @@ const roundTripCheckbox = document.getElementById("roundTrip");
     document.querySelector('[onclick*="flights"]').textContent = t.flights;
     document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
     document.querySelector('[onclick*="sights"]').textContent = t.sights;
-    document.querySelector('button[type="submit"]').textContent = t.findFlights;
+    document.querySelector('#search-form button[type="submit"]').textContent = t.findFlights;
     document.querySelector('label[for="departureDate"]').textContent = t.departure;
     document.getElementById("returnDateLabel").textContent = t.return;
     document.getElementById("roundTripText").textContent = t.roundTrip;
   }
 
-  const langSwitcher = document.getElementById("langSwitcher");
-  langSwitcher.addEventListener("change", (e) => {
+  document.getElementById("langSwitcher").addEventListener("change", (e) => {
     currentLang = e.target.value;
     applyTranslations(currentLang);
   });
 
   applyTranslations(currentLang);
-});
 
-const hotelForm = document.getElementById("hotelForm");
-hotelForm?.addEventListener("submit", (e) => {
-  e.preventDefault();
+  const hotelForm = document.getElementById("hotelForm");
+  hotelForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
 
-  // Получаем значения из полей формы
-  const city = document.getElementById("hotelCity").value.trim();
-  const checkIn = document.getElementById("checkIn").value;
-  const checkOut = document.getElementById("checkOut").value;
-  const guests = parseInt(document.getElementById("guests").value, 10);
-  const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
-  const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
-  const minRating = parseFloat(document.getElementById("minRating").value) || 0;
+    const city = document.getElementById("hotelCity").value.trim();
+    const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
+    const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
+    const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
-  // Моковые данные отелей
-  const mockHotels = [
-    { name: "Hotel Sunrise", city, price: 85, rating: 8.9 },
-    { name: "Ocean View", city, price: 120, rating: 9.1 },
-    { name: "Budget Stay", city, price: 40, rating: 7.5 },
-    { name: "Luxury Palace", city, price: 200, rating: 9.8 },
-    { name: "Comfort Inn", city, price: 70, rating: 8.2 },
-  ];
+    const mockHotels = [
+      { name: "Hotel Sunrise", city, price: 85, rating: 8.9 },
+      { name: "Ocean View", city, price: 120, rating: 9.1 },
+      { name: "Budget Stay", city, price: 40, rating: 7.5 },
+      { name: "Luxury Palace", city, price: 200, rating: 9.8 },
+      { name: "Comfort Inn", city, price: 70, rating: 8.2 },
+    ];
 
-  // Фильтруем отели по выбранным фильтрам
-  const filtered = mockHotels.filter(h =>
-    h.price >= minPrice &&
-    h.price <= maxPrice &&
-    h.rating >= minRating
-  );
+    const filtered = mockHotels.filter(h =>
+      h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
+    );
 
-  // Локализация
-  const t = translations[currentLang];
-
-  // Выводим результаты на экран
-  const resultBlock = document.getElementById("hotelsResult");
-  resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-    filtered.length
-      ? filtered.map(hotel => `
+    const t = translations[currentLang];
+    const resultBlock = document.getElementById("hotelsResult");
+    resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+      filtered.length ? filtered.map(hotel => `
         <div class="bg-white border p-4 rounded-xl mb-2">
           <strong>${hotel.name}</strong> (${hotel.city})<br>
           Цена: $${hotel.price} / ночь<br>
           Рейтинг: ${hotel.rating}
-        </div>`).join("")
-      : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-  );
+        </div>`).join("") :
+      `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+    );
+  });
 });
