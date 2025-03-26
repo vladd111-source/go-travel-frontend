@@ -1,30 +1,3 @@
-let currentLang = "ru";
-
-const translations = {
-  ru: {
-    flights: "✈️ Авиабилеты",
-    hotels: "🏨 Отели",
-    sights: "🌍 Места",
-    findFlights: "Найти рейсы",
-    roundTrip: "Туда и обратно",
-    departure: "Дата вылета",
-    return: "Дата возвращения",
-    hotelResults: "Результаты:",
-    noHotelsFound: "Ничего не найдено по заданным фильтрам."
-  },
-  en: {
-    flights: "✈️ Flights",
-    hotels: "🏨 Hotels",
-    sights: "🌍 Places",
-    findFlights: "Search Flights",
-    roundTrip: "Round Trip",
-    departure: "Departure Date",
-    return: "Return Date",
-    hotelResults: "Results:",
-    noHotelsFound: "Nothing found for the selected filters."
-  }
-};
-
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = "ru";
 
