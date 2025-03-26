@@ -93,6 +93,7 @@ const hotelForm = document.getElementById("hotelForm");
 hotelForm?.addEventListener("submit", (e) => {
   e.preventDefault();
 
+  // Получаем значения из полей формы
   const city = document.getElementById("hotelCity").value.trim();
   const checkIn = document.getElementById("checkIn").value;
   const checkOut = document.getElementById("checkOut").value;
@@ -101,6 +102,7 @@ hotelForm?.addEventListener("submit", (e) => {
   const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
   const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
+  // Моковые данные отелей
   const mockHotels = [
     { name: "Hotel Sunrise", city, price: 85, rating: 8.9 },
     { name: "Ocean View", city, price: 120, rating: 9.1 },
@@ -109,13 +111,15 @@ hotelForm?.addEventListener("submit", (e) => {
     { name: "Comfort Inn", city, price: 70, rating: 8.2 },
   ];
 
+  // Фильтруем отели по выбранным фильтрам
   const filtered = mockHotels.filter(h =>
     h.price >= minPrice &&
     h.price <= maxPrice &&
     h.rating >= minRating
   );
 
-  const t = translations[currentLang];
+  // Выводим результаты на экран
+  const t = translations[currentLang]; // Локализация
   const resultBlock = document.getElementById("hotelsResult");
   resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
     filtered.length
