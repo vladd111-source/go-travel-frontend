@@ -1,0 +1,33 @@
+/* Base styles */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Кастомные стили без @apply */
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid #d1d5db; /* gray-300 */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* shadow-sm */
+  font-size: 0.875rem; /* text-sm */
+}
+
+.btn {
+  background-color: #6366f1; /* indigo-500 */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #4f46e5; /* indigo-600 */
+}
+
+.label {
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 500;
+}
