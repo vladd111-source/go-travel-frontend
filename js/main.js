@@ -85,3 +85,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
   applyTranslations("ru");
 });
+// Форма отелей
+const hotelForm = document.getElementById("hotelForm");
+hotelForm?.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const city = document.getElementById("hotelCity").value.trim();
+  const checkIn = document.getElementById("checkIn").value;
+  const checkOut = document.getElementById("checkOut").value;
+  const guests = parseInt(document.getElementById("guests").value, 10);
+  const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
+  const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
+  const minRating = parseFloat(document.getElementById("minRating").value) || 0;
+
+  const mockHotels = [
+    { name: "Hotel Sunrise", city, price: 85, rating: 8.9 },
+    { name: "Ocean View", city, price: 120, rating: 9.1 },
+    { name: "Budget Stay", city, price: 40, rating: 7.5 },
+    { name: "Luxury Palace", city, price: 200, rating: 9.8 },
+    { name: "Comfort Inn", city, price: 70, rating: 8.2 },
+  ];
+
+  const filtered = mockHotels.filter(h =>
+    h.price >= minPrice &&
+    h.price <= maxPrice &&
+    h.rating >= minRating
+  );
+
+  const resultBlock = document.getElementById("hotelsResult");
+  resultBlock.innerHTML = "<h3 class='font-semibold mb-2'>Результаты:</h3>" + (
+    filtered.length
+      ? filtered.map(hotel => `
+          <div class="bg-white border p-4 rounded-xl mb-2">
+            <strong>${hotel.name}</strong> (${hotel.city})<br>
+            Цена: $${hotel.price} / ночь<br>
+            Рейтинг: ${hotel.rating}
+          </div>`).join("")
+      : "<p class='text-sm text-gray-500'>Ничего не найдено по заданным фильтрам.</p>"
+  );
+});
