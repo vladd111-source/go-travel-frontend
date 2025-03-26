@@ -43,7 +43,6 @@
       <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
         <input type="text" name="from" placeholder="Откуда" class="input" required />
         <input type="text" name="to" placeholder="Куда" class="input" required />
-
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="label block mb-1" for="departureDate">Дата вылета</label>
@@ -54,47 +53,16 @@
             <input type="date" name="returnDate" id="returnDate" class="input" />
           </div>
         </div>
-
         <label class="flex items-center gap-2" id="roundTripLabel">
           <input type="checkbox" id="roundTrip" />
           <span id="roundTripText">Туда и обратно</span>
         </label>
-
         <button type="submit" class="btn w-full mt-2">Найти рейсы</button>
       </form>
-      
-     <h2 class="text-lg font-semibold mt-6">🔥 Горячие предложения</h2>
-<div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
-
+      <h2 class="text-lg font-semibold mt-6">🔥 Горячие предложения</h2>
+      <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
     </div>
-<script>
-    const hotDeals = [
-      { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
-      { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
-      { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
-      { from: "Берлин", to: "Милан", price: 49, date: "10.05" },
-      { from: "Прага", to: "Амстердам", price: 59, date: "17.05" },
-      { from: "Вена", to: "Лондон", price: 68, date: "22.05" },
-      { from: "Мюнхен", to: "Мадрид", price: 72, date: "29.05" }
-    ];
 
-    document.getElementById("hotDeals").innerHTML = hotDeals.map(
-      (deal) => `
-        <div class="bg-white p-4 rounded-xl shadow">
-          ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
-          📅 ${deal.date}<br>
-          <span class="text-red-600 font-semibold">$${deal.price}</span><br>
-          <button class="btn mt-2 w-full">Забронировать</button>
-        </div>`
-    ).join("");
-
-    function showTab(id) {
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-    }
-  </script>
-    
-    
     <!-- Hotels -->
     <div id="hotels" class="tab hidden">
       <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-2">
@@ -133,165 +101,83 @@
       </div>
     </div>
   </div>
-
   <script>
-    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-
-    const flights = [
-      { airline: 'Ryanair', from: 'Kyiv', to: 'Lisbon', price: 140, transfers: 1 },
-      { airline: 'WizzAir', from: 'Lviv', to: 'Barcelona', price: 120, transfers: 0 },
-    ];
-
-    function renderFlights(data) {
-      const container = document.getElementById('flights-container');
-      container.innerHTML = '';
-      data.forEach((flight) => {
-        const card = document.createElement('div');
-        card.className = 'bg-white shadow rounded-xl p-4';
-        card.innerHTML = `
-          <div class="flex justify-between items-center mb-1">
-            <span class="text-sm font-semibold">${flight.airline}</span>
-            <span class="text-sm text-indigo-500">$${flight.price}</span>
-          </div>
-          <div class="text-sm">${flight.from} ✈️ ${flight.to}</div>
-          <div class="text-xs text-gray-500">Пересадок: ${flight.transfers}</div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    renderFlights(flights);
-
     const hotDeals = [
-  { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
-  { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
-  { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
-  { from: "Берлин", to: "Милан", price: 49, date: "10.05" },
-  { from: "Прага", to: "Амстердам", price: 59, date: "17.05" },
-  { from: "Вена", to: "Лондон", price: 68, date: "22.05" },
-  { from: "Мюнхен", to: "Мадрид", price: 72, date: "29.05" }
-];
-
-document.getElementById("hotDeals").innerHTML = hotDeals.map(
-  (deal) => `
-    <div class="bg-white p-4 rounded-xl shadow">
-      ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
-      📅 ${deal.date}<br>
-      <span class="text-red-600 font-semibold">$${deal.price}</span><br>
-      <button class="btn mt-2 w-full">Забронировать</button>
-    </div>`
-).join("");
+      { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
+      { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
+      { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
+      { from: "Берлин", to: "Милан", price: 49, date: "10.05" },
+      { from: "Прага", to: "Амстердам", price: 59, date: "17.05" },
+      { from: "Вена", to: "Лондон", price: 68, date: "22.05" },
+      { from: "Мюнхен", to: "Мадрид", price: 72, date: "29.05" }
+    ];
+    document.getElementById("hotDeals").innerHTML = hotDeals.map(
+      (deal) => `
+        <div class="bg-white p-4 rounded-xl shadow">
+          ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
+          📅 ${deal.date}<br>
+          <span class="text-red-600 font-semibold">$${deal.price}</span><br>
+          <button class="btn mt-2 w-full">Забронировать</button>
+        </div>`
+    ).join("");
 
     function showTab(id) {
       document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
       document.getElementById(id).classList.remove('hidden');
     }
 
-    document.getElementById('search-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const from = e.target.from.value;
-      const to = e.target.to.value;
-      const departureDate = document.getElementById("departureDate").value;
-      const returnDate = document.getElementById("returnDate").value;
-      const isRoundTrip = document.getElementById("roundTrip").checked;
-      alert(`Поиск: ${from} → ${to}${isRoundTrip ? ` (обратно ${returnDate})` : ''} на ${departureDate}`);
-    });
-
-    document.getElementById("hotelForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const city = document.getElementById("hotelCity").value;
-      const checkIn = document.getElementById("checkIn").value;
-      const checkOut = document.getElementById("checkOut").value;
-      const guests = document.getElementById("guests").value;
-
-      const mockHotels = [
-        { name: "Hotel Sunrise", price: 85, city, rating: 8.9 },
-        { name: "Ocean View", price: 120, city, rating: 9.1 },
-        { name: "Budget Stay", price: 40, city, rating: 7.5 },
-      ];
-
-      const resultBlock = document.getElementById("hotelsResult");
-      resultBlock.innerHTML = "<h3 class='font-semibold mb-2'>Результаты:</h3>" + mockHotels.map(
-        (hotel) => `
-          <div class="bg-white border p-4 rounded-xl mb-2">
-            <strong>${hotel.name}</strong> (${hotel.city})<br>
-            Цена: $${hotel.price} / ночь<br>
-            Рейтинг: ${hotel.rating}
-          </div>`
-      ).join("");
-    });
-
-    const roundTripCheckbox = document.getElementById("roundTrip");
-    const returnDateInput = document.getElementById("returnDate");
-    const returnDateWrapper = document.getElementById("returnDateWrapper");
-
-    roundTripCheckbox.addEventListener("change", () => {
-      if (roundTripCheckbox.checked) {
-        returnDateWrapper.classList.remove("hidden");
-        returnDateInput.required = true;
+    document.getElementById('roundTrip').addEventListener("change", function () {
+      const wrapper = document.getElementById("returnDateWrapper");
+      const input = document.getElementById("returnDate");
+      if (this.checked) {
+        wrapper.classList.remove("hidden");
+        input.required = true;
       } else {
-        returnDateWrapper.classList.add("hidden");
-        returnDateInput.required = false;
-        returnDateInput.value = "";
+        wrapper.classList.add("hidden");
+        input.required = false;
+        input.value = "";
       }
     });
-    
-  document.addEventListener("DOMContentLoaded", function () {
-    const translations = {
-      ru: {
-        flights: "✈️ Авиабилеты",
-        hotels: "🏨 Отели",
-        sights: "🌍 Места",
-        findFlights: "Найти рейсы",
-        roundTrip: "Туда и обратно",
-        departure: "Дата вылета",
-        return: "Дата возвращения"
-      },
-      en: {
-        flights: "✈️ Flights",
-        hotels: "🏨 Hotels",
-        sights: "🌍 Places",
-        findFlights: "Search Flights",
-        roundTrip: "Round Trip",
-        departure: "Departure Date",
-        return: "Return Date"
-      }
-    };
 
-    function applyTranslations(lang) {
-      const t = translations[lang];
-      document.querySelector('[onclick*="flights"]').textContent = t.flights;
-      document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
-      document.querySelector('[onclick*="sights"]').textContent = t.sights;
-      document.querySelector('button[type="submit"]').textContent = t.findFlights;
-      document.querySelector('label[for="departureDate"]').textContent = t.departure;
-      document.getElementById("returnDateLabel").textContent = t.return;
-      document.getElementById("roundTripText").textContent = t.roundTrip;
-    }
-
-    const roundTripCheckbox = document.getElementById("roundTrip");
-    const returnDateWrapper = document.getElementById("returnDateWrapper");
-    const returnDateInput = document.getElementById("returnDate");
-
-    if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
-      roundTripCheckbox.addEventListener("change", () => {
-        if (roundTripCheckbox.checked) {
-          returnDateWrapper.classList.remove("hidden");
-          returnDateInput.required = true;
-        } else {
-          returnDateWrapper.classList.add("hidden");
-          returnDateInput.required = false;
-          returnDateInput.value = "";
+    document.addEventListener("DOMContentLoaded", function () {
+      const translations = {
+        ru: {
+          flights: "✈️ Авиабилеты",
+          hotels: "🏨 Отели",
+          sights: "🌍 Места",
+          findFlights: "Найти рейсы",
+          roundTrip: "Туда и обратно",
+          departure: "Дата вылета",
+          return: "Дата возвращения"
+        },
+        en: {
+          flights: "✈️ Flights",
+          hotels: "🏨 Hotels",
+          sights: "🌍 Places",
+          findFlights: "Search Flights",
+          roundTrip: "Round Trip",
+          departure: "Departure Date",
+          return: "Return Date"
         }
+      };
+
+      function applyTranslations(lang) {
+        const t = translations[lang];
+        document.querySelector('[onclick*="flights"]').textContent = t.flights;
+        document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
+        document.querySelector('[onclick*="sights"]').textContent = t.sights;
+        document.querySelector('button[type="submit"]').textContent = t.findFlights;
+        document.querySelector('label[for="departureDate"]').textContent = t.departure;
+        document.getElementById("returnDateLabel").textContent = t.return;
+        document.getElementById("roundTripText").textContent = t.roundTrip;
+      }
+
+      document.getElementById("langSwitcher").addEventListener("change", (e) => {
+        applyTranslations(e.target.value);
       });
-    }
 
-    applyTranslations("ru");
-
-    document.getElementById("langSwitcher").addEventListener("change", (e) => {
-      applyTranslations(e.target.value);
+      applyTranslations("ru");
     });
-  });
-</script>
+  </script>
 </body>
 </html>
