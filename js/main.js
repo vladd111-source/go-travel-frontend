@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   const hotDeals = [ /* тут твои hotDeals */ ];
-
+  
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
     hotDealsContainer.innerHTML = hotDeals.map((deal) => `
