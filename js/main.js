@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const filtered = mockHotels.filter(h =>
       h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
     );
-
+    
     const t = translations[currentLang];
     const resultBlock = document.getElementById("hotelsResult");
     resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
