@@ -256,7 +256,7 @@ document.getElementById("hotDeals").innerHTML = hotDeals.map(
         return: "Return Date"
       }
     };
-
+<script>
   document.addEventListener("DOMContentLoaded", function () {
     const translations = {
       ru: {
@@ -307,12 +307,9 @@ document.getElementById("hotDeals").innerHTML = hotDeals.map(
       });
     }
 
-    // Применяем локализацию по умолчанию
     applyTranslations("ru");
 
-    // Обработчик смены языка
-    const langSwitcher = document.getElementById("langSwitcher");
-    langSwitcher.addEventListener("change", (e) => {
+    document.getElementById("langSwitcher").addEventListener("change", (e) => {
       applyTranslations(e.target.value);
     });
   });
