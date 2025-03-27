@@ -1,5 +1,7 @@
+
+// ✅ Исправленный main.js (Go Travel)
 document.addEventListener("DOMContentLoaded", function () {
-  let currentLang = "ru";
+  let currentLang = localStorage.getItem("lang") || "ru";
 
   const translations = {
     ru: {
@@ -78,11 +80,27 @@ document.addEventListener("DOMContentLoaded", function () {
     Telegram.WebApp.ready();
     const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
     console.log("👤 Telegram ID:", userId);
-    window.showTab = function (id) {
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-      trackEvent("Переключение вкладки", id);
-    };
+  }
+
+  window.showTab = function (id) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    localStorage.setItem("activeTab", id);
+    trackEvent("Переключение вкладки", id);
+  };
+
+  document.getElementById("langSwitcher").value = currentLang;
+  document.getElementById("langSwitcher").addEventListener("change", (e) => {
+    currentLang = e.target.value;
+    localStorage.setItem("lang", currentLang);
+    applyTranslations(currentLang);
+    trackEvent("Смена языка", currentLang);
+  });
+
+  applyTranslations(currentLang);
+  const savedTab = localStorage.getItem("activeTab") || "flights";
+  showTab(savedTab);
+});
   } else {
     window.showTab = function (id) {
       document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
