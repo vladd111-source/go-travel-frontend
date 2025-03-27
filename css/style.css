@@ -1,52 +1,43 @@
+/* style.css */
+
 /* Базовые стили */
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f7f7f7;
-  color: #111827; /* dark-gray text */
 }
 
 /* Поля ввода */
 .input {
   width: 100%;
   padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
   border-radius: 0.75rem;
-  border: 1px solid #d1d5db; /* gray-300 */
-  font-size: 0.875rem;
-  background-color: white;
+  border: 1px solid #d1d5db;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-size: 0.875rem;
 }
 
-.input:focus {
-  outline: none;
-  border-color: #6366f1; /* indigo-500 */
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-}
-
-/* Кнопки */
+/* Кнопка */
 .btn {
-  background-color: #6366f1; /* indigo-500 */
+  background-color: #6366f1;
   color: white;
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
   font-size: 1rem;
   font-weight: 600;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: background-color 0.2s ease;
   width: 100%;
-  cursor: pointer;
-  border: none;
 }
 
 .btn:hover {
-  background-color: #4f46e5; /* indigo-600 */
-  transform: translateY(-1px);
+  background-color: #4f46e5;
 }
 
 /* Активная вкладка */
 .tab-btn.bg-blue-100 {
-  background-color: #bfdbfe; /* light-blue */
+  background-color: #bfdbfe;
 }
 
 /* Подписи */
@@ -55,7 +46,6 @@ body {
   font-weight: 500;
   margin-bottom: 0.5rem;
   display: block;
-  color: #374151; /* gray-700 */
 }
 
 /* Разделитель */
@@ -73,7 +63,7 @@ hr {
 
 /* Спиннер */
 .loader {
-  border: 4px solid #60a5fa; /* blue-400 */
+  border: 4px solid #60a5fa;
   border-top: 4px solid transparent;
   border-radius: 50%;
   width: 24px;
@@ -82,22 +72,7 @@ hr {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Мобильная адаптивность (по желанию) */
-@media (max-width: 640px) {
-  .btn {
-    font-size: 0.9rem;
-    padding: 0.65rem 1rem;
-  }
-
-  .input {
-    font-size: 0.85rem;
-    padding: 0.6rem 0.9rem;
-  }
-
-  .label {
-    font-size: 0.9rem;
+  to {
+    transform: rotate(360deg);
   }
 }
