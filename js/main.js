@@ -88,19 +88,21 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("👤 Telegram ID:", userId);
   }
 
- window.showTab = function (id) {
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.classList.remove('active');
-    tab.classList.add('hidden'); // 🛠️ Добавляем обратно hidden
+window.showTab = function (id) {
+  const allTabs = document.querySelectorAll('.tab');
+  const allButtons = document.querySelectorAll('.tab-btn');
+
+  allTabs.forEach(tab => {
+    tab.style.display = 'none'; // скрываем все вкладки
   });
 
-  const selected = document.getElementById(id);
-  selected.classList.remove('hidden'); // ✅ Показываем вкладку
-  requestAnimationFrame(() => {
-    selected.classList.add('active');
-  });
+  const selectedTab = document.getElementById(id);
+  if (selectedTab) {
+    selectedTab.style.display = 'block'; // показываем нужную
+  }
 
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+  allButtons.forEach(btn => btn.classList.remove('bg-blue-100'));
+
   const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
   activeBtn?.classList.add('bg-blue-100');
 
