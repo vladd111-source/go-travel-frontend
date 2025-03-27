@@ -21,6 +21,7 @@ body {
 
 /* Кнопка */
 .btn {
+  
   background-color: #6366f1;
   color: white;
   padding: 0.75rem 1rem;
@@ -33,6 +34,9 @@ body {
 
 .btn:hover {
   background-color: #4f46e5;
+}
+.tab-btn.bg-blue-100 {
+  background-color: #bfdbfe; /* light blue */
 }
 
 /* Подписи */
