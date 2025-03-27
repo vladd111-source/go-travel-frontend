@@ -1,3 +1,4 @@
+
 // ✅ Go Travel — main.js с полной структурой и без ошибок
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
@@ -88,27 +89,27 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("👤 Telegram ID:", userId);
   }
 
-window.showTab = function (id) {
-  const allTabs = document.querySelectorAll('.tab');
-  const allButtons = document.querySelectorAll('.tab-btn');
+  window.showTab = function (id) {
+    const allTabs = document.querySelectorAll('.tab');
+    const allButtons = document.querySelectorAll('.tab-btn');
 
-  allTabs.forEach(tab => {
-    tab.style.display = 'none'; // скрываем все вкладки
-  });
+    allTabs.forEach(tab => {
+      tab.style.display = 'none';
+    });
 
-  const selectedTab = document.getElementById(id);
-  if (selectedTab) {
-    selectedTab.style.display = 'block'; // показываем нужную
-  }
+    const selectedTab = document.getElementById(id);
+    if (selectedTab) {
+      selectedTab.style.display = 'block';
+    }
 
-  allButtons.forEach(btn => btn.classList.remove('bg-blue-100'));
+    allButtons.forEach(btn => btn.classList.remove('bg-blue-100'));
 
-  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
-  activeBtn?.classList.add('bg-blue-100');
+    const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+    activeBtn?.classList.add('bg-blue-100');
 
-  localStorage.setItem("activeTab", id);
-  trackEvent("Переключение вкладки", id);
-};
+    localStorage.setItem("activeTab", id);
+    trackEvent("Переключение вкладки", id);
+  };
 
   document.getElementById("langSwitcher").value = currentLang;
   document.getElementById("langSwitcher").addEventListener("change", (e) => {
