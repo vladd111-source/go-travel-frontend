@@ -185,27 +185,32 @@ hotelForm?.addEventListener("submit", (e) => {
     { name: "Comfort Inn", city, price: 70, rating: 8.2 },
   ];
 
-  const filtered = mockHotels.filter(h =>
-    h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
-  );
+const filtered = mockHotels.filter(h =>
+  h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
+);
 
-  const t = translations[currentLang];
-  const resultBlock = document.getElementById("hotelsResult");
-  resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-    filtered.length ? filtered.map(hotel => `
-      <div class="bg-white border p-4 rounded-xl mb-2">
-        <strong>${hotel.name}</strong> (${hotel.city})<br>
-        Цена: $${hotel.price} / ночь<br>
-        Рейтинг: ${hotel.rating}<br>
-        <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
-      </div>`).join("") :
-    `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-  );
+const t = translations[currentLang];
+const resultBlock = document.getElementById("hotelsResult");
+resultBlock.classList.remove("visible"); // 👈 Сначала убираем эффект
 
-  // 📊 Отслеживание события
-  trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
-  
-  hideLoading(); // ✅ спрятать спиннер
+resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+  filtered.length ? filtered.map(hotel => `
+    <div class="card bg-white border p-4 rounded-xl mb-2">
+      <strong>${hotel.name}</strong> (${hotel.city})<br>
+      Цена: $${hotel.price} / ночь<br>
+      Рейтинг: ${hotel.rating}<br>
+      <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
+    </div>`).join("") :
+  `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+);
+
+// 👇 Добавим плавное появление после задержки
+setTimeout(() => {
+  resultBlock.classList.add("visible");
+}, 50);
+
+trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
+hideLoading();
   });
 
   const flightForm = document.getElementById("search-form");
