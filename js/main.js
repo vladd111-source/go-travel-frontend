@@ -47,6 +47,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
+  function showLoading() {
+  document.getElementById("loadingSpinner")?.classList.remove("hidden");
+}
+function hideLoading() {
+  document.getElementById("loadingSpinner")?.classList.add("hidden");
+}
+
   function trackEvent(name, data = "") {
     const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${data}` : "");
     console.log(message);
