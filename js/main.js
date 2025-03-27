@@ -153,8 +153,10 @@ function hideLoading() {
   }
 
   const hotelForm = document.getElementById("hotelForm");
-  hotelForm?.addEventListener("submit", (e) => {
-    e.preventDefault();
+ hotelForm?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  showLoading(); // 🔄 показать спиннер
+
 
     const city = document.getElementById("hotelCity").value.trim();
     const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
@@ -167,24 +169,27 @@ function hideLoading() {
       { name: "Budget Stay", city, price: 40, rating: 7.5 },
       { name: "Luxury Palace", city, price: 200, rating: 9.8 },
       { name: "Comfort Inn", city, price: 70, rating: 8.2 },
-    ];
+   ];
 
-    const filtered = mockHotels.filter(h =>
-      h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
-    );
+  const filtered = mockHotels.filter(h =>
+    h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
+  );
 
-    const t = translations[currentLang];
-    const resultBlock = document.getElementById("hotelsResult");
-    resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-      filtered.length ? filtered.map(hotel => `
-        <div class="bg-white border p-4 rounded-xl mb-2">
-          <strong>${hotel.name}</strong> (${hotel.city})<br>
-          Цена: $${hotel.price} / ночь<br>
-          Рейтинг: ${hotel.rating}<br>
-          <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
-        </div>`).join("") :
-      `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-    );
+  const t = translations[currentLang];
+  const resultBlock = document.getElementById("hotelsResult");
+  resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+    filtered.length ? filtered.map(hotel => `
+      <div class="bg-white border p-4 rounded-xl mb-2">
+        <strong>${hotel.name}</strong> (${hotel.city})<br>
+        Цена: $${hotel.price} / ночь<br>
+        Рейтинг: ${hotel.rating}<br>
+        <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
+      </div>`).join("") :
+    `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+  );
+
+  hideLoading(); // ✅ спрятать спиннер
+});
 
     trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
   });
