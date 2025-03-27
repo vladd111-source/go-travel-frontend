@@ -47,6 +47,11 @@ body {
   transform: translateY(0);
 }
 
+/* Фикс отображения вкладки */
+.tab:not(.hidden) {
+  display: block;
+}
+
 /* Активная кнопка вкладки */
 .tab-btn.bg-blue-100 {
   background-color: #bfdbfe;
