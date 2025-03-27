@@ -138,7 +138,13 @@ window.bookFlight = function (from, to, date, price) {
       if (!this.checked) input.value = "";
     });
   }
-
+window.bookHotel = function (name, city, price, rating) {
+  const message = `🏨 *${name}*\n📍 ${city}\n💵 $${price}\n⭐ ${rating}`;
+  trackEvent("Клик по брони (отель)", `${name} в ${city}, $${price}`);
+  if (window.Telegram && Telegram.WebApp) {
+    Telegram.WebApp.sendData(message);
+  }
+};
   const hotelForm = document.getElementById("hotelForm");
   hotelForm?.addEventListener("submit", (e) => {
     e.preventDefault();
