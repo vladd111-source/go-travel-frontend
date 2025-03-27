@@ -191,9 +191,6 @@ hotelForm?.addEventListener("submit", (e) => {
   trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
   
   hideLoading(); // ✅ спрятать спиннер
-});
-
-    trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
   });
 
   const flightForm = document.getElementById("search-form");
