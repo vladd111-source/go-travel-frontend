@@ -30,56 +30,24 @@ body {
   transition: background-color 0.2s ease;
   width: 100%;
 }
+.btn:hover {
+  background-color: #4f46e5;
+}
 
+/* Вкладки */
 .tab {
   transition: opacity 0.3s ease, transform 0.3s ease;
   opacity: 0;
   transform: translateY(10px);
   display: none;
 }
-.card {
-  opacity: 0;
-  transform: translateY(10px);
-  animation: fadeInUp 0.4s ease forwards;
-}
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.card:nth-child(1) { animation-delay: 0.05s; }
-.card:nth-child(2) { animation-delay: 0.1s; }
-.card:nth-child(3) { animation-delay: 0.15s; }
-.card:nth-child(4) { animation-delay: 0.2s; }
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  #hotelsResult {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-#hotelsResult.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 .tab.active {
   display: block;
   opacity: 1;
   transform: translateY(0);
 }
-.btn:hover {
-  background-color: #4f46e5;
-}
 
-/* Активная вкладка */
+/* Активная кнопка вкладки */
 .tab-btn.bg-blue-100 {
   background-color: #bfdbfe;
 }
@@ -103,6 +71,35 @@ hr {
 .grid {
   display: grid;
   gap: 1rem;
+}
+
+/* Карточки */
+.card {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInUp 0.4s ease forwards;
+}
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.15s; }
+.card:nth-child(4) { animation-delay: 0.2s; }
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Результаты с плавным появлением */
+#hotelsResult {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+#hotelsResult.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Спиннер */
