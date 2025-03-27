@@ -89,10 +89,19 @@ function hideLoading() {
   }
 
   window.showTab = function (id) {
-  document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.remove('active');
+    tab.style.display = "none";
+  });
 
-  // Обновляем активную кнопку
+  const selected = document.getElementById(id);
+  selected.style.display = "block";
+
+  // Немного задержим, чтобы применился transition
+  requestAnimationFrame(() => {
+    selected.classList.add('active');
+  });
+
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
   const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
   activeBtn?.classList.add('bg-blue-100');
