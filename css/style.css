@@ -31,6 +31,18 @@ body {
   width: 100%;
 }
 
+.tab {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 0;
+  transform: translateY(10px);
+  display: none;
+}
+
+.tab.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
 .btn:hover {
   background-color: #4f46e5;
 }
