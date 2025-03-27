@@ -101,22 +101,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const savedTab = localStorage.getItem("activeTab") || "flights";
   showTab(savedTab);
 });
-  } else {
-    window.showTab = function (id) {
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
-      document.querySelector(`[onclick*="${id}"]`).classList.add('bg-blue-100');
-    };
-  }
-
-  applyTranslations(currentLang);
-
-  document.getElementById("langSwitcher").addEventListener("change", (e) => {
-    currentLang = e.target.value;
-    applyTranslations(currentLang);
-    trackEvent("Смена языка", currentLang);
-  });
 
   const hotDeals = [
     { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
