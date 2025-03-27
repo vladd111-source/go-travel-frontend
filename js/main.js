@@ -1,5 +1,4 @@
-
-// ✅ Исправленный main.js (Go Travel)
+// ✅ Go Travel — main.js с полной структурой и без ошибок
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
@@ -96,11 +95,6 @@ document.addEventListener("DOMContentLoaded", function () {
     applyTranslations(currentLang);
     trackEvent("Смена языка", currentLang);
   });
-
-  applyTranslations(currentLang);
-  const savedTab = localStorage.getItem("activeTab") || "flights";
-  showTab(savedTab);
-});
 
   const hotDeals = [
     { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
@@ -211,5 +205,7 @@ document.addEventListener("DOMContentLoaded", function () {
     trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
   });
 
-  showTab("flights");
+  // 🟢 Показать вкладку после инициализации
+  const savedTab = localStorage.getItem("activeTab") || "flights";
+  showTab(savedTab);
 });
