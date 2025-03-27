@@ -93,13 +93,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   applyTranslations(currentLang);
+
   document.getElementById("langSwitcher").addEventListener("change", (e) => {
     currentLang = e.target.value;
     applyTranslations(currentLang);
     trackEvent("Смена языка", currentLang);
   });
-
-  const t = translations[currentLang]; // для hotDeals
 
   const hotDeals = [
     { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
@@ -110,23 +109,34 @@ document.addEventListener("DOMContentLoaded", function () {
     { from: "Вена", to: "Лондон", price: 68, date: "22.05" },
     { from: "Мюнхен", to: "Мадрид", price: 72, date: "29.05" }
   ];
-window.bookFlight = function (from, to, date, price) {
-  const message = `✈️ *Рейс из ${from} в ${to}*\n📅 ${date}\n💵 $${price}`;
-  trackEvent("Клик по брони (рейс)", `${from} → ${to}, $${price}`);
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.sendData(message);
-  }
-};
+
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
+    const t = translations[currentLang];
     hotDealsContainer.innerHTML = hotDeals.map((deal) => `
       <div class="bg-white p-4 rounded-xl shadow">
-    ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
-    📅 ${deal.date}<br>
-    <span class="text-red-600 font-semibold">$${deal.price}</span><br>
-    <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
-  </div>`).join("");
+        ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
+        📅 ${deal.date}<br>
+        <span class="text-red-600 font-semibold">$${deal.price}</span><br>
+        <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
+      </div>`).join("");
   }
+
+  window.bookFlight = function (from, to, date, price) {
+    const message = `✈️ *Рейс из ${from} в ${to}*\n📅 ${date}\n💵 $${price}`;
+    trackEvent("Клик по брони (рейс)", `${from} → ${to}, $${price}`);
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.sendData(message);
+    }
+  };
+
+  window.bookHotel = function (name, city, price, rating) {
+    const message = `🏨 *${name}*\n📍 ${city}\n💵 $${price}\n⭐ ${rating}`;
+    trackEvent("Клик по брони (отель)", `${name} в ${city}, $${price}`);
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.sendData(message);
+    }
+  };
 
   const roundTripCheckbox = document.getElementById("roundTrip");
   if (roundTripCheckbox) {
@@ -138,13 +148,7 @@ window.bookFlight = function (from, to, date, price) {
       if (!this.checked) input.value = "";
     });
   }
-window.bookHotel = function (name, city, price, rating) {
-  const message = `🏨 *${name}*\n📍 ${city}\n💵 $${price}\n⭐ ${rating}`;
-  trackEvent("Клик по брони (отель)", `${name} в ${city}, $${price}`);
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.sendData(message);
-  }
-};
+
   const hotelForm = document.getElementById("hotelForm");
   hotelForm?.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -163,18 +167,8 @@ window.bookHotel = function (name, city, price, rating) {
     ];
 
     const filtered = mockHotels.filter(h =>
-      h.price >= minPrice &&
-      h.price <= maxPrice &&
-      h.rating >= minRating
+      h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
     );
-
-    if (window.Telegram && Telegram.WebApp && filtered[0]) {
-      const h = filtered[0];
-      const msg = `🏨 ${h.name}\n📍 Город: ${h.city}\n💵 Цена: $${h.price}\n⭐ Рейтинг: ${h.rating}`;
-      Telegram.WebApp.sendData(msg);
-    }
-
-    trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
 
     const t = translations[currentLang];
     const resultBlock = document.getElementById("hotelsResult");
@@ -183,10 +177,13 @@ window.bookHotel = function (name, city, price, rating) {
         <div class="bg-white border p-4 rounded-xl mb-2">
           <strong>${hotel.name}</strong> (${hotel.city})<br>
           Цена: $${hotel.price} / ночь<br>
-          Рейтинг: ${hotel.rating}
+          Рейтинг: ${hotel.rating}<br>
+          <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
         </div>`).join("") :
       `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
     );
+
+    trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
   });
 
   const flightForm = document.getElementById("search-form");
@@ -204,8 +201,8 @@ window.bookHotel = function (name, city, price, rating) {
       date: departureDate
     };
 
+    const msg = `✈️ Лучший рейс\n🛫 ${bestFlight.from} → 🛬 ${bestFlight.to}\n📅 ${bestFlight.date}\n💰 $${bestFlight.price}`;
     if (window.Telegram && Telegram.WebApp) {
-      const msg = `✈️ Лучший рейс\n🛫 ${bestFlight.from} → 🛬 ${bestFlight.to}\n📅 ${bestFlight.date}\n💰 $${bestFlight.price}`;
       Telegram.WebApp.sendData(msg);
     }
 
