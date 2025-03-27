@@ -1,5 +1,3 @@
-/* style.css */
-
 /* Базовые стили */
 body {
   font-family: 'Inter', sans-serif;
@@ -34,22 +32,17 @@ body {
   background-color: #4f46e5;
 }
 
-/* Вкладки */
+/* Вкладки (изначально скрыты) */
 .tab {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  display: none;
   opacity: 0;
   transform: translateY(10px);
-  display: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .tab.active {
   display: block;
   opacity: 1;
   transform: translateY(0);
-}
-
-/* Фикс отображения вкладки */
-.tab:not(.hidden) {
-  display: block;
 }
 
 /* Активная кнопка вкладки */
@@ -96,7 +89,7 @@ hr {
   }
 }
 
-/* Результаты с плавным появлением */
+/* Результаты отелей с плавным появлением */
 #hotelsResult {
   opacity: 0;
   transform: translateY(10px);
