@@ -7,22 +7,14 @@
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Шрифт -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- Telegram SDK -->
+  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <link rel="stylesheet" href="css/style.css">
-  <style>
-    .loader {
-      border-radius: 50%;
-      border-top-color: transparent;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
+  <!-- Стили -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4 font-[Inter]">
@@ -48,11 +40,11 @@
         <input type="text" name="to" placeholder="Куда" class="input" required />
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="label block mb-1" for="departureDate">Дата вылета</label>
+            <label class="label" for="departureDate">Дата вылета</label>
             <input type="date" name="departureDate" id="departureDate" class="input" required />
           </div>
           <div id="returnDateWrapper" class="hidden">
-            <label class="label block mb-1" for="returnDate" id="returnDateLabel">Дата возвращения</label>
+            <label class="label" for="returnDate" id="returnDateLabel">Дата возвращения</label>
             <input type="date" name="returnDate" id="returnDate" class="input" />
           </div>
         </div>
@@ -60,7 +52,7 @@
           <input type="checkbox" id="roundTrip" />
           <span id="roundTripText">Туда и обратно</span>
         </label>
-        <button type="submit" class="btn w-full mt-2">Найти рейсы</button>
+        <button type="submit" class="btn">Найти рейсы</button>
       </form>
       <h2 class="text-lg font-semibold mt-6">🔥 Горячие предложения</h2>
       <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
@@ -73,34 +65,34 @@
         <input type="text" placeholder="Город" id="hotelCity" class="input" required />
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="label block mb-1" for="checkIn">Дата заезда</label>
+            <label class="label" for="checkIn">Дата заезда</label>
             <input type="date" id="checkIn" class="input" />
           </div>
           <div>
-            <label class="label block mb-1" for="checkOut">Дата выезда</label>
+            <label class="label" for="checkOut">Дата выезда</label>
             <input type="date" id="checkOut" class="input" />
           </div>
         </div>
-        <hr class="my-2 border-gray-300" />
+        <hr />
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="label block mb-1" for="minPrice">Цена от</label>
+            <label class="label" for="minPrice">Цена от</label>
             <input type="number" id="minPrice" class="input" placeholder="от, $" min="0" />
           </div>
           <div>
-            <label class="label block mb-1" for="maxPrice">Цена до</label>
+            <label class="label" for="maxPrice">Цена до</label>
             <input type="number" id="maxPrice" class="input" placeholder="до, $" min="0" />
           </div>
         </div>
         <div>
-          <label class="label block mb-1" for="minRating">Минимальный рейтинг</label>
+          <label class="label" for="minRating">Минимальный рейтинг</label>
           <input type="number" id="minRating" class="input" placeholder="например, 8.0" min="0" max="10" step="0.1" />
         </div>
         <div>
-          <label class="label block mb-1" for="guests">Гостей</label>
-          <input type="number" placeholder="Количество гостей" id="guests" min="1" class="input" />
+          <label class="label" for="guests">Гостей</label>
+          <input type="number" id="guests" class="input" min="1" placeholder="Количество гостей" />
         </div>
-        <button type="submit" class="btn w-full mt-2">Найти отель</button>
+        <button type="submit" class="btn">Найти отель</button>
       </form>
       <div id="hotelsResult"></div>
     </div>
