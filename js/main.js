@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = "ru";
 
@@ -21,7 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
       priceFrom: "Цена от",
       priceTo: "Цена до",
       ratingMin: "Минимальный рейтинг",
-      findHotel: "Найти отель"
+      findHotel: "Найти отель",
+      bookNow: "Забронировать"
     },
     en: {
       flights: "✈️ Flights",
@@ -41,7 +41,8 @@ document.addEventListener("DOMContentLoaded", function () {
       priceFrom: "Price from",
       priceTo: "Price to",
       ratingMin: "Min Rating",
-      findHotel: "Find Hotel"
+      findHotel: "Find Hotel",
+      bookNow: "Book Now"
     }
   };
 
@@ -86,6 +87,8 @@ document.addEventListener("DOMContentLoaded", function () {
     window.showTab = function (id) {
       document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
       document.getElementById(id).classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+      document.querySelector(`[onclick*="${id}"]`).classList.add('bg-blue-100');
     };
   }
 
@@ -95,6 +98,8 @@ document.addEventListener("DOMContentLoaded", function () {
     applyTranslations(currentLang);
     trackEvent("Смена языка", currentLang);
   });
+
+  const t = translations[currentLang]; // для hotDeals
 
   const hotDeals = [
     { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
@@ -113,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
         📅 ${deal.date}<br>
         <span class="text-red-600 font-semibold">$${deal.price}</span><br>
-        <button class="btn mt-2 w-full">Забронировать</button>
+        <button class="btn mt-2 w-full" onclick="trackEvent('Клик по брони', '🔥 ${deal.from} → ${deal.to}')">${t.bookNow}</button>
       </div>`).join("");
   }
 
@@ -195,6 +200,5 @@ document.addEventListener("DOMContentLoaded", function () {
     trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
   });
 
-  // По умолчанию показываем вкладку с рейсами
   showTab("flights");
 });
