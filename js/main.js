@@ -152,24 +152,23 @@ function hideLoading() {
     });
   }
 
-  const hotelForm = document.getElementById("hotelForm");
- hotelForm?.addEventListener("submit", (e) => {
+ const hotelForm = document.getElementById("hotelForm");
+hotelForm?.addEventListener("submit", (e) => {
   e.preventDefault();
   showLoading(); // 🔄 показать спиннер
 
+  const city = document.getElementById("hotelCity").value.trim();
+  const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
+  const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
+  const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
-    const city = document.getElementById("hotelCity").value.trim();
-    const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
-    const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
-    const minRating = parseFloat(document.getElementById("minRating").value) || 0;
-
-    const mockHotels = [
-      { name: "Hotel Sunrise", city, price: 85, rating: 8.9 },
-      { name: "Ocean View", city, price: 120, rating: 9.1 },
-      { name: "Budget Stay", city, price: 40, rating: 7.5 },
-      { name: "Luxury Palace", city, price: 200, rating: 9.8 },
-      { name: "Comfort Inn", city, price: 70, rating: 8.2 },
-   ];
+  const mockHotels = [
+    { name: "Hotel Sunrise", city, price: 85, rating: 8.9 },
+    { name: "Ocean View", city, price: 120, rating: 9.1 },
+    { name: "Budget Stay", city, price: 40, rating: 7.5 },
+    { name: "Luxury Palace", city, price: 200, rating: 9.8 },
+    { name: "Comfort Inn", city, price: 70, rating: 8.2 },
+  ];
 
   const filtered = mockHotels.filter(h =>
     h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
@@ -188,6 +187,9 @@ function hideLoading() {
     `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
   );
 
+  // 📊 Отслеживание события
+  trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
+  
   hideLoading(); // ✅ спрятать спиннер
 });
 
