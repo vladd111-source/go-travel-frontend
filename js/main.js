@@ -118,6 +118,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ⬇️ Активируем вкладку "Отели" и скроллим к фильтрам
-  showTab("hotels");
-  document.getElementById("hotelForm")?.scrollIntoView({ behavior: "smooth" });
+  showTab("flights");
+ // document.getElementById("hotelForm")?.scrollIntoView({ behavior: "smooth" });
 });
