@@ -1,5 +1,4 @@
-
-// ✅ Go Travel — main.js с полной структурой и без ошибок
+// ✅ Go Travel — main.js с корректной работой вкладок
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
@@ -89,14 +88,17 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("👤 Telegram ID:", userId);
   }
 
+  // 🔁 Показываем нужную вкладку
   window.showTab = function (id) {
     document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
       tab.classList.add('hidden');
     });
 
     const selectedTab = document.getElementById(id);
     if (selectedTab) {
       selectedTab.classList.remove('hidden');
+      selectedTab.classList.add('active');
     }
 
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
@@ -107,6 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
     trackEvent("Переключение вкладки", id);
   };
 
+  // 🔁 Язык
   document.getElementById("langSwitcher").value = currentLang;
   document.getElementById("langSwitcher").addEventListener("change", (e) => {
     currentLang = e.target.value;
@@ -115,6 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
     trackEvent("Смена языка", currentLang);
   });
 
+  // 🔥 Горячие предложения
   const hotDeals = [
     { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
     { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
@@ -153,6 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
+  // Чекбокс "туда и обратно"
   const roundTripCheckbox = document.getElementById("roundTrip");
   if (roundTripCheckbox) {
     roundTripCheckbox.addEventListener("change", function () {
@@ -164,6 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // 🏨 Поиск отелей
   const hotelForm = document.getElementById("hotelForm");
   hotelForm?.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -209,6 +215,7 @@ document.addEventListener("DOMContentLoaded", function () {
     hideLoading();
   });
 
+  // ✈️ Поиск рейсов
   const flightForm = document.getElementById("search-form");
   flightForm?.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -232,6 +239,7 @@ document.addEventListener("DOMContentLoaded", function () {
     trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
   });
 
+  // 🟢 Показать сохраненную вкладку
   const savedTab = localStorage.getItem("activeTab") || "flights";
   showTab(savedTab);
 });
