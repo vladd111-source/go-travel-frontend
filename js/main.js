@@ -2,30 +2,97 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentLang = "ru";
 
   const translations = {
-    ru: {
-      flights: "✈️ Авиабилеты",
-      hotels: "🏨 Отели",
-      sights: "🌍 Места",
-      findFlights: "Найти рейсы",
-      roundTrip: "Туда и обратно",
-      departure: "Дата вылета",
-      return: "Дата возвращения",
-      hotelResults: "Результаты:",
-      noHotelsFound: "Ничего не найдено по заданным фильтрам."
-    },
-    en: {
-      flights: "✈️ Flights",
-      hotels: "🏨 Hotels",
-      sights: "🌍 Places",
-      findFlights: "Search Flights",
-      roundTrip: "Round Trip",
-      departure: "Departure Date",
-      return: "Return Date",
-      hotelResults: "Results:",
-      noHotelsFound: "Nothing found for the selected filters."
-    }
-  };
+  ru: {
+    flights: "✈️ Авиабилеты",
+    hotels: "🏨 Отели",
+    sights: "🌍 Места",
+    findFlights: "Найти рейсы",
+    roundTrip: "Туда и обратно",
+    departure: "Дата вылета",
+    return: "Дата возвращения",
+    hotelResults: "Результаты:",
+    noHotelsFound: "Ничего не найдено по заданным фильтрам.",
+    hotelFilters: "🔎 Фильтры поиска",
+    city: "Город",
+    guests: "Гостей",
+    checkIn: "Дата заезда",
+    checkOut: "Дата выезда",
+    priceFrom: "Цена от",
+    priceTo: "Цена до",
+    ratingMin: "Минимальный рейтинг",
+    findHotel: "Найти отель"
+  },
+  en: {
+    flights: "✈️ Flights",
+    hotels: "🏨 Hotels",
+    sights: "🌍 Places",
+    findFlights: "Search Flights",
+    roundTrip: "Round Trip",
+    departure: "Departure Date",
+    return: "Return Date",
+    hotelResults: "Results:",
+    noHotelsFound: "Nothing found for the selected filters.",
+    hotelFilters: "🔎 Search Filters",
+    city: "City",
+    guests: "Guests",
+    checkIn: "Check-in Date",
+    checkOut: "Check-out Date",
+    priceFrom: "Price from",
+    priceTo: "Price to",
+    ratingMin: "Min Rating",
+    findHotel: "Find Hotel"
+  }
+};
+function applyTranslations(lang) {
+  const t = translations[lang];
+  document.querySelector('[onclick*="flights"]').textContent = t.flights;
+  document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
+  document.querySelector('[onclick*="sights"]').textContent = t.sights;
+  document.querySelector('#search-form button[type="submit"]').textContent = t.findFlights;
+  document.querySelector('label[for="departureDate"]').textContent = t.departure;
+  document.getElementById("returnDateLabel").textContent = t.return;
+  document.getElementById("roundTripText").textContent = t.roundTrip;
 
+  // 🔁 Локализация фильтров отелей
+  document.querySelector("#hotelForm h3").textContent = t.hotelFilters;
+  document.getElementById("hotelCity").placeholder = t.city;
+  document.querySelector('label[for="checkIn"]').textContent = t.checkIn;
+  document.querySelector('label[for="checkOut"]').textContent = t.checkOut;
+  document.querySelector('label[for="minPrice"]').textContent = t.priceFrom;
+  document.querySelector('label[for="maxPrice"]').textContent = t.priceTo;
+  document.querySelector('label[for="minRating"]').textContent = t.ratingMin;
+  document.querySelector('label[for="guests"]').textContent = t.guests;
+  document.querySelector('#hotelForm button[type="submit"]').textContent = t.findHotel;
+}
+  // ✅ Инициализация Telegram WebApp + лог аналитики
+  if (window.Telegram && Telegram.WebApp) {
+    Telegram.WebApp.ready();
+    const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
+    console.log("👤 Telegram ID:", userId);
+
+    window.showTab = function (id) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+
+      // 📊 Лог в Telegram
+      Telegram.WebApp.sendData(`🧭 Переключено на вкладку: ${id}`);
+    };
+  } else {
+    // 📱 Для браузера или если Telegram недоступен
+    window.showTab = function (id) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    };
+  }
+  // ⬇️ Применяем локализацию по умолчанию
+  applyTranslations(currentLang);
+
+  document.getElementById("langSwitcher").addEventListener("change", (e) => {
+    currentLang = e.target.value;
+    applyTranslations(currentLang);
+  });
+
+  // 🔥 Горячие предложения
   const hotDeals = [
     { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
     { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
@@ -179,6 +246,8 @@ resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` 
       </div>`).join("")
     : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
 );
+
+
 
   // ⬇️ Активируем вкладку "Отели" и скроллим к фильтрам
   showTab("flights");
