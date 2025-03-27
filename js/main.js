@@ -89,11 +89,17 @@ function hideLoading() {
   }
 
   window.showTab = function (id) {
-    document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-    localStorage.setItem("activeTab", id);
-    trackEvent("Переключение вкладки", id);
-  };
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+
+  // Обновляем активную кнопку
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+  activeBtn?.classList.add('bg-blue-100');
+
+  localStorage.setItem("activeTab", id);
+  trackEvent("Переключение вкладки", id);
+};
 
   document.getElementById("langSwitcher").value = currentLang;
   document.getElementById("langSwitcher").addEventListener("change", (e) => {
