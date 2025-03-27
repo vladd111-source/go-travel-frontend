@@ -88,26 +88,25 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("👤 Telegram ID:", userId);
   }
 
-  window.showTab = function (id) {
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.classList.remove('active');
-      tab.style.display = "none";
-    });
+ window.showTab = function (id) {
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.remove('active');
+    tab.classList.add('hidden'); // 🛠️ Добавляем обратно hidden
+  });
 
-    const selected = document.getElementById(id);
-    selected.style.display = "block";
+  const selected = document.getElementById(id);
+  selected.classList.remove('hidden'); // ✅ Показываем вкладку
+  requestAnimationFrame(() => {
+    selected.classList.add('active');
+  });
 
-    requestAnimationFrame(() => {
-      selected.classList.add('active');
-    });
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+  activeBtn?.classList.add('bg-blue-100');
 
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
-    const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
-    activeBtn?.classList.add('bg-blue-100');
-
-    localStorage.setItem("activeTab", id);
-    trackEvent("Переключение вкладки", id);
-  };
+  localStorage.setItem("activeTab", id);
+  trackEvent("Переключение вкладки", id);
+};
 
   document.getElementById("langSwitcher").value = currentLang;
   document.getElementById("langSwitcher").addEventListener("change", (e) => {
