@@ -48,11 +48,11 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   function showLoading() {
-  document.getElementById("loadingSpinner")?.classList.remove("hidden");
-}
-function hideLoading() {
-  document.getElementById("loadingSpinner")?.classList.add("hidden");
-}
+    document.getElementById("loadingSpinner")?.classList.remove("hidden");
+  }
+  function hideLoading() {
+    document.getElementById("loadingSpinner")?.classList.add("hidden");
+  }
 
   function trackEvent(name, data = "") {
     const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${data}` : "");
@@ -89,26 +89,25 @@ function hideLoading() {
   }
 
   window.showTab = function (id) {
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.classList.remove('active');
-    tab.style.display = "none";
-  });
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+      tab.style.display = "none";
+    });
 
-  const selected = document.getElementById(id);
-  selected.style.display = "block";
+    const selected = document.getElementById(id);
+    selected.style.display = "block";
 
-  // Немного задержим, чтобы применился transition
-  requestAnimationFrame(() => {
-    selected.classList.add('active');
-  });
+    requestAnimationFrame(() => {
+      selected.classList.add('active');
+    });
 
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
-  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
-  activeBtn?.classList.add('bg-blue-100');
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+    const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+    activeBtn?.classList.add('bg-blue-100');
 
-  localStorage.setItem("activeTab", id);
-  trackEvent("Переключение вкладки", id);
-};
+    localStorage.setItem("activeTab", id);
+    trackEvent("Переключение вкладки", id);
+  };
 
   document.getElementById("langSwitcher").value = currentLang;
   document.getElementById("langSwitcher").addEventListener("change", (e) => {
@@ -167,50 +166,49 @@ function hideLoading() {
     });
   }
 
- const hotelForm = document.getElementById("hotelForm");
-hotelForm?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  showLoading(); // 🔄 показать спиннер
+  const hotelForm = document.getElementById("hotelForm");
+  hotelForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    showLoading();
 
-  const city = document.getElementById("hotelCity").value.trim();
-  const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
-  const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
-  const minRating = parseFloat(document.getElementById("minRating").value) || 0;
+    const city = document.getElementById("hotelCity").value.trim();
+    const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
+    const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
+    const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
-  const mockHotels = [
-    { name: "Hotel Sunrise", city, price: 85, rating: 8.9 },
-    { name: "Ocean View", city, price: 120, rating: 9.1 },
-    { name: "Budget Stay", city, price: 40, rating: 7.5 },
-    { name: "Luxury Palace", city, price: 200, rating: 9.8 },
-    { name: "Comfort Inn", city, price: 70, rating: 8.2 },
-  ];
+    const mockHotels = [
+      { name: "Hotel Sunrise", city, price: 85, rating: 8.9 },
+      { name: "Ocean View", city, price: 120, rating: 9.1 },
+      { name: "Budget Stay", city, price: 40, rating: 7.5 },
+      { name: "Luxury Palace", city, price: 200, rating: 9.8 },
+      { name: "Comfort Inn", city, price: 70, rating: 8.2 },
+    ];
 
-const filtered = mockHotels.filter(h =>
-  h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
-);
+    const filtered = mockHotels.filter(h =>
+      h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
+    );
 
-const t = translations[currentLang];
-const resultBlock = document.getElementById("hotelsResult");
-resultBlock.classList.remove("visible"); // 👈 Сначала убираем эффект
+    const t = translations[currentLang];
+    const resultBlock = document.getElementById("hotelsResult");
+    resultBlock.classList.remove("visible");
 
-resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-  filtered.length ? filtered.map(hotel => `
-    <div class="card bg-white border p-4 rounded-xl mb-2">
-      <strong>${hotel.name}</strong> (${hotel.city})<br>
-      Цена: $${hotel.price} / ночь<br>
-      Рейтинг: ${hotel.rating}<br>
-      <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
-    </div>`).join("") :
-  `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-);
+    resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+      filtered.length ? filtered.map(hotel => `
+        <div class="card bg-white border p-4 rounded-xl mb-2">
+          <strong>${hotel.name}</strong> (${hotel.city})<br>
+          Цена: $${hotel.price} / ночь<br>
+          Рейтинг: ${hotel.rating}<br>
+          <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
+        </div>`).join("") :
+      `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+    );
 
-// 👇 Добавим плавное появление после задержки
-setTimeout(() => {
-  resultBlock.classList.add("visible");
-}, 50);
+    setTimeout(() => {
+      resultBlock.classList.add("visible");
+    }, 50);
 
-trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
-hideLoading();
+    trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
+    hideLoading();
   });
 
   const flightForm = document.getElementById("search-form");
@@ -236,7 +234,6 @@ hideLoading();
     trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
   });
 
-  // 🟢 Показать вкладку после инициализации
   const savedTab = localStorage.getItem("activeTab") || "flights";
   showTab(savedTab);
 });
