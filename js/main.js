@@ -1,3 +1,11 @@
+document.addEventListener("DOMContentLoaded", function () {
+  let currentLang = localStorage.getItem("lang") || "ru";
+
+  // ✅ Отправляем событие загрузки приложения сразу
+  trackEvent("Загрузка приложения", {
+    lang: currentLang,
+    timestamp: new Date().toISOString(),
+  });
 // ✅ Supabase через CDN (без import/export)
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA'; // твой ключ
@@ -84,15 +92,19 @@ document.addEventListener("DOMContentLoaded", function () {
 }
 
 function trackEvent(name, data = "") {
-  const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${data}` : "");
+  const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
   console.log(message);
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.sendData(message);
   }
 
-  logEventToAnalytics(name, { info: data });
+  logEventToAnalytics(name, {
+    info: data,
+    lang: localStorage.getItem("lang") || "ru",
+    activeTab: localStorage.getItem("activeTab") || "flights",
+    timestamp: new Date().toISOString(),
+  });
 }
-
   function applyTranslations(lang) {
     const t = translations[lang];
     document.querySelector('[onclick*="flights"]').textContent = t.flights;
