@@ -1,10 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-import { supabase } from './supabase.js';
-const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
-const supabaseKey = 'твой ключ';
-export const supabase = createClient(supabaseUrl, supabaseKey);
-
-
+import { supabase } from './supabase.js'; // только импорт
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
