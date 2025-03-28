@@ -59,13 +59,39 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("loadingSpinner")?.classList.add("hidden");
   }
 
-  function trackEvent(name, data = "") {
-    const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${data}` : "");
-    console.log(message);
-    if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.sendData(message);
-    }
+ function logEventToAnalytics(eventName, eventData = {}) {
+  const userId = Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  if (!userId) {
+    console.warn("Нет Telegram ID — аналитика не записана");
+    return;
   }
+
+  const payload = {
+    telegram_id: userId.toString(),
+    event: eventName,
+    data: eventData,
+    created_at: new Date().toISOString(),
+  };
+
+  supabase.from('analytics').insert([payload])
+    .then(({ error }) => {
+      if (error) {
+        console.error("❌ Ошибка записи в аналитику:", error.message);
+      } else {
+        console.log("📊 Событие аналитики записано:", eventName);
+      }
+    });
+}
+
+function trackEvent(name, data = "") {
+  const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${data}` : "");
+  console.log(message);
+  if (window.Telegram && Telegram.WebApp) {
+    Telegram.WebApp.sendData(message);
+  }
+
+  logEventToAnalytics(name, { info: data });
+}
 
   function applyTranslations(lang) {
     const t = translations[lang];
