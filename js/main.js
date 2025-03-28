@@ -1,4 +1,3 @@
-
 // ✅ Supabase через CDN
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'твой_ключ';
@@ -95,6 +94,26 @@ function trackEvent(name, data = "") {
   });
 }
 
+function applyTranslations(lang) {
+  const t = translations[lang];
+  document.querySelector('[onclick*="flights"]').textContent = t.flights;
+  document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
+  document.querySelector('[onclick*="sights"]').textContent = t.sights;
+  document.querySelector('#search-form button[type="submit"]').textContent = t.findFlights;
+  document.querySelector('label[for="departureDate"]').textContent = t.departure;
+  document.getElementById("returnDateLabel").textContent = t.return;
+  document.getElementById("roundTripText").textContent = t.roundTrip;
+  document.querySelector("#hotelForm h3").textContent = t.hotelFilters;
+  document.getElementById("hotelCity").placeholder = t.city;
+  document.querySelector('label[for="checkIn"]').textContent = t.checkIn;
+  document.querySelector('label[for="checkOut"]').textContent = t.checkOut;
+  document.querySelector('label[for="minPrice"]').textContent = t.priceFrom;
+  document.querySelector('label[for="maxPrice"]').textContent = t.priceTo;
+  document.querySelector('label[for="minRating"]').textContent = t.ratingMin;
+  document.querySelector('label[for="guests"]').textContent = t.guests;
+  document.querySelector('#hotelForm button[type="submit"]').textContent = t.findHotel;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
@@ -108,43 +127,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window._telegramId = userId;
     window._appLang = localStorage.getItem("lang") || "ru";
-
     console.log("👤 Telegram ID:", userId);
 
+    applyTranslations(window._appLang); // ✅ Применяем перевод
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
       timestamp: new Date().toISOString(),
     });
-  }
-});
-
-
-  function showLoading() {
-    document.getElementById("loadingSpinner")?.classList.remove("hidden");
-  }
-
-  function hideLoading() {
-    document.getElementById("loadingSpinner")?.classList.add("hidden");
-  }
-
-  function applyTranslations(lang) {
-    const t = translations[lang];
-    document.querySelector('[onclick*="flights"]').textContent = t.flights;
-    document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
-    document.querySelector('[onclick*="sights"]').textContent = t.sights;
-    document.querySelector('#search-form button[type="submit"]').textContent = t.findFlights;
-    document.querySelector('label[for="departureDate"]').textContent = t.departure;
-    document.getElementById("returnDateLabel").textContent = t.return;
-    document.getElementById("roundTripText").textContent = t.roundTrip;
-    document.querySelector("#hotelForm h3").textContent = t.hotelFilters;
-    document.getElementById("hotelCity").placeholder = t.city;
-    document.querySelector('label[for="checkIn"]').textContent = t.checkIn;
-    document.querySelector('label[for="checkOut"]').textContent = t.checkOut;
-    document.querySelector('label[for="minPrice"]').textContent = t.priceFrom;
-    document.querySelector('label[for="maxPrice"]').textContent = t.priceTo;
-    document.querySelector('label[for="minRating"]').textContent = t.ratingMin;
-    document.querySelector('label[for="guests"]').textContent = t.guests;
-    document.querySelector('#hotelForm button[type="submit"]').textContent = t.findHotel;
   }
 
   document.getElementById("langSwitcher").value = window._appLang;
@@ -176,18 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
         hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
       });
   }
-
-  window.bookFlight = function (from, to, date, price) {
-    const message = `✈️ *Рейс из ${from} в ${to}*\n📅 ${date}\n💵 $${price}`;
-    trackEvent("Клик по брони (рейс)", `${from} → ${to}, $${price}`);
-    Telegram.WebApp.sendData?.(message);
-  };
-
-  window.bookHotel = function (name, city, price, rating) {
-    const message = `🏨 *${name}*\n📍 ${city}\n💵 $${price}\n⭐ ${rating}`;
-    trackEvent("Клик по брони (отель)", `${name} в ${city}, $${price}`);
-    Telegram.WebApp.sendData?.(message);
-  };
 
   document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -253,6 +230,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
   });
+
+  window.bookFlight = function (from, to, date, price) {
+    const message = `✈️ *Рейс из ${from} в ${to}*\n📅 ${date}\n💵 $${price}`;
+    trackEvent("Клик по брони (рейс)", `${from} → ${to}, $${price}`);
+    Telegram.WebApp.sendData?.(message);
+  };
+
+  window.bookHotel = function (name, city, price, rating) {
+    const message = `🏨 *${name}*\n📍 ${city}\n💵 $${price}\n⭐ ${rating}`;
+    trackEvent("Клик по брони (отель)", `${name} в ${city}, $${price}`);
+    Telegram.WebApp.sendData?.(message);
+  };
 
   window.showTab = function (id) {
     document.querySelectorAll('.tab').forEach(tab => {
