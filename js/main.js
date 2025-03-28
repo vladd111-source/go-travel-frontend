@@ -1,4 +1,5 @@
-// ✅ Go Travel — main.js с корректной работой вкладок
+
+// ✅ Go Travel — main.js с подключением API и корректной работой вкладок
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
@@ -50,6 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function showLoading() {
     document.getElementById("loadingSpinner")?.classList.remove("hidden");
   }
+
   function hideLoading() {
     document.getElementById("loadingSpinner")?.classList.add("hidden");
   }
@@ -88,7 +90,6 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("👤 Telegram ID:", userId);
   }
 
-  // 🔁 Показываем нужную вкладку
   window.showTab = function (id) {
     document.querySelectorAll('.tab').forEach(tab => {
       tab.classList.remove('active');
@@ -109,7 +110,6 @@ document.addEventListener("DOMContentLoaded", function () {
     trackEvent("Переключение вкладки", id);
   };
 
-  // 🔁 Язык
   document.getElementById("langSwitcher").value = currentLang;
   document.getElementById("langSwitcher").addEventListener("change", (e) => {
     currentLang = e.target.value;
@@ -118,37 +118,24 @@ document.addEventListener("DOMContentLoaded", function () {
     trackEvent("Смена языка", currentLang);
   });
 
-  // 🔥 Горячие предложения
- const hotDealsContainer = document.getElementById("hotDeals");
-if (hotDealsContainer) {
-  fetch("http://localhost:3000/api/flights")
-    .then(res => res.json())
-    .then(data => {
-      const t = translations[currentLang];
-      hotDealsContainer.innerHTML = data.map((deal) => `
-        <div class="bg-white p-4 rounded-xl shadow">
-          ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
-          📅 ${deal.date}<br>
-          <span class="text-red-600 font-semibold">$${deal.price}</span><br>
-          <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
-        </div>`).join("");
-    })
-    .catch(err => {
-      console.error("Ошибка загрузки рейсов:", err);
-      hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Не удалось загрузить предложения.</p>";
-    });
-}
-
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
-    const t = translations[currentLang];
-    hotDealsContainer.innerHTML = hotDeals.map((deal) => `
-      <div class="bg-white p-4 rounded-xl shadow">
-        ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
-        📅 ${deal.date}<br>
-        <span class="text-red-600 font-semibold">$${deal.price}</span><br>
-        <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
-      </div>`).join("");
+    fetch("http://localhost:3000/api/flights")
+      .then(res => res.json())
+      .then(data => {
+        const t = translations[currentLang];
+        hotDealsContainer.innerHTML = data.map((deal) => `
+          <div class="bg-white p-4 rounded-xl shadow">
+            ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
+            📅 ${deal.date}<br>
+            <span class="text-red-600 font-semibold">$${deal.price}</span><br>
+            <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
+          </div>`).join("");
+      })
+      .catch(err => {
+        console.error("Ошибка загрузки рейсов:", err);
+        hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Не удалось загрузить предложения.</p>";
+      });
   }
 
   window.bookFlight = function (from, to, date, price) {
@@ -167,7 +154,6 @@ if (hotDealsContainer) {
     }
   };
 
-  // Чекбокс "туда и обратно"
   const roundTripCheckbox = document.getElementById("roundTrip");
   if (roundTripCheckbox) {
     roundTripCheckbox.addEventListener("change", function () {
@@ -179,7 +165,6 @@ if (hotDealsContainer) {
     });
   }
 
-  // 🏨 Поиск отелей
   const hotelForm = document.getElementById("hotelForm");
   hotelForm?.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -190,42 +175,42 @@ if (hotDealsContainer) {
     const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
     const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
-    const mockHotels = [
-      { name: "Hotel Sunrise", city, price: 85, rating: 8.9 },
-      { name: "Ocean View", city, price: 120, rating: 9.1 },
-      { name: "Budget Stay", city, price: 40, rating: 7.5 },
-      { name: "Luxury Palace", city, price: 200, rating: 9.8 },
-      { name: "Comfort Inn", city, price: 70, rating: 8.2 },
-    ];
-
-    const filtered = mockHotels.filter(h =>
-      h.price >= minPrice && h.price <= maxPrice && h.rating >= minRating
-    );
-
     const t = translations[currentLang];
     const resultBlock = document.getElementById("hotelsResult");
     resultBlock.classList.remove("visible");
 
-    resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-      filtered.length ? filtered.map(hotel => `
-        <div class="card bg-white border p-4 rounded-xl mb-2">
-          <strong>${hotel.name}</strong> (${hotel.city})<br>
-          Цена: $${hotel.price} / ночь<br>
-          Рейтинг: ${hotel.rating}<br>
-          <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
-        </div>`).join("") :
-      `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-    );
+    fetch("http://localhost:3000/api/hotels")
+      .then(res => res.json())
+      .then(hotels => {
+        const filtered = hotels.filter(h =>
+          h.price >= minPrice &&
+          h.price <= maxPrice &&
+          h.rating >= minRating &&
+          (!city || h.city.toLowerCase().includes(city.toLowerCase()))
+        );
 
-    setTimeout(() => {
-      resultBlock.classList.add("visible");
-    }, 50);
+        resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+          filtered.length ? filtered.map(hotel => `
+            <div class="card bg-white border p-4 rounded-xl mb-2">
+              <strong>${hotel.name}</strong> (${hotel.city})<br>
+              Цена: $${hotel.price} / ночь<br>
+              Рейтинг: ${hotel.rating}<br>
+              <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
+            </div>`).join("") :
+          `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+        );
 
-    trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
-    hideLoading();
+        setTimeout(() => resultBlock.classList.add("visible"), 50);
+        trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
+        hideLoading();
+      })
+      .catch(err => {
+        console.error("Ошибка загрузки отелей:", err);
+        resultBlock.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
+        hideLoading();
+      });
   });
 
-  // ✈️ Поиск рейсов
   const flightForm = document.getElementById("search-form");
   flightForm?.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -249,7 +234,6 @@ if (hotDealsContainer) {
     trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
   });
 
-  // 🟢 Показать сохраненную вкладку
   const savedTab = localStorage.getItem("activeTab") || "flights";
   showTab(savedTab);
 });
