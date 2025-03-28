@@ -118,26 +118,28 @@ document.addEventListener("DOMContentLoaded", function () {
     trackEvent("Смена языка", currentLang);
   });
 
-  // ✈️ Загрузка рейсов из Supabase
-  const hotDealsContainer = document.getElementById("hotDeals");
-  if (hotDealsContainer) {
-    supabase.from("go_travel").select("*")
-      .then(({ data, error }) => {
-        if (error) throw error;
-        const t = translations[currentLang];
-        hotDealsContainer.innerHTML = data.map((deal) => `
-          <div class="bg-white p-4 rounded-xl shadow">
-            ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
-            📅 ${deal.date}<br>
-            <span class="text-red-600 font-semibold">$${deal.price}</span><br>
-            <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
-          </div>`).join("");
-      })
-      .catch(err => {
-        console.error("Ошибка Supabase:", err.message);
-        hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
-      });
-  }
+// ✈️ Загрузка рейсов из Supabase
+const hotDealsContainer = document.getElementById("hotDeals");
+if (hotDealsContainer) {
+  supabase.from("go_travel").select("*")
+    .then(({ data, error }) => {
+      if (error) throw error;
+
+      const t = translations[currentLang];
+      hotDealsContainer.innerHTML = data.map((deal) => `
+        <div class="bg-white p-4 rounded-xl shadow">
+          ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
+          📅 ${deal.date}<br>
+          <span class="text-red-600 font-semibold">$${deal.price}</span><br>
+          <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
+        </div>
+      `).join("");
+    })
+    .catch(err => {
+      console.error("Ошибка Supabase:", err.message);
+      hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
+    });
+}
 
   window.bookFlight = function (from, to, date, price) {
     const message = `✈️ *Рейс из ${from} в ${to}*\n📅 ${date}\n💵 $${price}`;
