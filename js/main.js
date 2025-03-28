@@ -1,5 +1,5 @@
+import { supabase } from './supabase.js'; // Подключение Supabase
 
-// ✅ Go Travel — main.js с подключением API и корректной работой вкладок
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
@@ -118,11 +118,12 @@ document.addEventListener("DOMContentLoaded", function () {
     trackEvent("Смена языка", currentLang);
   });
 
+  // ✈️ Загрузка рейсов из Supabase
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
-    fetch("http://localhost:3000/api/flights")
-      .then(res => res.json())
-      .then(data => {
+    supabase.from("go_travel").select("*")
+      .then(({ data, error }) => {
+        if (error) throw error;
         const t = translations[currentLang];
         hotDealsContainer.innerHTML = data.map((deal) => `
           <div class="bg-white p-4 rounded-xl shadow">
@@ -133,8 +134,8 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>`).join("");
       })
       .catch(err => {
-        console.error("Ошибка загрузки рейсов:", err);
-        hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Не удалось загрузить предложения.</p>";
+        console.error("Ошибка Supabase:", err.message);
+        hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
       });
   }
 
@@ -154,73 +155,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
-  const roundTripCheckbox = document.getElementById("roundTrip");
-  if (roundTripCheckbox) {
-    roundTripCheckbox.addEventListener("change", function () {
-      const wrapper = document.getElementById("returnDateWrapper");
-      const input = document.getElementById("returnDate");
-      wrapper.classList.toggle("hidden", !this.checked);
-      input.required = this.checked;
-      if (!this.checked) input.value = "";
-    });
-  }
-
+  // Остальная логика (чекбоксы, формы, фильтры) — без изменений
+  // 🏨 Поиск отелей через API
   const hotelForm = document.getElementById("hotelForm");
   hotelForm?.addEventListener("submit", (e) => {
     e.preventDefault();
     showLoading();
-    const city = document.getElementById("hotelCity").value.trim();
-    const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
-    const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
-    const minRating = parseFloat(document.getElementById("minRating").value) || 0;
-
-    fetch("http://localhost:3000/api/hotels")
-      .then(res => res.json())
-      .then(data => {
-        const filtered = data.filter(h =>
-          h.city.toLowerCase().includes(city.toLowerCase()) &&
-          h.price >= minPrice &&
-          h.price <= maxPrice &&
-          h.rating >= minRating
-        );
-
-        const t = translations[currentLang];
-        const resultBlock = document.getElementById("hotelsResult");
-        resultBlock.classList.remove("visible");
-
-        resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-          filtered.length ? filtered.map(hotel => `
-            <div class="card bg-white border p-4 rounded-xl mb-2">
-              <strong>${hotel.name}</strong> (${hotel.city})<br>
-              Цена: $${hotel.price} / ночь<br>
-              Рейтинг: ${hotel.rating}<br>
-              <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
-            </div>`).join("") :
-          `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-        );
-
-        setTimeout(() => {
-          resultBlock.classList.add("visible");
-        }, 50);
-
-        trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
-        hideLoading();
-      })
-      .catch(err => {
-        console.error("Ошибка загрузки отелей:", err);
-        document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
-        hideLoading();
-      });
-
 
     const city = document.getElementById("hotelCity").value.trim();
     const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
     const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
     const minRating = parseFloat(document.getElementById("minRating").value) || 0;
-
-    const t = translations[currentLang];
-    const resultBlock = document.getElementById("hotelsResult");
-    resultBlock.classList.remove("visible");
 
     fetch("http://localhost:3000/api/hotels")
       .then(res => res.json())
@@ -231,6 +176,10 @@ document.addEventListener("DOMContentLoaded", function () {
           h.rating >= minRating &&
           (!city || h.city.toLowerCase().includes(city.toLowerCase()))
         );
+
+        const t = translations[currentLang];
+        const resultBlock = document.getElementById("hotelsResult");
+        resultBlock.classList.remove("visible");
 
         resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
           filtered.length ? filtered.map(hotel => `
@@ -249,27 +198,30 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch(err => {
         console.error("Ошибка загрузки отелей:", err);
-        resultBlock.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
+        document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
         hideLoading();
       });
   });
 
+  const roundTripCheckbox = document.getElementById("roundTrip");
+  if (roundTripCheckbox) {
+    roundTripCheckbox.addEventListener("change", function () {
+      const wrapper = document.getElementById("returnDateWrapper");
+      const input = document.getElementById("returnDate");
+      wrapper.classList.toggle("hidden", !this.checked);
+      input.required = this.checked;
+      if (!this.checked) input.value = "";
+    });
+  }
+
   const flightForm = document.getElementById("search-form");
   flightForm?.addEventListener("submit", (e) => {
     e.preventDefault();
-
     const from = flightForm.from.value.trim();
     const to = flightForm.to.value.trim();
     const departureDate = flightForm.departureDate.value;
 
-    const bestFlight = {
-      from,
-      to,
-      price: 99,
-      date: departureDate
-    };
-
-    const msg = `✈️ Лучший рейс\n🛫 ${bestFlight.from} → 🛬 ${bestFlight.to}\n📅 ${bestFlight.date}\n💰 $${bestFlight.price}`;
+    const msg = `✈️ Лучший рейс\n🛫 ${from} → 🛬 ${to}\n📅 ${departureDate}\n💰 $99`;
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.sendData(msg);
     }
