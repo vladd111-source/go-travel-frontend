@@ -10,11 +10,17 @@ localStorage.setItem("session_id", sessionId);
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
-  // 📊 Событие сразу при входе
+if (window.Telegram && Telegram.WebApp) {
+  Telegram.WebApp.ready();
+  const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
+  console.log("👤 Telegram ID:", userId);
+
+  // 📊 Теперь можно безопасно отправлять
   trackEvent("Загрузка приложения", {
     lang: currentLang,
     timestamp: new Date().toISOString(),
   });
+}
 
   const translations = {
     ru: {
