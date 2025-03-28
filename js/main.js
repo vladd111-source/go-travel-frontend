@@ -1,6 +1,6 @@
 // ✅ Supabase через CDN
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
-const supabaseKey = 'твой_ключ';
+const supabaseKey = 'твой_ключ'; // 🔁 Замени на свой ключ!
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // ✅ Генерация session_id
@@ -31,10 +31,6 @@ window.showTab = function (id) {
   localStorage.setItem("activeTab", id);
   trackEvent("Переключение вкладки", id);
 };
-
-// ✅ Глобальные переменные
-window._telegramId = null;
-window._appLang = localStorage.getItem("lang") || "ru";
 
 // ✅ Переводы
 const translations = {
@@ -154,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Смена языка", window._appLang);
   });
 
-  // ✈️ Загрузка горячих предложений
+  // ✈️ Горячие предложения
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
     supabase.from("go_travel").select("*")
@@ -177,31 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // 🧭 Переключение вкладок
-  window.showTab = function (id) {
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.classList.remove('active');
-      tab.classList.add('hidden');
-    });
-
-    const selectedTab = document.getElementById(id);
-    if (selectedTab) {
-      selectedTab.classList.remove('hidden');
-      selectedTab.classList.add('active');
-    }
-
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
-    const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
-    activeBtn?.classList.add('bg-blue-100');
-
-    localStorage.setItem("activeTab", id);
-    trackEvent("Переключение вкладки", id);
-  };
-
-  const savedTab = localStorage.getItem("activeTab") || "flights";
-  showTab(savedTab);
-
-  // 📅 Обработка round-trip чекбокса
+  // 📅 Обработка round-trip
   document.getElementById("roundTrip")?.addEventListener("change", function () {
     const wrapper = document.getElementById("returnDateWrapper");
     const input = document.getElementById("returnDate");
@@ -267,39 +239,6 @@ document.addEventListener("DOMContentLoaded", () => {
     Telegram.WebApp.sendData?.(msg);
     trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
   });
-
-  // 📚 Перевод
-  function applyTranslations(lang) {
-    const t = translations[lang];
-    document.querySelector('[onclick*="flights"]').textContent = t.flights;
-    document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
-    document.querySelector('[onclick*="sights"]').textContent = t.sights;
-    document.querySelector('#search-form button[type="submit"]').textContent = t.findFlights;
-    document.querySelector('label[for="departureDate"]').textContent = t.departure;
-    document.getElementById("returnDateLabel").textContent = t.return;
-    document.getElementById("roundTripText").textContent = t.roundTrip;
-    document.querySelector("#hotelForm h3").textContent = t.hotelFilters;
-    document.getElementById("hotelCity").placeholder = t.city;
-    document.querySelector('label[for="checkIn"]').textContent = t.checkIn;
-    document.querySelector('label[for="checkOut"]').textContent = t.checkOut;
-    document.querySelector('label[for="minPrice"]').textContent = t.priceFrom;
-    document.querySelector('label[for="maxPrice"]').textContent = t.priceTo;
-    document.querySelector('label[for="minRating"]').textContent = t.ratingMin;
-    document.querySelector('label[for="guests"]').textContent = t.guests;
-    document.querySelector('#hotelForm button[type="submit"]').textContent = t.findHotel;
-  }
-
-  window.bookFlight = function (from, to, date, price) {
-    const message = `✈️ *Рейс из ${from} в ${to}*\n📅 ${date}\n💵 $${price}`;
-    trackEvent("Клик по брони (рейс)", `${from} → ${to}, $${price}`);
-    Telegram.WebApp.sendData?.(message);
-  };
-
-  window.bookHotel = function (name, city, price, rating) {
-    const message = `🏨 *${name}*\n📍 ${city}\n💵 $${price}\n⭐ ${rating}`;
-    trackEvent("Клик по брони (отель)", `${name} в ${city}, $${price}`);
-    Telegram.WebApp.sendData?.(message);
-  };
 });
 
 // ⛑ Глобальный обработчик ошибок
@@ -315,3 +254,12 @@ window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - appStart) / 1000);
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
 });
+
+// 🔄 Loader
+function showLoading() {
+  document.getElementById("loadingSpinner")?.classList.remove("hidden");
+}
+
+function hideLoading() {
+  document.getElementById("loadingSpinner")?.classList.add("hidden");
+}
