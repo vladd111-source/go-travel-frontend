@@ -13,9 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
     timestamp: new Date().toISOString(),
   });
 
-document.addEventListener("DOMContentLoaded", function () {
-  let currentLang = localStorage.getItem("lang") || "ru";
-
   const translations = {
     ru: {
       flights: "✈️ Авиабилеты",
