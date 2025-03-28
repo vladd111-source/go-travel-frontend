@@ -223,48 +223,4 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         setTimeout(() => resultBlock.classList.add("visible"), 50);
-        trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
-        hideLoading();
-      })
-      .catch(err => {
-        console.error("Ошибка загрузки отелей:", err);
-        document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
-        hideLoading();
-      });
-  });
-
-  // ✈️ Поиск рейсов
-  document.getElementById("search-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const from = e.target.from.value.trim();
-    const to = e.target.to.value.trim();
-    const departureDate = e.target.departureDate.value;
-
-    const msg = `✈️ Лучший рейс\n🛫 ${from} → 🛬 ${to}\n📅 ${departureDate}\n💰 $99`;
-    Telegram.WebApp.sendData?.(msg);
-    trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
-  });
-});
-
-// ⛑ Глобальный обработчик ошибок
-window.onerror = function (msg, url, line, col, error) {
-  logEventToAnalytics("Ошибка JS", {
-    msg, url, line, col, stack: error?.stack || null
-  });
-};
-
-// 🕓 Длительность сессии
-const appStart = Date.now();
-window.addEventListener("beforeunload", () => {
-  const duration = Math.round((Date.now() - appStart) / 1000);
-  logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
-});
-
-// 🔄 Loader
-function showLoading() {
-  document.getElementById("loadingSpinner")?.classList.remove("hidden");
-}
-
-function hideLoading() {
-  document.getElementById("loadingSpinner")?.classList.add("hidden");
-}
+        trackEvent("Поиск отеля", `Город: ${city},
