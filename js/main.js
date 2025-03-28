@@ -150,14 +150,19 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Смена языка", window._appLang);
   });
 
-  // 📅 Обработка round-trip
-  document.getElementById("roundTrip")?.addEventListener("change", function () {
-    const wrapper = document.getElementById("returnDateWrapper");
-    const input = document.getElementById("returnDate");
-    wrapper.classList.toggle("hidden", !this.checked);
-    input.required = this.checked;
-    if (!this.checked) input.value = "";
-  });
+  // 📅 Обработка round-trip (показ даты возврата)
+  const roundTripCheckbox = document.getElementById("roundTrip");
+  const returnDateWrapper = document.getElementById("returnDateWrapper");
+  const returnDateInput = document.getElementById("returnDate");
+
+  if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
+    roundTripCheckbox.addEventListener("change", () => {
+      const isChecked = roundTripCheckbox.checked;
+      returnDateWrapper.classList.toggle("hidden", !isChecked);
+      returnDateInput.required = isChecked;
+      if (!isChecked) returnDateInput.value = "";
+    });
+  }
 
   // ✈️ Горячие предложения
   const hotDealsContainer = document.getElementById("hotDeals");
