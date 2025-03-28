@@ -1,7 +1,11 @@
-// ✅ Supabase через CDN (без import/export)
+// Supabase
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'твой_ключ';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+// ✅ Генерация session_id
+const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
+localStorage.setItem("session_id", sessionId);
 
 // ✅ Всё в одном месте
 document.addEventListener("DOMContentLoaded", function () {
