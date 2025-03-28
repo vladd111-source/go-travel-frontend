@@ -10,18 +10,6 @@ localStorage.setItem("session_id", sessionId);
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
-if (window.Telegram && Telegram.WebApp) {
-  Telegram.WebApp.ready();
-  const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
-  console.log("👤 Telegram ID:", userId);
-
-  // 📊 Теперь можно безопасно отправлять
-  trackEvent("Загрузка приложения", {
-    lang: currentLang,
-    timestamp: new Date().toISOString(),
-  });
-}
-
   const translations = {
     ru: {
       flights: "✈️ Авиабилеты",
@@ -107,6 +95,18 @@ if (window.Telegram && Telegram.WebApp) {
     });
   }
 
+  if (window.Telegram && Telegram.WebApp) {
+    Telegram.WebApp.ready();
+    const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
+    console.log("👤 Telegram ID:", userId);
+  }
+
+  // 📊 Событие входа
+  trackEvent("Загрузка приложения", {
+    lang: currentLang,
+    timestamp: new Date().toISOString(),
+  });
+
   function showLoading() {
     document.getElementById("loadingSpinner")?.classList.remove("hidden");
   }
@@ -135,32 +135,6 @@ if (window.Telegram && Telegram.WebApp) {
     document.querySelector('#hotelForm button[type="submit"]').textContent = t.findHotel;
   }
 
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.ready();
-    const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
-    console.log("👤 Telegram ID:", userId);
-  }
-
-  window.showTab = function (id) {
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.classList.remove('active');
-      tab.classList.add('hidden');
-    });
-
-    const selectedTab = document.getElementById(id);
-    if (selectedTab) {
-      selectedTab.classList.remove('hidden');
-      selectedTab.classList.add('active');
-    }
-
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
-    const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
-    activeBtn?.classList.add('bg-blue-100');
-
-    localStorage.setItem("activeTab", id);
-    trackEvent("Переключение вкладки", id);
-  };
-
   document.getElementById("langSwitcher").value = currentLang;
   document.getElementById("langSwitcher").addEventListener("change", (e) => {
     currentLang = e.target.value;
@@ -169,7 +143,6 @@ if (window.Telegram && Telegram.WebApp) {
     trackEvent("Смена языка", currentLang);
   });
 
-  // ✈️ Загрузка рейсов
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
     supabase.from("go_travel").select("*")
@@ -195,17 +168,13 @@ if (window.Telegram && Telegram.WebApp) {
   window.bookFlight = function (from, to, date, price) {
     const message = `✈️ *Рейс из ${from} в ${to}*\n📅 ${date}\n💵 $${price}`;
     trackEvent("Клик по брони (рейс)", `${from} → ${to}, $${price}`);
-    if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.sendData(message);
-    }
+    Telegram.WebApp.sendData?.(message);
   };
 
   window.bookHotel = function (name, city, price, rating) {
     const message = `🏨 *${name}*\n📍 ${city}\n💵 $${price}\n⭐ ${rating}`;
     trackEvent("Клик по брони (отель)", `${name} в ${city}, $${price}`);
-    if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.sendData(message);
-    }
+    Telegram.WebApp.sendData?.(message);
   };
 
   document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
@@ -268,12 +237,30 @@ if (window.Telegram && Telegram.WebApp) {
     const departureDate = e.target.departureDate.value;
 
     const msg = `✈️ Лучший рейс\n🛫 ${from} → 🛬 ${to}\n📅 ${departureDate}\n💰 $99`;
-    if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.sendData(msg);
-    }
+    Telegram.WebApp.sendData?.(msg);
 
     trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
   });
+
+  window.showTab = function (id) {
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+      tab.classList.add('hidden');
+    });
+
+    const selectedTab = document.getElementById(id);
+    if (selectedTab) {
+      selectedTab.classList.remove('hidden');
+      selectedTab.classList.add('active');
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+    const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+    activeBtn?.classList.add('bg-blue-100');
+
+    localStorage.setItem("activeTab", id);
+    trackEvent("Переключение вкладки", id);
+  };
 
   const savedTab = localStorage.getItem("activeTab") || "flights";
   showTab(savedTab);
