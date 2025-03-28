@@ -1,5 +1,3 @@
-import { supabase } from './supabase.js'; // Подключение Supabase
-
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
