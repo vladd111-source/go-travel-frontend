@@ -1,5 +1,5 @@
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
-const supabaseKey = 'твОй_публичный_ключ'; // вставь свой Supabase API key
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA'; // вставь свой Supabase API key
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 
