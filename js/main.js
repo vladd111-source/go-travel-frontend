@@ -150,19 +150,27 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Смена языка", window._appLang);
   });
 
-  // ✅ Обработка "Туда и обратно"
-  const roundTripCheckbox = document.getElementById("roundTrip");
-  const returnDateWrapper = document.getElementById("returnDateWrapper");
-  const returnDateInput = document.getElementById("returnDate");
+ // ✅ Обработка "Туда и обратно"
+const roundTripCheckbox = document.getElementById("roundTrip");
+const returnDateWrapper = document.getElementById("returnDateWrapper");
+const returnDateInput = document.getElementById("returnDate");
 
-  if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
-    roundTripCheckbox.addEventListener("change", () => {
-      const isChecked = roundTripCheckbox.checked;
-      returnDateWrapper.classList.toggle("hidden", !isChecked); // Показать / скрыть блок с датой возврата
-      returnDateInput.required = isChecked; // Сделать обязательным поле, если выбрано "Туда и обратно"
-      if (!isChecked) returnDateInput.value = ""; // Если не выбрано "Туда и обратно", очищаем значение
-    });
-  }
+if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
+  // При инициализации сразу установить нужное состояние
+  const updateReturnDateVisibility = () => {
+    const isChecked = roundTripCheckbox.checked;
+    returnDateWrapper.classList.toggle("hidden", !isChecked);
+    returnDateWrapper.style.display = isChecked ? 'block' : 'none';
+    returnDateInput.required = isChecked;
+    if (!isChecked) returnDateInput.value = "";
+  };
+
+  // Обновить при загрузке (вдруг галочка уже стоит)
+  updateReturnDateVisibility();
+
+  // Обработчик на изменение
+  roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
+}
 
   // ✈️ Горячие предложения
   const hotDealsContainer = document.getElementById("hotDeals");
