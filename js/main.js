@@ -158,9 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     roundTripCheckbox.addEventListener("change", () => {
       const isChecked = roundTripCheckbox.checked;
-      returnDateWrapper.classList.toggle("hidden", !isChecked);
-      returnDateInput.required = isChecked;
-      if (!isChecked) returnDateInput.value = "";
+      returnDateWrapper.classList.toggle("hidden", !isChecked); // Показать / скрыть блок с датой возврата
+      returnDateInput.required = isChecked; // Сделать обязательным поле, если выбрано "Туда и обратно"
+      if (!isChecked) returnDateInput.value = ""; // Если не выбрано "Туда и обратно", очищаем значение
     });
   }
 
