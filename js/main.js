@@ -1,4 +1,8 @@
-import { supabase } from './supabase.js';
+const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
+const supabaseKey = 'твОй_публичный_ключ'; // вставь свой Supabase API key
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
