@@ -1,6 +1,6 @@
 // ✅ Supabase через CDN
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA'; // 🔁 Замени на свой ключ!
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // 🔁 Твой ключ
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // ✅ Генерация session_id
@@ -150,28 +150,26 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Смена языка", window._appLang);
   });
 
- // ✅ Обработка "Туда и обратно"
-const roundTripCheckbox = document.getElementById("roundTrip");
-const returnDateWrapper = document.getElementById("returnDateWrapper");
-const returnDateInput = document.getElementById("returnDate");
+  // ✅ Обработка "Туда и обратно"
+  const roundTripCheckbox = document.getElementById("roundTrip");
+  const returnDateWrapper = document.getElementById("returnDateWrapper");
+  const returnDateInput = document.getElementById("returnDate");
 
-if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
-  const updateReturnDateVisibility = () => {
-    const isChecked = roundTripCheckbox.checked;
+  if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
+    const updateReturnDateVisibility = () => {
+      const isChecked = roundTripCheckbox.checked;
+      if (isChecked) {
+        returnDateWrapper.classList.remove("hidden");
+      } else {
+        returnDateWrapper.classList.add("hidden");
+        returnDateInput.value = "";
+      }
+      returnDateInput.required = isChecked;
+    };
 
-    if (isChecked) {
-      returnDateWrapper.classList.remove("hidden");
-    } else {
-      returnDateWrapper.classList.add("hidden");
-      returnDateInput.value = "";
-    }
-
-    returnDateInput.required = isChecked;
-  };
-
-  updateReturnDateVisibility();
-  roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
-}
+    updateReturnDateVisibility();
+    roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
+  }
 
   // ✈️ Горячие предложения
   const hotDealsContainer = document.getElementById("hotDeals");
@@ -273,7 +271,6 @@ window.addEventListener("beforeunload", () => {
 function showLoading() {
   document.getElementById("loadingSpinner")?.classList.remove("hidden");
 }
-
 function hideLoading() {
   document.getElementById("loadingSpinner")?.classList.add("hidden");
 }
