@@ -119,15 +119,25 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // 🔥 Горячие предложения
-  const hotDeals = [
-    { from: "Киев", to: "Барселона", price: 79, date: "12.04" },
-    { from: "Варшава", to: "Рим", price: 55, date: "19.04" },
-    { from: "Будапешт", to: "Париж", price: 63, date: "25.04" },
-    { from: "Берлин", to: "Милан", price: 49, date: "10.05" },
-    { from: "Прага", to: "Амстердам", price: 59, date: "17.05" },
-    { from: "Вена", to: "Лондон", price: 68, date: "22.05" },
-    { from: "Мюнхен", to: "Мадрид", price: 72, date: "29.05" }
-  ];
+ const hotDealsContainer = document.getElementById("hotDeals");
+if (hotDealsContainer) {
+  fetch("http://localhost:3000/api/flights")
+    .then(res => res.json())
+    .then(data => {
+      const t = translations[currentLang];
+      hotDealsContainer.innerHTML = data.map((deal) => `
+        <div class="bg-white p-4 rounded-xl shadow">
+          ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
+          📅 ${deal.date}<br>
+          <span class="text-red-600 font-semibold">$${deal.price}</span><br>
+          <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
+        </div>`).join("");
+    })
+    .catch(err => {
+      console.error("Ошибка загрузки рейсов:", err);
+      hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Не удалось загрузить предложения.</p>";
+    });
+}
 
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
