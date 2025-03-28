@@ -1,4 +1,4 @@
-// ✅ Supabase через CDN (без import/export)
+// ✅ Supabase через CDN
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'твой_ключ';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -7,105 +7,70 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
 localStorage.setItem("session_id", sessionId);
 
-document.addEventListener("DOMContentLoaded", function () {
-  let currentLang = localStorage.getItem("lang") || "ru";
+// ✅ Глобальные переменные
+window._telegramId = null;
+window._appLang = localStorage.getItem("lang") || "ru";
 
-  const translations = {
-    ru: {
-      flights: "✈️ Авиабилеты",
-      hotels: "🏨 Отели",
-      sights: "🌍 Места",
-      findFlights: "Найти рейсы",
-      roundTrip: "Туда и обратно",
-      departure: "Дата вылета",
-      return: "Дата возвращения",
-      hotelResults: "Результаты:",
-      noHotelsFound: "Ничего не найдено по заданным фильтрам.",
-      hotelFilters: "🔎 Фильтры поиска",
-      city: "Город",
-      guests: "Гостей",
-      checkIn: "Дата заезда",
-      checkOut: "Дата выезда",
-      priceFrom: "Цена от",
-      priceTo: "Цена до",
-      ratingMin: "Минимальный рейтинг",
-      findHotel: "Найти отель",
-      bookNow: "Забронировать"
-    },
-    en: {
-      flights: "✈️ Flights",
-      hotels: "🏨 Hotels",
-      sights: "🌍 Places",
-      findFlights: "Search Flights",
-      roundTrip: "Round Trip",
-      departure: "Departure Date",
-      return: "Return Date",
-      hotelResults: "Results:",
-      noHotelsFound: "Nothing found for the selected filters.",
-      hotelFilters: "🔎 Search Filters",
-      city: "City",
-      guests: "Guests",
-      checkIn: "Check-in Date",
-      checkOut: "Check-out Date",
-      priceFrom: "Price from",
-      priceTo: "Price to",
-      ratingMin: "Min Rating",
-      findHotel: "Find Hotel",
-      bookNow: "Book Now"
-    }
+function logEventToAnalytics(eventName, eventData = {}) {
+  const userId = window._telegramId;
+  if (!userId) {
+    console.warn("⚠️ Нет Telegram ID — аналитика не записана");
+    return;
+  }
+
+  const payload = {
+    telegram_id: userId.toString(),
+    event: eventName,
+    event_data: eventData,
+    session_id: sessionId,
+    created_at: new Date().toISOString(),
   };
 
-  function logEventToAnalytics(eventName, eventData = {}) {
-    const userId = Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  supabase.from('analytics').insert([payload])
+    .then(({ error }) => {
+      if (error) {
+        console.error("❌ Supabase insert error:", error.message);
+      } else {
+        console.log("✅ Событие записано:", eventName);
+      }
+    });
+}
+
+function trackEvent(name, data = "") {
+  const currentLang = window._appLang;
+  const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
+  console.log(message);
+  Telegram.WebApp.sendData?.(message);
+  logEventToAnalytics(name, {
+    info: data,
+    lang: currentLang,
+    activeTab: localStorage.getItem("activeTab") || "flights",
+    timestamp: new Date().toISOString(),
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.Telegram && Telegram.WebApp) {
+    Telegram.WebApp.ready();
+    console.log("🔍 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
+
+    const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
     if (!userId) {
-      console.warn("Нет Telegram ID — аналитика не записана");
+      console.warn("❌ Нет Telegram ID — события не отправляются");
       return;
     }
 
-    const payload = {
-      telegram_id: userId.toString(),
-      event: eventName,
-      data: eventData,
-      session_id: sessionId,
-      created_at: new Date().toISOString(),
-    };
+    window._telegramId = userId;
+    window._appLang = localStorage.getItem("lang") || "ru";
 
-    supabase.from('analytics').insert([payload])
-      .then(({ error }) => {
-        if (error) {
-          console.error("❌ Ошибка записи в аналитику:", error.message);
-        } else {
-          console.log("📊 Событие аналитики записано:", eventName);
-        }
-      });
-  }
+    console.log("👤 Telegram ID:", userId);
 
-  function trackEvent(name, data = "") {
-    const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
-    console.log(message);
-    if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.sendData(message);
-    }
-
-    logEventToAnalytics(name, {
-      info: data,
-      lang: currentLang,
-      activeTab: localStorage.getItem("activeTab") || "flights",
+    trackEvent("Загрузка приложения", {
+      lang: window._appLang,
       timestamp: new Date().toISOString(),
     });
   }
-
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.ready();
-    const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
-    console.log("👤 Telegram ID:", userId);
-  }
-
-  // 📊 Событие входа
-  trackEvent("Загрузка приложения", {
-    lang: currentLang,
-    timestamp: new Date().toISOString(),
-  });
+});
 
   function showLoading() {
     document.getElementById("loadingSpinner")?.classList.remove("hidden");
