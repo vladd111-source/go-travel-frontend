@@ -1,4 +1,4 @@
-
+import { supabase } from './supabase.js';
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
