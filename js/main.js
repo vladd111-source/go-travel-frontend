@@ -169,6 +169,49 @@ document.addEventListener("DOMContentLoaded", function () {
   hotelForm?.addEventListener("submit", (e) => {
     e.preventDefault();
     showLoading();
+    const city = document.getElementById("hotelCity").value.trim();
+    const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
+    const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
+    const minRating = parseFloat(document.getElementById("minRating").value) || 0;
+
+    fetch("http://localhost:3000/api/hotels")
+      .then(res => res.json())
+      .then(data => {
+        const filtered = data.filter(h =>
+          h.city.toLowerCase().includes(city.toLowerCase()) &&
+          h.price >= minPrice &&
+          h.price <= maxPrice &&
+          h.rating >= minRating
+        );
+
+        const t = translations[currentLang];
+        const resultBlock = document.getElementById("hotelsResult");
+        resultBlock.classList.remove("visible");
+
+        resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+          filtered.length ? filtered.map(hotel => `
+            <div class="card bg-white border p-4 rounded-xl mb-2">
+              <strong>${hotel.name}</strong> (${hotel.city})<br>
+              Цена: $${hotel.price} / ночь<br>
+              Рейтинг: ${hotel.rating}<br>
+              <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
+            </div>`).join("") :
+          `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+        );
+
+        setTimeout(() => {
+          resultBlock.classList.add("visible");
+        }, 50);
+
+        trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
+        hideLoading();
+      })
+      .catch(err => {
+        console.error("Ошибка загрузки отелей:", err);
+        document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
+        hideLoading();
+      });
+
 
     const city = document.getElementById("hotelCity").value.trim();
     const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
