@@ -1,15 +1,17 @@
+// ✅ Supabase через CDN (без import/export)
+const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
+const supabaseKey = 'твой_ключ';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+// ✅ Всё в одном месте
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
-  // ✅ Отправляем событие загрузки приложения сразу
+  // 📊 Событие сразу при входе
   trackEvent("Загрузка приложения", {
     lang: currentLang,
     timestamp: new Date().toISOString(),
   });
-// ✅ Supabase через CDN (без import/export)
-const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA'; // твой ключ
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
