@@ -1,7 +1,7 @@
+// ✅ Supabase через CDN (без import/export)
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA'; // вставь свой Supabase API key
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // твой ключ
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
@@ -121,28 +121,28 @@ document.addEventListener("DOMContentLoaded", function () {
     trackEvent("Смена языка", currentLang);
   });
 
-// ✈️ Загрузка рейсов из Supabase
-const hotDealsContainer = document.getElementById("hotDeals");
-if (hotDealsContainer) {
-  supabase.from("go_travel").select("*")
-    .then(({ data, error }) => {
-      if (error) throw error;
+  // ✈️ Загрузка рейсов из Supabase
+  const hotDealsContainer = document.getElementById("hotDeals");
+  if (hotDealsContainer && typeof supabase !== 'undefined') {
+    supabase.from("go_travel").select("*")
+      .then(({ data, error }) => {
+        if (error) throw error;
 
-      const t = translations[currentLang];
-      hotDealsContainer.innerHTML = data.map((deal) => `
-        <div class="bg-white p-4 rounded-xl shadow">
-          ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
-          📅 ${deal.date}<br>
-          <span class="text-red-600 font-semibold">$${deal.price}</span><br>
-          <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
-        </div>
-      `).join("");
-    })
-    .catch(err => {
-      console.error("Ошибка Supabase:", err.message);
-      hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
-    });
-}
+        const t = translations[currentLang];
+        hotDealsContainer.innerHTML = data.map((deal) => `
+          <div class="bg-white p-4 rounded-xl shadow">
+            ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
+            📅 ${deal.date}<br>
+            <span class="text-red-600 font-semibold">$${deal.price}</span><br>
+            <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
+          </div>
+        `).join("");
+      })
+      .catch(err => {
+        console.error("Ошибка Supabase:", err.message);
+        hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
+      });
+  }
 
   window.bookFlight = function (from, to, date, price) {
     const message = `✈️ *Рейс из ${from} в ${to}*\n📅 ${date}\n💵 $${price}`;
@@ -160,8 +160,6 @@ if (hotDealsContainer) {
     }
   };
 
-  // Остальная логика (чекбоксы, формы, фильтры) — без изменений
-  // 🏨 Поиск отелей через API
   const hotelForm = document.getElementById("hotelForm");
   hotelForm?.addEventListener("submit", (e) => {
     e.preventDefault();
