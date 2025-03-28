@@ -150,6 +150,15 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Смена языка", window._appLang);
   });
 
+  // 📅 Обработка round-trip
+  document.getElementById("roundTrip")?.addEventListener("change", function () {
+    const wrapper = document.getElementById("returnDateWrapper");
+    const input = document.getElementById("returnDate");
+    wrapper.classList.toggle("hidden", !this.checked);
+    input.required = this.checked;
+    if (!this.checked) input.value = "";
+  });
+
   // ✈️ Горячие предложения
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
@@ -172,15 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
         hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
       });
   }
-
-  // 📅 Обработка round-trip
-  document.getElementById("roundTrip")?.addEventListener("change", function () {
-    const wrapper = document.getElementById("returnDateWrapper");
-    const input = document.getElementById("returnDate");
-    wrapper.classList.toggle("hidden", !this.checked);
-    input.required = this.checked;
-    if (!this.checked) input.value = "";
-  });
 
   // 🔍 Поиск отелей
   document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
