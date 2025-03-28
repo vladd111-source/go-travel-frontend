@@ -1,9 +1,9 @@
 // ✅ Supabase через CDN
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
-const supabaseKey = 'твой_ключ';
+const supabaseKey = 'твой_секретный_ключ';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// ✅ Генерация session_id
+// ✅ Сессионный ID
 const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
 localStorage.setItem("session_id", sessionId);
 
@@ -57,6 +57,7 @@ const translations = {
   }
 };
 
+// ✅ Логирование аналитики
 function logEventToAnalytics(eventName, eventData = {}) {
   const userId = window._telegramId;
   if (!userId) {
@@ -82,6 +83,7 @@ function logEventToAnalytics(eventName, eventData = {}) {
     });
 }
 
+// ✅ Трекер событий
 function trackEvent(name, data = "") {
   const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
   console.log(message);
@@ -94,32 +96,13 @@ function trackEvent(name, data = "") {
   });
 }
 
-function applyTranslations(lang) {
-  const t = translations[lang];
-  document.querySelector('[onclick*="flights"]').textContent = t.flights;
-  document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
-  document.querySelector('[onclick*="sights"]').textContent = t.sights;
-  document.querySelector('#search-form button[type="submit"]').textContent = t.findFlights;
-  document.querySelector('label[for="departureDate"]').textContent = t.departure;
-  document.getElementById("returnDateLabel").textContent = t.return;
-  document.getElementById("roundTripText").textContent = t.roundTrip;
-  document.querySelector("#hotelForm h3").textContent = t.hotelFilters;
-  document.getElementById("hotelCity").placeholder = t.city;
-  document.querySelector('label[for="checkIn"]').textContent = t.checkIn;
-  document.querySelector('label[for="checkOut"]').textContent = t.checkOut;
-  document.querySelector('label[for="minPrice"]').textContent = t.priceFrom;
-  document.querySelector('label[for="maxPrice"]').textContent = t.priceTo;
-  document.querySelector('label[for="minRating"]').textContent = t.ratingMin;
-  document.querySelector('label[for="guests"]').textContent = t.guests;
-  document.querySelector('#hotelForm button[type="submit"]').textContent = t.findHotel;
-}
-
+// ✅ Основной запуск
 document.addEventListener("DOMContentLoaded", () => {
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
+    const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
     console.log("🔍 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
 
-    const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
     if (!userId) {
       console.warn("❌ Нет Telegram ID — события не отправляются");
       return;
@@ -127,15 +110,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window._telegramId = userId;
     window._appLang = localStorage.getItem("lang") || "ru";
+
     console.log("👤 Telegram ID:", userId);
 
-    applyTranslations(window._appLang); // ✅ Применяем перевод
+    applyTranslations(window._appLang);
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
       timestamp: new Date().toISOString(),
     });
   }
 
+  // 🔤 Перевод
   document.getElementById("langSwitcher").value = window._appLang;
   document.getElementById("langSwitcher").addEventListener("change", (e) => {
     window._appLang = e.target.value;
@@ -144,6 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Смена языка", window._appLang);
   });
 
+  // ✈️ Загрузка горячих предложений
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
     supabase.from("go_travel").select("*")
@@ -166,6 +152,40 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
+  // 🧭 Переключение вкладок
+  window.showTab = function (id) {
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+      tab.classList.add('hidden');
+    });
+
+    const selectedTab = document.getElementById(id);
+    if (selectedTab) {
+      selectedTab.classList.remove('hidden');
+      selectedTab.classList.add('active');
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+    const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+    activeBtn?.classList.add('bg-blue-100');
+
+    localStorage.setItem("activeTab", id);
+    trackEvent("Переключение вкладки", id);
+  };
+
+  const savedTab = localStorage.getItem("activeTab") || "flights";
+  showTab(savedTab);
+
+  // 📅 Обработка round-trip чекбокса
+  document.getElementById("roundTrip")?.addEventListener("change", function () {
+    const wrapper = document.getElementById("returnDateWrapper");
+    const input = document.getElementById("returnDate");
+    wrapper.classList.toggle("hidden", !this.checked);
+    input.required = this.checked;
+    if (!this.checked) input.value = "";
+  });
+
+  // 🔍 Поиск отелей
   document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
     e.preventDefault();
     showLoading();
@@ -211,14 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  document.getElementById("roundTrip")?.addEventListener("change", function () {
-    const wrapper = document.getElementById("returnDateWrapper");
-    const input = document.getElementById("returnDate");
-    wrapper.classList.toggle("hidden", !this.checked);
-    input.required = this.checked;
-    if (!this.checked) input.value = "";
-  });
-
+  // ✈️ Поиск рейсов
   document.getElementById("search-form")?.addEventListener("submit", (e) => {
     e.preventDefault();
     const from = e.target.from.value.trim();
@@ -227,9 +240,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const msg = `✈️ Лучший рейс\n🛫 ${from} → 🛬 ${to}\n📅 ${departureDate}\n💰 $99`;
     Telegram.WebApp.sendData?.(msg);
-
     trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
   });
+
+  // 📚 Перевод
+  function applyTranslations(lang) {
+    const t = translations[lang];
+    document.querySelector('[onclick*="flights"]').textContent = t.flights;
+    document.querySelector('[onclick*="hotels"]').textContent = t.hotels;
+    document.querySelector('[onclick*="sights"]').textContent = t.sights;
+    document.querySelector('#search-form button[type="submit"]').textContent = t.findFlights;
+    document.querySelector('label[for="departureDate"]').textContent = t.departure;
+    document.getElementById("returnDateLabel").textContent = t.return;
+    document.getElementById("roundTripText").textContent = t.roundTrip;
+    document.querySelector("#hotelForm h3").textContent = t.hotelFilters;
+    document.getElementById("hotelCity").placeholder = t.city;
+    document.querySelector('label[for="checkIn"]').textContent = t.checkIn;
+    document.querySelector('label[for="checkOut"]').textContent = t.checkOut;
+    document.querySelector('label[for="minPrice"]').textContent = t.priceFrom;
+    document.querySelector('label[for="maxPrice"]').textContent = t.priceTo;
+    document.querySelector('label[for="minRating"]').textContent = t.ratingMin;
+    document.querySelector('label[for="guests"]').textContent = t.guests;
+    document.querySelector('#hotelForm button[type="submit"]').textContent = t.findHotel;
+  }
 
   window.bookFlight = function (from, to, date, price) {
     const message = `✈️ *Рейс из ${from} в ${to}*\n📅 ${date}\n💵 $${price}`;
@@ -242,29 +275,6 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Клик по брони (отель)", `${name} в ${city}, $${price}`);
     Telegram.WebApp.sendData?.(message);
   };
-
-  window.showTab = function (id) {
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.classList.remove('active');
-      tab.classList.add('hidden');
-    });
-
-    const selectedTab = document.getElementById(id);
-    if (selectedTab) {
-      selectedTab.classList.remove('hidden');
-      selectedTab.classList.add('active');
-    }
-
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
-    const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
-    activeBtn?.classList.add('bg-blue-100');
-
-    localStorage.setItem("activeTab", id);
-    trackEvent("Переключение вкладки", id);
-  };
-
-  const savedTab = localStorage.getItem("activeTab") || "flights";
-  showTab(savedTab);
 });
 
 // ⛑ Глобальный обработчик ошибок
