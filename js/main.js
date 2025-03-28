@@ -156,19 +156,20 @@ const returnDateWrapper = document.getElementById("returnDateWrapper");
 const returnDateInput = document.getElementById("returnDate");
 
 if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
-  // При инициализации сразу установить нужное состояние
   const updateReturnDateVisibility = () => {
     const isChecked = roundTripCheckbox.checked;
-    returnDateWrapper.classList.toggle("hidden", !isChecked);
-    returnDateWrapper.style.display = isChecked ? 'block' : 'none';
+
+    if (isChecked) {
+      returnDateWrapper.classList.remove("hidden");
+    } else {
+      returnDateWrapper.classList.add("hidden");
+      returnDateInput.value = "";
+    }
+
     returnDateInput.required = isChecked;
-    if (!isChecked) returnDateInput.value = "";
   };
 
-  // Обновить при загрузке (вдруг галочка уже стоит)
   updateReturnDateVisibility();
-
-  // Обработчик на изменение
   roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
 }
 
