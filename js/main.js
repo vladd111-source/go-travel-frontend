@@ -1,3 +1,4 @@
+
 // ✅ Supabase через CDN
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'твой_ключ';
@@ -10,6 +11,52 @@ localStorage.setItem("session_id", sessionId);
 // ✅ Глобальные переменные
 window._telegramId = null;
 window._appLang = localStorage.getItem("lang") || "ru";
+
+// ✅ Переводы
+const translations = {
+  ru: {
+    flights: "✈️ Авиабилеты",
+    hotels: "🏨 Отели",
+    sights: "🌍 Места",
+    findFlights: "Найти рейсы",
+    roundTrip: "Туда и обратно",
+    departure: "Дата вылета",
+    return: "Дата возвращения",
+    hotelResults: "Результаты:",
+    noHotelsFound: "Ничего не найдено по заданным фильтрам.",
+    hotelFilters: "🔎 Фильтры поиска",
+    city: "Город",
+    guests: "Гостей",
+    checkIn: "Дата заезда",
+    checkOut: "Дата выезда",
+    priceFrom: "Цена от",
+    priceTo: "Цена до",
+    ratingMin: "Минимальный рейтинг",
+    findHotel: "Найти отель",
+    bookNow: "Забронировать"
+  },
+  en: {
+    flights: "✈️ Flights",
+    hotels: "🏨 Hotels",
+    sights: "🌍 Places",
+    findFlights: "Search Flights",
+    roundTrip: "Round Trip",
+    departure: "Departure Date",
+    return: "Return Date",
+    hotelResults: "Results:",
+    noHotelsFound: "Nothing found for the selected filters.",
+    hotelFilters: "🔎 Search Filters",
+    city: "City",
+    guests: "Guests",
+    checkIn: "Check-in Date",
+    checkOut: "Check-out Date",
+    priceFrom: "Price from",
+    priceTo: "Price to",
+    ratingMin: "Min Rating",
+    findHotel: "Find Hotel",
+    bookNow: "Book Now"
+  }
+};
 
 function logEventToAnalytics(eventName, eventData = {}) {
   const userId = window._telegramId;
@@ -37,13 +84,12 @@ function logEventToAnalytics(eventName, eventData = {}) {
 }
 
 function trackEvent(name, data = "") {
-  const currentLang = window._appLang;
   const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
   console.log(message);
   Telegram.WebApp.sendData?.(message);
   logEventToAnalytics(name, {
     info: data,
-    lang: currentLang,
+    lang: window._appLang,
     activeTab: localStorage.getItem("activeTab") || "flights",
     timestamp: new Date().toISOString(),
   });
@@ -71,6 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
 
   function showLoading() {
     document.getElementById("loadingSpinner")?.classList.remove("hidden");
@@ -100,12 +147,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector('#hotelForm button[type="submit"]').textContent = t.findHotel;
   }
 
-  document.getElementById("langSwitcher").value = currentLang;
+  document.getElementById("langSwitcher").value = window._appLang;
   document.getElementById("langSwitcher").addEventListener("change", (e) => {
-    currentLang = e.target.value;
-    localStorage.setItem("lang", currentLang);
-    applyTranslations(currentLang);
-    trackEvent("Смена языка", currentLang);
+    window._appLang = e.target.value;
+    localStorage.setItem("lang", window._appLang);
+    applyTranslations(window._appLang);
+    trackEvent("Смена языка", window._appLang);
   });
 
   const hotDealsContainer = document.getElementById("hotDeals");
@@ -114,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(({ data, error }) => {
         if (error) throw error;
 
-        const t = translations[currentLang];
+        const t = translations[window._appLang];
         hotDealsContainer.innerHTML = data.map((deal) => `
           <div class="bg-white p-4 rounded-xl shadow">
             ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
@@ -161,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
           (!city || h.city.toLowerCase().includes(city.toLowerCase()))
         );
 
-        const t = translations[currentLang];
+        const t = translations[window._appLang];
         const resultBlock = document.getElementById("hotelsResult");
         resultBlock.classList.remove("visible");
 
