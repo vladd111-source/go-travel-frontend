@@ -1,11 +1,36 @@
 // ✅ Supabase через CDN
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA';
+const supabaseKey = 'твой_ключ';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// ✅ Сессионный ID
+// ✅ Генерация session_id
 const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
 localStorage.setItem("session_id", sessionId);
+
+// ✅ Глобальные переменные
+window._telegramId = null;
+window._appLang = localStorage.getItem("lang") || "ru";
+
+// ✅ Глобально доступная функция showTab
+window.showTab = function (id) {
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.remove('active');
+    tab.classList.add('hidden');
+  });
+
+  const selectedTab = document.getElementById(id);
+  if (selectedTab) {
+    selectedTab.classList.remove('hidden');
+    selectedTab.classList.add('active');
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+  activeBtn?.classList.add('bg-blue-100');
+
+  localStorage.setItem("activeTab", id);
+  trackEvent("Переключение вкладки", id);
+};
 
 // ✅ Глобальные переменные
 window._telegramId = null;
