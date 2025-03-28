@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Смена языка", window._appLang);
   });
 
-  // 📅 Обработка round-trip (показ даты возврата)
+  // ✅ Обработка "Туда и обратно"
   const roundTripCheckbox = document.getElementById("roundTrip");
   const returnDateWrapper = document.getElementById("returnDateWrapper");
   const returnDateInput = document.getElementById("returnDate");
