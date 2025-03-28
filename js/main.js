@@ -1,4 +1,4 @@
-// Supabase
+// ✅ Supabase через CDN (без import/export)
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'твой_ключ';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -7,7 +7,6 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
 localStorage.setItem("session_id", sessionId);
 
-// ✅ Всё в одном месте
 document.addEventListener("DOMContentLoaded", function () {
   let currentLang = localStorage.getItem("lang") || "ru";
 
@@ -62,6 +61,46 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
+  function logEventToAnalytics(eventName, eventData = {}) {
+    const userId = Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    if (!userId) {
+      console.warn("Нет Telegram ID — аналитика не записана");
+      return;
+    }
+
+    const payload = {
+      telegram_id: userId.toString(),
+      event: eventName,
+      data: eventData,
+      session_id: sessionId,
+      created_at: new Date().toISOString(),
+    };
+
+    supabase.from('analytics').insert([payload])
+      .then(({ error }) => {
+        if (error) {
+          console.error("❌ Ошибка записи в аналитику:", error.message);
+        } else {
+          console.log("📊 Событие аналитики записано:", eventName);
+        }
+      });
+  }
+
+  function trackEvent(name, data = "") {
+    const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
+    console.log(message);
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.sendData(message);
+    }
+
+    logEventToAnalytics(name, {
+      info: data,
+      lang: currentLang,
+      activeTab: localStorage.getItem("activeTab") || "flights",
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   function showLoading() {
     document.getElementById("loadingSpinner")?.classList.remove("hidden");
   }
@@ -70,44 +109,6 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("loadingSpinner")?.classList.add("hidden");
   }
 
- function logEventToAnalytics(eventName, eventData = {}) {
-  const userId = Telegram?.WebApp?.initDataUnsafe?.user?.id;
-  if (!userId) {
-    console.warn("Нет Telegram ID — аналитика не записана");
-    return;
-  }
-
-  const payload = {
-    telegram_id: userId.toString(),
-    event: eventName,
-    data: eventData,
-    created_at: new Date().toISOString(),
-  };
-
-  supabase.from('analytics').insert([payload])
-    .then(({ error }) => {
-      if (error) {
-        console.error("❌ Ошибка записи в аналитику:", error.message);
-      } else {
-        console.log("📊 Событие аналитики записано:", eventName);
-      }
-    });
-}
-
-function trackEvent(name, data = "") {
-  const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
-  console.log(message);
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.sendData(message);
-  }
-
-  logEventToAnalytics(name, {
-    info: data,
-    lang: localStorage.getItem("lang") || "ru",
-    activeTab: localStorage.getItem("activeTab") || "flights",
-    timestamp: new Date().toISOString(),
-  });
-}
   function applyTranslations(lang) {
     const t = translations[lang];
     document.querySelector('[onclick*="flights"]').textContent = t.flights;
@@ -162,9 +163,9 @@ function trackEvent(name, data = "") {
     trackEvent("Смена языка", currentLang);
   });
 
-  // ✈️ Загрузка рейсов из Supabase
+  // ✈️ Загрузка рейсов
   const hotDealsContainer = document.getElementById("hotDeals");
-  if (hotDealsContainer && typeof supabase !== 'undefined') {
+  if (hotDealsContainer) {
     supabase.from("go_travel").select("*")
       .then(({ data, error }) => {
         if (error) throw error;
@@ -201,8 +202,7 @@ function trackEvent(name, data = "") {
     }
   };
 
-  const hotelForm = document.getElementById("hotelForm");
-  hotelForm?.addEventListener("submit", (e) => {
+  document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
     e.preventDefault();
     showLoading();
 
@@ -247,23 +247,19 @@ function trackEvent(name, data = "") {
       });
   });
 
-  const roundTripCheckbox = document.getElementById("roundTrip");
-  if (roundTripCheckbox) {
-    roundTripCheckbox.addEventListener("change", function () {
-      const wrapper = document.getElementById("returnDateWrapper");
-      const input = document.getElementById("returnDate");
-      wrapper.classList.toggle("hidden", !this.checked);
-      input.required = this.checked;
-      if (!this.checked) input.value = "";
-    });
-  }
+  document.getElementById("roundTrip")?.addEventListener("change", function () {
+    const wrapper = document.getElementById("returnDateWrapper");
+    const input = document.getElementById("returnDate");
+    wrapper.classList.toggle("hidden", !this.checked);
+    input.required = this.checked;
+    if (!this.checked) input.value = "";
+  });
 
-  const flightForm = document.getElementById("search-form");
-  flightForm?.addEventListener("submit", (e) => {
+  document.getElementById("search-form")?.addEventListener("submit", (e) => {
     e.preventDefault();
-    const from = flightForm.from.value.trim();
-    const to = flightForm.to.value.trim();
-    const departureDate = flightForm.departureDate.value;
+    const from = e.target.from.value.trim();
+    const to = e.target.to.value.trim();
+    const departureDate = e.target.departureDate.value;
 
     const msg = `✈️ Лучший рейс\n🛫 ${from} → 🛬 ${to}\n📅 ${departureDate}\n💰 $99`;
     if (window.Telegram && Telegram.WebApp) {
@@ -275,4 +271,18 @@ function trackEvent(name, data = "") {
 
   const savedTab = localStorage.getItem("activeTab") || "flights";
   showTab(savedTab);
+});
+
+// ⛑ Глобальный обработчик ошибок
+window.onerror = function (msg, url, line, col, error) {
+  logEventToAnalytics("Ошибка JS", {
+    msg, url, line, col, stack: error?.stack || null
+  });
+};
+
+// 🕓 Длительность сессии
+const appStart = Date.now();
+window.addEventListener("beforeunload", () => {
+  const duration = Math.round((Date.now() - appStart) / 1000);
+  logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
 });
