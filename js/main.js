@@ -118,11 +118,9 @@ function trackEvent(name, data = "") {
   });
 }
 
-// ✅ Основной запуск
 document.addEventListener("DOMContentLoaded", () => {
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
-
     console.log("📦 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
 
     const user = Telegram.WebApp.initDataUnsafe?.user;
@@ -142,13 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 🔄 Прочий запусковой код можешь оставить ниже:
-  // - установка языка
-  // - отображение активной вкладки
-  // - инициализация чекбокса "Туда и обратно"
-});
-
-  // Язык
+  // ✅ Язык
   const langSwitcher = document.getElementById("langSwitcher");
   langSwitcher.value = window._appLang;
   langSwitcher.addEventListener("change", (e) => {
@@ -158,11 +150,11 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Смена языка", window._appLang);
   });
 
-  // Вкладка
+  // ✅ Вкладка
   const lastTab = localStorage.getItem("activeTab") || "flights";
   showTab(lastTab);
 
-  // Чекбокс "Туда и обратно"
+  // ✅ Чекбокс "Туда и обратно"
   const roundTripCheckbox = document.getElementById("roundTrip");
   const returnDateWrapper = document.getElementById("returnDateWrapper");
   const returnDateInput = document.getElementById("returnDate");
@@ -176,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
     roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
   }
 
-  // Горячие предложения
+  // ✅ Горячие предложения
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
     supabase.from("go_travel").select("*")
@@ -197,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // Поиск отелей
+  // ✅ Поиск отелей
   document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
     e.preventDefault();
     showLoading();
@@ -205,6 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
     const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
     const minRating = parseFloat(document.getElementById("minRating").value) || 0;
+
     fetch("http://localhost:3000/api/hotels")
       .then(res => res.json())
       .then(hotels => {
@@ -214,6 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
           h.rating >= minRating &&
           (!city || h.city.toLowerCase().includes(city.toLowerCase()))
         );
+
         const t = translations[window._appLang];
         const resultBlock = document.getElementById("hotelsResult");
         resultBlock.classList.remove("visible");
@@ -224,8 +218,8 @@ document.addEventListener("DOMContentLoaded", () => {
               Цена: $${h.price} / ночь<br>
               Рейтинг: ${h.rating}<br>
               <button class="btn mt-2 w-full" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
-            </div>
-          `).join("") : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+            </div>`).join("") :
+          `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
         );
         setTimeout(() => resultBlock.classList.add("visible"), 50);
         trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
@@ -237,16 +231,13 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  // Поиск рейсов
+  // ✅ Поиск рейсов
   document.getElementById("search-form")?.addEventListener("submit", (e) => {
     e.preventDefault();
     const from = e.target.from.value.trim();
     const to = e.target.to.value.trim();
     const departureDate = e.target.departureDate.value;
-    const msg = `✈️ Лучший рейс
-🛫 ${from} → 🛬 ${to}
-📅 ${departureDate}
-💰 $99`;
+    const msg = `✈️ Лучший рейс\n🛫 ${from} → 🛬 ${to}\n📅 ${departureDate}\n💰 $99`;
     Telegram.WebApp.sendData?.(msg);
     trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
   });
