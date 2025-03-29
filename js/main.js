@@ -122,6 +122,8 @@ function trackEvent(name, data = "") {
 document.addEventListener("DOMContentLoaded", () => {
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
+        console.log("initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
+    
     const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
     if (!userId) return;
     window._telegramId = userId;
