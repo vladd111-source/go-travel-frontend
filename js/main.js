@@ -122,18 +122,31 @@ function trackEvent(name, data = "") {
 document.addEventListener("DOMContentLoaded", () => {
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
-        console.log("initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
-    
-    const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
-    if (!userId) return;
-    window._telegramId = userId;
-    window._appLang = localStorage.getItem("lang") || "ru";
-    applyTranslations(window._appLang);
-    trackEvent("Загрузка приложения", {
-      lang: window._appLang,
-      timestamp: new Date().toISOString(),
-    });
+
+    console.log("📦 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
+
+    const user = Telegram.WebApp.initDataUnsafe?.user;
+    if (user && user.id) {
+      window._telegramId = user.id.toString();
+      console.log("✅ Telegram ID установлен:", window._telegramId);
+
+      window._appLang = localStorage.getItem("lang") || "ru";
+      applyTranslations(window._appLang);
+
+      trackEvent("Загрузка приложения", {
+        lang: window._appLang,
+        timestamp: new Date().toISOString(),
+      });
+    } else {
+      console.warn("❌ Не удалось получить Telegram ID — аналитика не будет записана");
+    }
   }
+
+  // 🔄 Прочий запусковой код можешь оставить ниже:
+  // - установка языка
+  // - отображение активной вкладки
+  // - инициализация чекбокса "Туда и обратно"
+});
 
   // Язык
   const langSwitcher = document.getElementById("langSwitcher");
