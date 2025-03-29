@@ -1,4 +1,3 @@
-
 // ✅ Supabase через CDN
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // 🔁 Твой ключ
@@ -107,7 +106,8 @@ function logEventToAnalytics(eventName, eventData = {}) {
 
 // ✅ Трекер событий
 function trackEvent(name, data = "") {
-  const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
+  const message = `📈 Событие: ${name}` + (data ? `
+➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
   console.log(message);
   Telegram.WebApp.sendData?.(message);
   logEventToAnalytics(name, {
@@ -120,19 +120,12 @@ function trackEvent(name, data = "") {
 
 // ✅ Основной запуск
 document.addEventListener("DOMContentLoaded", () => {
-  // Telegram init
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
     const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
-
-    if (!userId) {
-      console.warn("❌ Нет Telegram ID — события не отправляются");
-      return;
-    }
-
+    if (!userId) return;
     window._telegramId = userId;
     window._appLang = localStorage.getItem("lang") || "ru";
-
     applyTranslations(window._appLang);
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
@@ -140,16 +133,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Переключение языка
-  document.getElementById("langSwitcher").value = window._appLang;
-  document.getElementById("langSwitcher").addEventListener("change", (e) => {
+  // Язык
+  const langSwitcher = document.getElementById("langSwitcher");
+  langSwitcher.value = window._appLang;
+  langSwitcher.addEventListener("change", (e) => {
     window._appLang = e.target.value;
     localStorage.setItem("lang", window._appLang);
     applyTranslations(window._appLang);
     trackEvent("Смена языка", window._appLang);
   });
 
-  // Показать последнюю активную вкладку
+  // Вкладка
   const lastTab = localStorage.getItem("activeTab") || "flights";
   showTab(lastTab);
 
@@ -157,13 +151,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const roundTripCheckbox = document.getElementById("roundTrip");
   const returnDateWrapper = document.getElementById("returnDateWrapper");
   const returnDateInput = document.getElementById("returnDate");
-
   if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     const updateReturnDateVisibility = () => {
-      const isChecked = roundTripCheckbox.checked;
-      returnDateWrapper.classList.toggle("hidden", !isChecked);
-      returnDateInput.required = isChecked;
-      if (!isChecked) returnDateInput.value = "";
+      returnDateWrapper.classList.toggle("hidden", !roundTripCheckbox.checked);
+      returnDateInput.required = roundTripCheckbox.checked;
+      if (!roundTripCheckbox.checked) returnDateInput.value = "";
     };
     updateReturnDateVisibility();
     roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
@@ -176,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(({ data, error }) => {
         if (error) throw error;
         const t = translations[window._appLang];
-        hotDealsContainer.innerHTML = data.map((deal) => `
+        hotDealsContainer.innerHTML = data.map(deal => `
           <div class="bg-white p-4 rounded-xl shadow">
             ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
             📅 ${deal.date}<br>
@@ -186,7 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
         `).join("");
       })
       .catch(err => {
-        console.error("Ошибка Supabase:", err.message);
         hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
       });
   }
@@ -212,21 +203,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const resultBlock = document.getElementById("hotelsResult");
         resultBlock.classList.remove("visible");
         resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-          filtered.length ? filtered.map(hotel => `
+          filtered.length ? filtered.map(h => `
             <div class="card bg-white border p-4 rounded-xl mb-2">
-              <strong>${hotel.name}</strong> (${hotel.city})<br>
-              Цена: $${hotel.price} / ночь<br>
-              Рейтинг: ${hotel.rating}<br>
-              <button class="btn mt-2 w-full" onclick="bookHotel('${hotel.name}', '${hotel.city}', ${hotel.price}, ${hotel.rating})">${t.bookNow}</button>
-            </div>`).join("") :
-          `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+              <strong>${h.name}</strong> (${h.city})<br>
+              Цена: $${h.price} / ночь<br>
+              Рейтинг: ${h.rating}<br>
+              <button class="btn mt-2 w-full" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
+            </div>
+          `).join("") : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
         );
         setTimeout(() => resultBlock.classList.add("visible"), 50);
         trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
         hideLoading();
       })
       .catch(err => {
-        console.error("Ошибка загрузки отелей:", err);
         document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
         hideLoading();
       });
@@ -238,17 +228,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const from = e.target.from.value.trim();
     const to = e.target.to.value.trim();
     const departureDate = e.target.departureDate.value;
-    const btn = e.target.querySelector("button[type='submit']");
-    btn.disabled = true;
-    btn.innerText = "Поиск...";
-
-    setTimeout(() => {
-      const msg = `✈️ Лучший рейс\n🛫 ${from} → 🛬 ${to}\n📅 ${departureDate}\n💰 $99`;
-      Telegram.WebApp.sendData?.(msg);
-      trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
-      btn.disabled = false;
-      btn.innerText = translations[window._appLang].findFlights;
-    }, 1000); // имитация обработки
+    const msg = `✈️ Лучший рейс
+🛫 ${from} → 🛬 ${to}
+📅 ${departureDate}
+💰 $99`;
+    Telegram.WebApp.sendData?.(msg);
+    trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
   });
 });
 
