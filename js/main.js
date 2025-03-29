@@ -151,6 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ✅ Обработка "Туда и обратно"
+ document.addEventListener("DOMContentLoaded", () => {
   const roundTripCheckbox = document.getElementById("roundTrip");
   const returnDateWrapper = document.getElementById("returnDateWrapper");
   const returnDateInput = document.getElementById("returnDate");
@@ -166,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateReturnDateVisibility();
     roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
   }
+});
 
   // ✈️ Горячие предложения
   const hotDealsContainer = document.getElementById("hotDeals");
