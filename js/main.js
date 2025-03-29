@@ -149,24 +149,22 @@ document.addEventListener("DOMContentLoaded", () => {
     applyTranslations(window._appLang);
     trackEvent("Смена языка", window._appLang);
   });
+ // ✅ Обработка "Туда и обратно"
+const roundTripCheckbox = document.getElementById("roundTrip");
+const returnDateWrapper = document.getElementById("returnDateWrapper");
+const returnDateInput = document.getElementById("returnDate");
 
-  // ✅ Обработка "Туда и обратно"
- document.addEventListener("DOMContentLoaded", () => {
-  const roundTripCheckbox = document.getElementById("roundTrip");
-  const returnDateWrapper = document.getElementById("returnDateWrapper");
-  const returnDateInput = document.getElementById("returnDate");
+if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
+  const updateReturnDateVisibility = () => {
+    const isChecked = roundTripCheckbox.checked;
+    returnDateWrapper.classList.toggle("hidden", !isChecked);
+    returnDateInput.required = isChecked;
+    if (!isChecked) returnDateInput.value = "";
+  };
 
-  if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
-    const updateReturnDateVisibility = () => {
-      const isChecked = roundTripCheckbox.checked;
-      returnDateWrapper.classList.toggle("hidden", !isChecked);
-      returnDateInput.required = isChecked;
-      if (!isChecked) returnDateInput.value = "";
-    };
-
-    updateReturnDateVisibility();
-    roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
-  }
+  updateReturnDateVisibility();
+  roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
+}
 });
 
   // ✈️ Горячие предложения
