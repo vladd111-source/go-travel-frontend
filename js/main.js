@@ -1,3 +1,4 @@
+
 // ✅ Supabase через CDN
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // 🔁 Твой ключ
@@ -139,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 🔤 Перевод
+  // Переключение языка
   document.getElementById("langSwitcher").value = window._appLang;
   document.getElementById("langSwitcher").addEventListener("change", (e) => {
     window._appLang = e.target.value;
@@ -148,7 +149,11 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Смена языка", window._appLang);
   });
 
-  // ✅ Обработка "Туда и обратно"
+  // Показать последнюю активную вкладку
+  const lastTab = localStorage.getItem("activeTab") || "flights";
+  showTab(lastTab);
+
+  // Чекбокс "Туда и обратно"
   const roundTripCheckbox = document.getElementById("roundTrip");
   const returnDateWrapper = document.getElementById("returnDateWrapper");
   const returnDateInput = document.getElementById("returnDate");
@@ -160,18 +165,16 @@ document.addEventListener("DOMContentLoaded", () => {
       returnDateInput.required = isChecked;
       if (!isChecked) returnDateInput.value = "";
     };
-
-    updateReturnDateVisibility(); // при первой загрузке
+    updateReturnDateVisibility();
     roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
   }
 
-  // ✈️ Горячие предложения
+  // Горячие предложения
   const hotDealsContainer = document.getElementById("hotDeals");
   if (hotDealsContainer) {
     supabase.from("go_travel").select("*")
       .then(({ data, error }) => {
         if (error) throw error;
-
         const t = translations[window._appLang];
         hotDealsContainer.innerHTML = data.map((deal) => `
           <div class="bg-white p-4 rounded-xl shadow">
@@ -188,16 +191,14 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // 🔍 Поиск отелей
+  // Поиск отелей
   document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
     e.preventDefault();
     showLoading();
-
     const city = document.getElementById("hotelCity").value.trim();
     const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
     const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
     const minRating = parseFloat(document.getElementById("minRating").value) || 0;
-
     fetch("http://localhost:3000/api/hotels")
       .then(res => res.json())
       .then(hotels => {
@@ -207,11 +208,9 @@ document.addEventListener("DOMContentLoaded", () => {
           h.rating >= minRating &&
           (!city || h.city.toLowerCase().includes(city.toLowerCase()))
         );
-
         const t = translations[window._appLang];
         const resultBlock = document.getElementById("hotelsResult");
         resultBlock.classList.remove("visible");
-
         resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
           filtered.length ? filtered.map(hotel => `
             <div class="card bg-white border p-4 rounded-xl mb-2">
@@ -222,7 +221,6 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>`).join("") :
           `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
         );
-
         setTimeout(() => resultBlock.classList.add("visible"), 50);
         trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
         hideLoading();
@@ -234,34 +232,39 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  // ✈️ Поиск рейсов
+  // Поиск рейсов
   document.getElementById("search-form")?.addEventListener("submit", (e) => {
     e.preventDefault();
     const from = e.target.from.value.trim();
     const to = e.target.to.value.trim();
     const departureDate = e.target.departureDate.value;
+    const btn = e.target.querySelector("button[type='submit']");
+    btn.disabled = true;
+    btn.innerText = "Поиск...";
 
-    const msg = `✈️ Лучший рейс\n🛫 ${from} → 🛬 ${to}\n📅 ${departureDate}\n💰 $99`;
-    Telegram.WebApp.sendData?.(msg);
-    trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
+    setTimeout(() => {
+      const msg = `✈️ Лучший рейс\n🛫 ${from} → 🛬 ${to}\n📅 ${departureDate}\n💰 $99`;
+      Telegram.WebApp.sendData?.(msg);
+      trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
+      btn.disabled = false;
+      btn.innerText = translations[window._appLang].findFlights;
+    }, 1000); // имитация обработки
   });
 });
 
-// ✅ Глобальный обработчик ошибок
+// Глобальный обработчик ошибок
 window.onerror = function (msg, url, line, col, error) {
-  logEventToAnalytics("Ошибка JS", {
-    msg, url, line, col, stack: error?.stack || null
-  });
+  logEventToAnalytics("Ошибка JS", { msg, url, line, col, stack: error?.stack || null });
 };
 
-// 🕓 Длительность сессии
+// Длительность сессии
 const appStart = Date.now();
 window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - appStart) / 1000);
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
 });
 
-// 🔄 Loader
+// Loader
 function showLoading() {
   document.getElementById("loadingSpinner")?.classList.remove("hidden");
 }
