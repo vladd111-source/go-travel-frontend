@@ -119,10 +119,10 @@ function trackEvent(name, data = "") {
 
 // ✅ Основной запуск
 document.addEventListener("DOMContentLoaded", () => {
+  // Telegram init
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
     const userId = Telegram.WebApp.initDataUnsafe?.user?.id;
-    console.log("🔍 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
 
     if (!userId) {
       console.warn("❌ Нет Telegram ID — события не отправляются");
@@ -131,8 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window._telegramId = userId;
     window._appLang = localStorage.getItem("lang") || "ru";
-
-    console.log("👤 Telegram ID:", userId);
 
     applyTranslations(window._appLang);
     trackEvent("Загрузка приложения", {
@@ -149,23 +147,23 @@ document.addEventListener("DOMContentLoaded", () => {
     applyTranslations(window._appLang);
     trackEvent("Смена языка", window._appLang);
   });
- // ✅ Обработка "Туда и обратно"
-const roundTripCheckbox = document.getElementById("roundTrip");
-const returnDateWrapper = document.getElementById("returnDateWrapper");
-const returnDateInput = document.getElementById("returnDate");
 
-if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
-  const updateReturnDateVisibility = () => {
-    const isChecked = roundTripCheckbox.checked;
-    returnDateWrapper.classList.toggle("hidden", !isChecked);
-    returnDateInput.required = isChecked;
-    if (!isChecked) returnDateInput.value = "";
-  };
+  // ✅ Обработка "Туда и обратно"
+  const roundTripCheckbox = document.getElementById("roundTrip");
+  const returnDateWrapper = document.getElementById("returnDateWrapper");
+  const returnDateInput = document.getElementById("returnDate");
 
-  updateReturnDateVisibility();
-  roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
-}
-});
+  if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
+    const updateReturnDateVisibility = () => {
+      const isChecked = roundTripCheckbox.checked;
+      returnDateWrapper.classList.toggle("hidden", !isChecked);
+      returnDateInput.required = isChecked;
+      if (!isChecked) returnDateInput.value = "";
+    };
+
+    updateReturnDateVisibility(); // при первой загрузке
+    roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
+  }
 
   // ✈️ Горячие предложения
   const hotDealsContainer = document.getElementById("hotDeals");
@@ -249,7 +247,7 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
   });
 });
 
-// ⛑ Глобальный обработчик ошибок
+// ✅ Глобальный обработчик ошибок
 window.onerror = function (msg, url, line, col, error) {
   logEventToAnalytics("Ошибка JS", {
     msg, url, line, col, stack: error?.stack || null
