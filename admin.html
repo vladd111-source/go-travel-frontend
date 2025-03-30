@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel – Go Travel</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 p-6 font-sans">
   <div class="max-w-6xl mx-auto">
@@ -13,11 +12,9 @@
 
     <div class="mb-4">
       <label for="filterUser" class="text-sm font-semibold">Фильтр по Telegram ID:</label>
-      <input type="text" id="filterUser" placeholder="Введите Telegram ID" class="border px-3 py-1 rounded ml-2" />
-      <button onclick="loadAnalytics()" class="ml-2 bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 transition">Обновить</button>
+      <input type="text" id="filterUser" placeholder="Введите Telegram ID" class="border px-3 py-1 rounded ml-2">
+      <button onclick="loadAnalytics()" class="ml-2 bg-blue-600 text-white px-4 py-1 rounded">Обновить</button>
     </div>
-
-    <div class="text-sm text-gray-500 mb-2 hidden" id="loadingMsg">Загрузка данных...</div>
 
     <div class="overflow-x-auto">
       <table class="min-w-full bg-white rounded shadow text-sm">
@@ -34,14 +31,8 @@
     </div>
   </div>
 
-  <!-- ✅ Скрипт в отдельном файле -->
-  <script src="js/admin.js"></script>
-
-  <!-- Поддержка Enter для фильтра -->
-  <script>
-    document.getElementById("filterUser").addEventListener("keydown", e => {
-      if (e.key === "Enter") loadAnalytics();
-    });
-  </script>
+  <!-- Подключение JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>
