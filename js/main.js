@@ -279,7 +279,11 @@ document.addEventListener("DOMContentLoaded", () => {
         hideLoading();
       });
   });
-
+setTimeout(() => {
+  document.querySelectorAll(".card").forEach(card => {
+    card.classList.add("visible");
+  });
+}, 50);
   // Loader
   function showLoading() {
     document.getElementById("loadingSpinner")?.classList.remove("hidden");
