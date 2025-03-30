@@ -231,16 +231,40 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  // ✅ Поиск рейсов
-  document.getElementById("search-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const from = e.target.from.value.trim();
-    const to = e.target.to.value.trim();
-    const departureDate = e.target.departureDate.value;
-    const msg = `✈️ Лучший рейс\n🛫 ${from} → 🛬 ${to}\n📅 ${departureDate}\n💰 $99`;
-    Telegram.WebApp.sendData?.(msg);
-    trackEvent("Поиск рейса", `Из: ${from} → В: ${to}, Дата: ${departureDate}`);
-  });
+// ✅ Поиск рейсов (через API)
+document.getElementById("search-form")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const from = e.target.from.value.trim();
+  const to = e.target.to.value.trim();
+  const departureDate = e.target.departureDate.value;
+
+  showLoading();
+
+  fetch("https://go-travel-backend.vercel.app/api/flights")
+    .then(res => res.json())
+    .then(flights => {
+      const match = flights.find(f =>
+        f.from.toLowerCase() === from.toLowerCase() &&
+        f.to.toLowerCase() === to.toLowerCase()
+      );
+
+      if (match) {
+        const msg = `✈️ Нашли рейс\n🛫 ${match.from} → 🛬 ${match.to}\n📅 ${match.date}\n💰 $${match.price}`;
+        Telegram.WebApp.sendData?.(msg);
+        trackEvent("Поиск рейса", msg);
+      } else {
+        Telegram.WebApp.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
+        trackEvent("Поиск рейса", `Не найдено: ${from} → ${to}, ${departureDate}`);
+      }
+    })
+    .catch(err => {
+      console.error("Ошибка запроса рейсов:", err);
+      Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
+      trackEvent("Ошибка загрузки рейсов", err.message);
+    })
+    .finally(() => {
+      hideLoading();
+    });
 });
 
 // Глобальный обработчик ошибок
