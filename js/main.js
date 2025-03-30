@@ -197,6 +197,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
           </div>
         `).join("");
+        // 💡 Анимация после вставки
+setTimeout(() => {
+  document.querySelectorAll(".card").forEach(card => {
+    card.classList.add("visible");
+  });
+}, 50);
       })
       .catch(err => {
         hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
@@ -280,11 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hideLoading();
       });
   });
-setTimeout(() => {
-  document.querySelectorAll(".card").forEach(card => {
-    card.classList.add("visible");
-  });
-}, 50);
+
   // Loader
   function showLoading() {
     document.getElementById("loadingSpinner")?.classList.remove("hidden");
