@@ -63,6 +63,10 @@ function applyTranslations(lang) {
     const key = el.getAttribute("data-i18n");
     if (t[key]) el.textContent = t[key];
   });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    if (t[key]) el.placeholder = t[key];
+  });
 }
 
 // ✅ Глобально доступная функция showTab
