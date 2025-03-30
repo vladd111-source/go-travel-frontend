@@ -16,6 +16,11 @@ body {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   font-size: 0.875rem;
 }
+.input:focus {
+  border-color: #60a5fa;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+}
 /* Кнопка */
 .btn {
   background: linear-gradient(to right, #3b82f6, #6366f1);
@@ -79,6 +84,7 @@ hr {
 
 .card {
   opacity: 0;
+  margin-bottom: 1rem;
   transform: translateY(10px);
   animation: fadeInUp 0.4s ease forwards;
 }
