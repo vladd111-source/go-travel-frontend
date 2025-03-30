@@ -157,7 +157,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const returnDateInput = document.getElementById("returnDate");
   if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     const updateReturnDateVisibility = () => {
-      returnDateWrapper.classList.toggle("hidden", !roundTripCheckbox.checked);
+      if (roundTripCheckbox.checked) {
+  returnDateWrapper.classList.remove("hidden");
+} else {
+  returnDateWrapper.classList.add("hidden");
+}
       returnDateInput.required = roundTripCheckbox.checked;
       if (!roundTripCheckbox.checked) returnDateInput.value = "";
     };
