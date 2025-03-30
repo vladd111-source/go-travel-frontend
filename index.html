@@ -18,106 +18,107 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4 font-[Inter]">
-  <div class="max-w-2xl mx-auto">
-    <div class="flex justify-between items-center mb-4">
-      <h1 class="text-3xl font-bold">Go Travel ✈️</h1>
-      <select id="langSwitcher" class="text-sm border rounded px-2 py-1">
-        <option value="ru" selected>RU</option>
-        <option value="en">EN</option>
-      </select>
-    </div>
+ <div class="max-w-2xl mx-auto">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-3xl font-bold">Go Travel ✈️</h1>
+    <select id="langSwitcher" class="text-sm border rounded px-2 py-1">
+      <option value="ru" selected>RU</option>
+      <option value="en">EN</option>
+    </select>
+  </div>
 
-    <div class="flex justify-center mb-4 gap-2">
-      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('flights')">✈️ Авиабилеты</button>
-      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('hotels')">🏨 Отели</button>
-      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('sights')">🌍 Места</button>
-    </div>
+  <div class="flex justify-center mb-4 gap-2">
+    <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('flights')" data-i18n="flights"></button>
+    <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('hotels')" data-i18n="hotels"></button>
+    <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('sights')" data-i18n="sights"></button>
+  </div>
 
+  <!-- ✈️ Авиабилеты -->
   <div id="flights" class="tab block">
-  <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
-    <input type="text" name="from" placeholder="Откуда" class="input" required />
-    <input type="text" name="to" placeholder="Куда" class="input" required />
+    <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
+      <input type="text" name="from" class="input" required data-i18n-placeholder="city" />
+      <input type="text" name="to" class="input" required data-i18n-placeholder="city" />
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="label" for="departureDate" data-i18n="departure"></label>
+          <input type="date" name="departureDate" id="departureDate" class="input" required />
+        </div>
+        <div id="returnDateWrapper" class="hidden">
+          <label class="label" for="returnDate" data-i18n="return"></label>
+          <input type="date" name="returnDate" id="returnDate" class="input" />
+        </div>
+      </div>
+
+      <label class="flex items-center gap-2">
+        <input type="checkbox" id="roundTrip" />
+        <span data-i18n="roundTrip"></span>
+      </label>
+
+      <button type="submit" class="btn" data-i18n="findFlights"></button>
+    </form>
+
+    <h2 class="text-lg font-semibold mt-6" data-i18n="hotelResults"></h2>
+    <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
+  </div>
+
+  <!-- 🏨 Отели -->
+  <div id="hotels" class="tab hidden">
+    <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
+      <h3 class="text-base font-semibold mb-2" data-i18n="hotelFilters"></h3>
+      <input type="text" id="hotelCity" class="input" required data-i18n-placeholder="city" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="label" for="checkIn" data-i18n="checkIn"></label>
+          <input type="date" id="checkIn" class="input" />
+        </div>
+        <div>
+          <label class="label" for="checkOut" data-i18n="checkOut"></label>
+          <input type="date" id="checkOut" class="input" />
+        </div>
+      </div>
+      <hr />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="label" for="minPrice" data-i18n="priceFrom"></label>
+          <input type="number" id="minPrice" class="input" min="0" />
+        </div>
+        <div>
+          <label class="label" for="maxPrice" data-i18n="priceTo"></label>
+          <input type="number" id="maxPrice" class="input" min="0" />
+        </div>
+      </div>
       <div>
-        <label class="label" for="departureDate">Дата вылета</label>
-        <input type="date" name="departureDate" id="departureDate" class="input" required />
+        <label class="label" for="minRating" data-i18n="ratingMin"></label>
+        <input type="number" id="minRating" class="input" min="0" max="10" step="0.1" />
       </div>
-      <div id="returnDateWrapper" class="hidden">
-        <label class="label" for="returnDate">Дата возвращения</label>
-        <input type="date" name="returnDate" id="returnDate" class="input" />
+      <div>
+        <label class="label" for="guests" data-i18n="guests"></label>
+        <input type="number" id="guests" class="input" min="1" />
       </div>
-    </div>
+      <button type="submit" class="btn" data-i18n="findHotel"></button>
+    </form>
+    <div id="hotelsResult"></div>
+  </div>
 
-    <label class="flex items-center gap-2">
-      <input type="checkbox" id="roundTrip" />
-      Туда и обратно
-    </label>
-
-    <button type="submit" class="btn">Найти рейсы</button>
-  </form>
-
-  <h2 class="text-lg font-semibold mt-6">🔥 Горячие предложения</h2>
-  <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
-</div>
-
-    <!-- 🏨 Отели -->
-    <div id="hotels" class="tab hidden">
-      <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
-        <h3 class="text-base font-semibold mb-2">🔎 Фильтры поиска</h3>
-        <input type="text" placeholder="Город" id="hotelCity" class="input" required />
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="label" for="checkIn">Дата заезда</label>
-            <input type="date" id="checkIn" class="input" />
-          </div>
-          <div>
-            <label class="label" for="checkOut">Дата выезда</label>
-            <input type="date" id="checkOut" class="input" />
-          </div>
-        </div>
-        <hr />
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="label" for="minPrice">Цена от</label>
-            <input type="number" id="minPrice" class="input" placeholder="от, $" min="0" />
-          </div>
-          <div>
-            <label class="label" for="maxPrice">Цена до</label>
-            <input type="number" id="maxPrice" class="input" placeholder="до, $" min="0" />
-          </div>
-        </div>
-        <div>
-          <label class="label" for="minRating">Минимальный рейтинг</label>
-          <input type="number" id="minRating" class="input" placeholder="например, 8.0" min="0" max="10" step="0.1" />
-        </div>
-        <div>
-          <label class="label" for="guests">Гостей</label>
-          <input type="number" id="guests" class="input" min="1" placeholder="Количество гостей" />
-        </div>
-        <button type="submit" class="btn">Найти отель</button>
-      </form>
-      <div id="hotelsResult"></div>
-    </div>
-
-    <!-- 🌍 Места -->
-    <div id="sights" class="tab hidden">
-      <div class="grid gap-4">
-        <div class="bg-white p-4 rounded-xl shadow">
-          <h3 class="text-lg font-semibold">Castelo de São Jorge</h3>
-          <p class="text-sm text-gray-500">⭐ 4.7 | Лиссабон</p>
-        </div>
-        <div class="bg-white p-4 rounded-xl shadow">
-          <h3 class="text-lg font-semibold">Miradouro da Senhora do Monte</h3>
-          <p class="text-sm text-gray-500">⭐ 4.8 | Панорамный вид</p>
-        </div>
-        <div class="bg-white p-4 rounded-xl shadow">
-          <h3 class="text-lg font-semibold">Oceanário de Lisboa</h3>
-          <p class="text-sm text-gray-500">⭐ 4.6 | Один из лучших океанариумов Европы</p>
-        </div>
+  <!-- 🌍 Места -->
+  <div id="sights" class="tab hidden">
+    <div class="grid gap-4">
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h3 class="text-lg font-semibold">Castelo de São Jorge</h3>
+        <p class="text-sm text-gray-500">⭐ 4.7 | Лиссабон</p>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h3 class="text-lg font-semibold">Miradouro da Senhora do Monte</h3>
+        <p class="text-sm text-gray-500">⭐ 4.8 | Панорамный вид</p>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h3 class="text-lg font-semibold">Oceanário de Lisboa</h3>
+        <p class="text-sm text-gray-500">⭐ 4.6 | Один из лучших океанариумов Европы</p>
       </div>
     </div>
   </div>
+</div>
 
   <!-- 🔄 Спиннер -->
   <div id="loadingSpinner" class="hidden text-center my-4 text-gray-500">
