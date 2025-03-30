@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel – Go Travel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6 font-sans">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">📊 Admin Panel – Go Travel</h1>
+
+    <div class="mb-4">
+      <label for="filterUser" class="text-sm font-semibold">Фильтр по Telegram ID:</label>
+      <input type="text" id="filterUser" placeholder="Введите Telegram ID" class="border px-3 py-1 rounded ml-2">
+      <button onclick="loadAnalytics()" class="ml-2 bg-blue-600 text-white px-4 py-1 rounded">Обновить</button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white rounded shadow text-sm">
+        <thead class="bg-gray-200 text-left">
+          <tr>
+            <th class="p-2">🆔 Telegram ID</th>
+            <th class="p-2">📌 Событие</th>
+            <th class="p-2">📄 Данные</th>
+            <th class="p-2">🕒 Время</th>
+          </tr>
+        </thead>
+        <tbody id="analyticsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function loadAnalytics() {
+      const filter = document.getElementById("filterUser").value.trim();
+      let query = supabase.from("analytics").select("*").order("created_at", { ascending: false }).limit(100);
+      if (filter) query = query.eq("telegram_id", filter);
+
+      const { data, error } = await query;
+      const table = document.getElementById("analyticsTable");
+      table.innerHTML = "";
+
+      if (error) {
+        table.innerHTML = `<tr><td colspan="4" class="p-2 text-red-600">Ошибка загрузки: ${error.message}</td></tr>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        table.innerHTML = `<tr><td colspan="4" class="p-2 text-gray-500">Нет данных</td></tr>`;
+        return;
+      }
+
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="border-t p-2">${row.telegram_id}</td>
+          <td class="border-t p-2">${row.event}</td>
+          <td class="border-t p-2 whitespace-pre-wrap text-xs">${JSON.stringify(row.event_data, null, 2)}</td>
+          <td class="border-t p-2">${new Date(row.created_at).toLocaleString()}</td>
+        `;
+        table.appendChild(tr);
+      });
+    }
+
+    loadAnalytics();
+  </script>
+</body>
+</html>
