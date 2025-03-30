@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
     const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
-    fetch("http://localhost:3000/api/hotels")
+    fetch("https://go-travel-backend.vercel.app/api/hotels")
       .then(res => res.json())
       .then(hotels => {
         const filtered = hotels.filter(h =>
