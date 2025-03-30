@@ -286,3 +286,4 @@ function showLoading() {
 function hideLoading() {
   document.getElementById("loadingSpinner")?.classList.add("hidden");
 }
+  });
