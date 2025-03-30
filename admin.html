@@ -11,31 +11,33 @@
   <div class="max-w-6xl mx-auto">
     <h1 class="text-2xl font-bold mb-4">📊 Admin Panel – Go Travel</h1>
 
-    <div class="mb-6 flex flex-wrap gap-4 items-end">
+    <!-- Фильтры -->
+    <div class="flex flex-wrap gap-4 items-end mb-6">
       <div>
-        <label class="block text-sm font-semibold">Фильтр по Telegram ID:</label>
-        <input type="text" id="filterUser" placeholder="Введите Telegram ID" class="border px-3 py-1 rounded">
+        <label class="block text-sm font-medium">Telegram ID</label>
+        <input type="text" id="filterUser" placeholder="Введите Telegram ID" class="border px-3 py-1 rounded w-48">
       </div>
       <div>
-        <label class="block text-sm font-semibold">Дата от:</label>
+        <label class="block text-sm font-medium">С (дата)</label>
         <input type="date" id="dateFrom" class="border px-3 py-1 rounded">
       </div>
       <div>
-        <label class="block text-sm font-semibold">Дата до:</label>
+        <label class="block text-sm font-medium">По (дата)</label>
         <input type="date" id="dateTo" class="border px-3 py-1 rounded">
       </div>
-      <button onclick="loadAnalytics()" class="bg-blue-600 text-white px-4 py-2 rounded">Обновить</button>
+      <button onclick="loadAnalytics()" class="bg-blue-600 text-white px-4 py-2 rounded">🔄 Обновить</button>
     </div>
 
-    <div class="mb-6">
+    <!-- 📈 Статистика -->
+    <div class="bg-white rounded shadow p-4 mb-6">
       <h2 class="text-lg font-semibold mb-2">📈 Статистика</h2>
-      <div id="stats" class="bg-white rounded shadow p-4 text-sm grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div><strong>Уникальных пользователей:</strong> <span id="uniqueUsers">—</span></div>
-        <div><strong>Всего событий:</strong> <span id="totalEvents">—</span></div>
-        <div><strong>Топ событий:</strong> <ul id="topEvents" class="list-disc list-inside"></ul></div>
-      </div>
+      <p><strong>Уникальных пользователей:</strong> <span id="statUsers">–</span></p>
+      <p><strong>Всего событий:</strong> <span id="statEvents">–</span></p>
+      <p><strong>Топ событий:</strong></p>
+      <ul id="topEvents" class="list-disc pl-6 text-sm text-gray-700"></ul>
     </div>
 
+    <!-- Таблица -->
     <div class="overflow-x-auto">
       <table class="min-w-full bg-white rounded shadow text-sm">
         <thead class="bg-gray-200 text-left">
@@ -51,6 +53,7 @@
     </div>
   </div>
 
+  <!-- JS-файл -->
   <script src="admin.js"></script>
 </body>
 </html>
