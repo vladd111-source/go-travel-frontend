@@ -56,6 +56,14 @@ const translations = {
     bookNow: "Book Now"
   }
 };
+// ✅ Функция перевода элементов
+function applyTranslations(lang) {
+  const t = translations[lang];
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (t[key]) el.textContent = t[key];
+  });
+}
 
 // ✅ Глобально доступная функция showTab
 window.showTab = function (id) {
