@@ -1,6 +1,6 @@
 // ✅ Supabase через CDN
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA'; // 🔁 Твой ключ
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // ✅ Генерация session_id
@@ -10,27 +10,6 @@ localStorage.setItem("session_id", sessionId);
 // ✅ Глобальные переменные
 window._telegramId = null;
 window._appLang = localStorage.getItem("lang") || "ru";
-
-// ✅ Глобально доступная функция showTab
-window.showTab = function (id) {
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.classList.remove('active');
-    tab.classList.add('hidden');
-  });
-
-  const selectedTab = document.getElementById(id);
-  if (selectedTab) {
-    selectedTab.classList.remove('hidden');
-    selectedTab.classList.add('active');
-  }
-
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
-  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
-  activeBtn?.classList.add('bg-blue-100');
-
-  localStorage.setItem("activeTab", id);
-  trackEvent("Переключение вкладки", id);
-};
 
 // ✅ Переводы
 const translations = {
@@ -78,6 +57,27 @@ const translations = {
   }
 };
 
+// ✅ Глобально доступная функция showTab
+window.showTab = function (id) {
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.remove('active');
+    tab.classList.add('hidden');
+  });
+
+  const selectedTab = document.getElementById(id);
+  if (selectedTab) {
+    selectedTab.classList.remove('hidden');
+    selectedTab.classList.add('active');
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+  activeBtn?.classList.add('bg-blue-100');
+
+  localStorage.setItem("activeTab", id);
+  trackEvent("Переключение вкладки", id);
+};
+
 // ✅ Логирование аналитики
 function logEventToAnalytics(eventName, eventData = {}) {
   const userId = window._telegramId;
@@ -106,8 +106,7 @@ function logEventToAnalytics(eventName, eventData = {}) {
 
 // ✅ Трекер событий
 function trackEvent(name, data = "") {
-  const message = `📈 Событие: ${name}` + (data ? `
-➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
+  const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
   console.log(message);
   Telegram.WebApp.sendData?.(message);
   logEventToAnalytics(name, {
@@ -140,7 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ✅ Язык
   const langSwitcher = document.getElementById("langSwitcher");
   langSwitcher.value = window._appLang;
   langSwitcher.addEventListener("change", (e) => {
@@ -150,7 +148,6 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Смена языка", window._appLang);
   });
 
-  // ✅ Вкладка
   const lastTab = localStorage.getItem("activeTab") || "flights";
   showTab(lastTab);
 
@@ -231,59 +228,59 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-// ✅ Поиск рейсов (через API)
-document.getElementById("search-form")?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const from = e.target.from.value.trim();
-  const to = e.target.to.value.trim();
-  const departureDate = e.target.departureDate.value;
+  // ✅ Поиск рейсов
+  document.getElementById("search-form")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const from = e.target.from.value.trim();
+    const to = e.target.to.value.trim();
+    const departureDate = e.target.departureDate.value;
 
-  showLoading();
+    showLoading();
 
-  fetch("https://go-travel-backend.vercel.app/api/flights")
-    .then(res => res.json())
-    .then(flights => {
-      const match = flights.find(f =>
-        f.from.toLowerCase() === from.toLowerCase() &&
-        f.to.toLowerCase() === to.toLowerCase()
-      );
+    fetch("https://go-travel-backend.vercel.app/api/flights")
+      .then(res => res.json())
+      .then(flights => {
+        const match = flights.find(f =>
+          f.from.toLowerCase() === from.toLowerCase() &&
+          f.to.toLowerCase() === to.toLowerCase()
+        );
 
-      if (match) {
-        const msg = `✈️ Нашли рейс\n🛫 ${match.from} → 🛬 ${match.to}\n📅 ${match.date}\n💰 $${match.price}`;
-        Telegram.WebApp.sendData?.(msg);
-        trackEvent("Поиск рейса", msg);
-      } else {
-        Telegram.WebApp.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
-        trackEvent("Поиск рейса", `Не найдено: ${from} → ${to}, ${departureDate}`);
-      }
-    })
-    .catch(err => {
-      console.error("Ошибка запроса рейсов:", err);
-      Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
-      trackEvent("Ошибка загрузки рейсов", err.message);
-    })
-    .finally(() => {
-      hideLoading();
-    });
-});
-
-// Глобальный обработчик ошибок
-window.onerror = function (msg, url, line, col, error) {
-  logEventToAnalytics("Ошибка JS", { msg, url, line, col, stack: error?.stack || null });
-};
-
-// Длительность сессии
-const appStart = Date.now();
-window.addEventListener("beforeunload", () => {
-  const duration = Math.round((Date.now() - appStart) / 1000);
-  logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
-});
-
-// Loader
-function showLoading() {
-  document.getElementById("loadingSpinner")?.classList.remove("hidden");
-}
-function hideLoading() {
-  document.getElementById("loadingSpinner")?.classList.add("hidden");
-}
+        if (match) {
+          const msg = `✈️ Нашли рейс\n🛫 ${match.from} → 🛬 ${match.to}\n📅 ${match.date}\n💰 $${match.price}`;
+          Telegram.WebApp.sendData?.(msg);
+          trackEvent("Поиск рейса", msg);
+        } else {
+          Telegram.WebApp.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
+          trackEvent("Поиск рейса", `Не найдено: ${from} → ${to}, ${departureDate}`);
+        }
+      })
+      .catch(err => {
+        console.error("Ошибка запроса рейсов:", err);
+        Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
+        trackEvent("Ошибка загрузки рейсов", err.message);
+      })
+      .finally(() => {
+        hideLoading();
+      });
   });
+
+  // Loader
+  function showLoading() {
+    document.getElementById("loadingSpinner")?.classList.remove("hidden");
+  }
+  function hideLoading() {
+    document.getElementById("loadingSpinner")?.classList.add("hidden");
+  }
+
+  // Обработка ошибок
+  window.onerror = function (msg, url, line, col, error) {
+    logEventToAnalytics("Ошибка JS", { msg, url, line, col, stack: error?.stack || null });
+  };
+
+  // Время сессии
+  const appStart = Date.now();
+  window.addEventListener("beforeunload", () => {
+    const duration = Math.round((Date.now() - appStart) / 1000);
+    logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
+  });
+});
