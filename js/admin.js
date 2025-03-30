@@ -3,13 +3,18 @@ const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-// ✅ Загрузка аналитики
 async function loadAnalytics() {
   const filter = document.getElementById("filterUser").value.trim();
-  let query = supabase.from("analytics").select("*").order("created_at", { ascending: false }).limit(100);
+  let query = supabase
+    .from("analytics")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   if (filter) {
-    query = supabase.from("analytics").select("*")
+    query = supabase
+      .from("analytics")
+      .select("*")
       .eq("telegram_id", filter)
       .order("created_at", { ascending: false })
       .limit(100);
@@ -41,5 +46,5 @@ async function loadAnalytics() {
   });
 }
 
-// ✅ Автозагрузка при открытии
+// Загрузка данных при открытии страницы
 document.addEventListener("DOMContentLoaded", loadAnalytics);
