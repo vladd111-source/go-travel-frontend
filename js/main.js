@@ -149,6 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       console.warn("❌ Не удалось получить Telegram ID — аналитика не будет записана");
     }
+    document.body.classList.remove("opacity-0");
   }
 
   const langSwitcher = document.getElementById("langSwitcher");
