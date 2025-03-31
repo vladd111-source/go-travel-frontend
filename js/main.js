@@ -58,6 +58,7 @@ const translations = {
     bookNow: "Book Now"
   }
 };
+
 // ✅ Функция перевода элементов
 function applyTranslations(lang) {
   const t = translations[lang];
