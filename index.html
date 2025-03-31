@@ -33,14 +33,19 @@
   </style>
 </head>
 <body class="opacity-0 bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4 font-[Inter]">
-  <div class="w-full max-w-2xl mx-auto px-2 sm:px-4">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
-      <h1 class="text-2xl sm:text-3xl font-bold leading-tight">Go Travel ✈️</h1>
-      <select id="langSwitcher" class="text-sm border rounded px-2 py-1 w-full sm:w-auto">
-        <option value="ru" selected>RU</option>
-        <option value="en">EN</option>
-      </select>
-    </div>
+  <div class="w-full max-w-2xl mx-auto px-2 sm:px-4 relative">
+  <!-- Языковой переключатель в правом верхнем углу -->
+  <select id="langSwitcher"
+    class="absolute top-0 right-0 mt-2 mr-2 text-sm bg-white border border-gray-300 rounded px-2 py-1 shadow-sm focus:outline-none">
+    <option value="ru">RU</option>
+    <option value="en">EN</option>
+  </select>
+
+  <!-- Заголовок -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 pr-12">
+    <h1 class="text-2xl sm:text-3xl font-bold leading-tight">Go Travel ✈️</h1>
+  </div>
+</div>
 
     <div class="flex justify-center mb-4 gap-2 flex-wrap">
       <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('flights')" data-i18n="flights"></button>
