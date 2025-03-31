@@ -203,6 +203,19 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     // Восстановление активной вкладки
     const lastTab = localStorage.getItem("activeTab") || "flights";
     showTab(lastTab);
+    
+    // ✅ Показ/скрытие фильтров в отелях по чекбоксу
+const hotelFiltersToggle = document.getElementById("toggleFilters");
+const hotelFiltersSection = document.getElementById("hotelFilters");
+
+if (hotelFiltersToggle && hotelFiltersSection) {
+  const toggleVisibility = () => {
+    hotelFiltersSection.classList.toggle("hidden", !hotelFiltersToggle.checked);
+  };
+
+  hotelFiltersToggle.addEventListener("change", toggleVisibility);
+  toggleVisibility(); // при загрузке страницы
+}
 
     // Автофокус на первом input текущей вкладки
     setTimeout(() => {
