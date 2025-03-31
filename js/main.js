@@ -292,52 +292,71 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   const resultBlock = document.getElementById("placesResult");
 
   const dummyPlaces = [
-      {
-        name: "Castelo de São Jorge",
-        description: "Древняя крепость с видом на Лиссабон",
-        city: "лиссабон",
-        category: "culture",
-        image: "https://via.placeholder.com/300x180?text=Castle"
-      },
-      {
-        name: "Miradouro da Senhora do Monte",
-        description: "Лучший панорамный вид на город",
-        city: "лиссабон",
-        category: "nature",
-        image: "https://via.placeholder.com/300x180?text=Viewpoint"
-      },
-      {
-        name: "Oceanário de Lisboa",
-        description: "Современный океанариум",
-        city: "лиссабон",
-        category: "fun",
-        image: "https://via.placeholder.com/300x180?text=Oceanarium"
-      },
-      {
-        name: "Time Out Market",
-        description: "Фудкорт и рынок в центре города",
-        city: "лиссабон",
-        category: "food",
-        image: "https://via.placeholder.com/300x180?text=Food+Market"
-      },
-      {
-        name: "Centro Colombo",
-        description: "Крупный торговый центр",
-        city: "лиссабон",
-        category: "shopping",
-        image: "https://via.placeholder.com/300x180?text=Shopping+Mall"
-      }
-    ];
-
-    const filtered = dummyPlaces.filter(p =>
-      (!city || p.city.includes(city)) &&
-      (!category || p.category === category)
-    );
-
-    if (filtered.length === 0) {
-      resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
-      return;
+    {
+      name: "Castelo de São Jorge",
+      description: "Древняя крепость с видом на Лиссабон",
+      city: "лиссабон",
+      category: "culture",
+      image: "https://via.placeholder.com/300x180?text=Castle"
+    },
+    {
+      name: "Miradouro da Senhora do Monte",
+      description: "Лучший панорамный вид на город",
+      city: "лиссабон",
+      category: "nature",
+      image: "https://via.placeholder.com/300x180?text=Viewpoint"
+    },
+    {
+      name: "Oceanário de Lisboa",
+      description: "Современный океанариум",
+      city: "лиссабон",
+      category: "fun",
+      image: "https://via.placeholder.com/300x180?text=Oceanarium"
+    },
+    {
+      name: "Time Out Market",
+      description: "Фудкорт и рынок в центре города",
+      city: "лиссабон",
+      category: "food",
+      image: "https://via.placeholder.com/300x180?text=Food+Market"
+    },
+    {
+      name: "Centro Colombo",
+      description: "Крупный торговый центр",
+      city: "лиссабон",
+      category: "shopping",
+      image: "https://via.placeholder.com/300x180?text=Shopping+Mall"
     }
+  ];
+
+  const filtered = dummyPlaces.filter(p =>
+    (!city || p.city.includes(city)) &&
+    (!category || p.category === category)
+  );
+
+  if (filtered.length === 0) {
+    resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
+    return;
+  }
+
+  resultBlock.innerHTML = filtered.map(p => `
+    <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+      <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
+      <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+      <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+      <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded w-full">📍 Подробнее</button>
+    </div>
+  `).join("");
+
+  // ✨ Анимация появления
+  setTimeout(() => {
+    document.querySelectorAll("#placesResult .card").forEach(card => {
+      card.classList.remove("opacity-0", "scale-95");
+      card.classList.add("opacity-100", "scale-100");
+    });
+  }, 50);
+});
 
     resultBlock.innerHTML = filtered.map(p => `
       <div class="card bg-white p-4 rounded-xl shadow flex gap-4 items-start">
