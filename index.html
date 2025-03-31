@@ -121,35 +121,31 @@
       <div id="hotelsResult"></div>
     </div>
 
-    <!-- 🌍 Места -->
-    <div id="sights" class="tab hidden">
-      <form id="placesForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="label" for="placeCity" data-i18n="city"></label>
-            <input id="placeCity" type="text" class="input w-full" data-i18n-placeholder="city" />
-          </div>
-          <div class="mb-3">
-  <label for="placeCategory" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-    Категория
-  </label>
-  <select id="placeCategory"
-    class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm shadow-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-    <option value="">Все</option>
-    <option value="nature">🏞 Природа</option>
-    <option value="culture">🏰 Культура</option>
-    <option value="fun">🎢 Развлечения</option>
-    <option value="shopping">🛍 Шопинг</option>
-    <option value="food">🍽 Еда</option>
-  </select>
-</div>
-        </div>
-        <button type="submit" class="btn w-full mt-2 sm:w-auto" data-i18n="findSights">Показать места</button>
-      </form>
-
-      <div id="placesResult" class="grid gap-4 transition-all duration-300"></div>
+   <!-- 🌍 Места -->
+<div id="sights" class="tab hidden">
+  <form id="placesForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="label" for="placeCity" data-i18n="city">Город</label>
+        <input id="placeCity" type="text" class="input w-full" data-i18n-placeholder="city" />
+      </div>
+      <div>
+        <label class="label" for="placeCategory" data-i18n="category">Категория</label>
+        <select id="placeCategory" class="input w-full bg-white text-gray-900 dark:bg-gray-800 dark:text-white">
+          <option value="">Все</option>
+          <option value="nature">🏞 Природа</option>
+          <option value="culture">🏰 Культура</option>
+          <option value="fun">🎢 Развлечения</option>
+          <option value="shopping">🛍 Шопинг</option>
+          <option value="food">🍽 Еда</option>
+        </select>
+      </div>
     </div>
-
+    <button type="submit" class="btn w-full mt-2 sm:w-auto" data-i18n="findSights">Показать места</button>
+  </form>
+  <div id="placesResult" class="grid gap-4 transition-all duration-300"></div>
+</div>
+  
     <!-- 🔄 Спиннер -->
     <div id="loadingSpinner" class="hidden text-center my-4 text-gray-500">
       <span class="loader inline-block w-6 h-6 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></span>
