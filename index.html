@@ -101,23 +101,32 @@
     <div id="hotelsResult"></div>
   </div>
 
-  <!-- 🌍 Места -->
+ <!-- 🌍 Места -->
 <div id="sights" class="tab hidden">
-  <form id="placesForm" class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-    <input id="placeCity" type="text" placeholder="Введите город" class="border px-3 py-2 rounded shadow" />
-    <select id="placeCategory" class="border px-3 py-2 rounded shadow">
-      <option value="">Все категории</option>
-      <option value="nature">🏞 Природа</option>
-      <option value="culture">🏰 Культура</option>
-      <option value="fun">🎢 Развлечения</option>
-      <option value="shopping">🛍 Шопинг</option>
-      <option value="food">🍽 Еда</option>
-    </select>
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded shadow">Показать места</button>
+  <form id="placesForm" class="bg-white p-4 rounded-xl shadow mb-4">
+    <div class="flex flex-wrap items-end gap-4">
+      <div>
+        <label class="block text-sm font-medium mb-1" for="placeCity">Город</label>
+        <input id="placeCity" type="text" placeholder="Введите город" class="border px-3 py-2 rounded w-48">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1" for="placeCategory">Категория</label>
+        <select id="placeCategory" class="border px-3 py-2 rounded w-48">
+          <option value="">Все</option>
+          <option value="nature">🏞 Природа</option>
+          <option value="culture">🏰 Культура</option>
+          <option value="fun">🎢 Развлечения</option>
+          <option value="shopping">🛍 Шопинг</option>
+          <option value="food">🍽 Еда</option>
+        </select>
+      </div>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Показать места</button>
+    </div>
   </form>
 
   <div id="placesResult" class="grid gap-4"></div>
 </div>
+
 
   <!-- 🔄 Спиннер -->
   <div id="loadingSpinner" class="hidden text-center my-4 text-gray-500">
