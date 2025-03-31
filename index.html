@@ -130,16 +130,19 @@
         <input id="placeCity" type="text" class="input w-full" data-i18n-placeholder="city" />
       </div>
       <div>
-        <label class="label" for="placeCategory" data-i18n="category">Категория</label>
-        <select id="placeCategory" class="input w-full bg-white text-gray-900 dark:bg-gray-800 dark:text-white">
-          <option value="">Все</option>
-          <option value="nature">🏞 Природа</option>
-          <option value="culture">🏰 Культура</option>
-          <option value="fun">🎢 Развлечения</option>
-          <option value="shopping">🛍 Шопинг</option>
-          <option value="food">🍽 Еда</option>
-        </select>
-      </div>
+  <label class="label block text-sm font-medium text-gray-700 mb-1" for="placeCategory" data-i18n="category">
+    Категория
+  </label>
+  <select id="placeCategory"
+    class="input w-full bg-sky-100 text-black border border-gray-300 rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+    <option value="">Все</option>
+    <option value="nature">🏞 Природа</option>
+    <option value="culture">🏰 Культура</option>
+    <option value="fun">🎢 Развлечения</option>
+    <option value="shopping">🛍 Шопинг</option>
+    <option value="food">🍽 Еда</option>
+  </select>
+</div>
     </div>
     <button type="submit" class="btn w-full mt-2 sm:w-auto" data-i18n="findSights">Показать места</button>
   </form>
