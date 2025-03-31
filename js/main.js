@@ -285,6 +285,91 @@ setTimeout(() => {
       .finally(() => {
         hideLoading();
       });
+
+  // 🔍 Обработка формы поиска мест
+document.getElementById("placeForm")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const city = document.getElementById("placeCity").value.trim().toLowerCase();
+  const category = document.getElementById("placeCategory").value;
+  const resultBlock = document.getElementById("placesResult");
+
+  const dummyPlaces = [
+    {
+      name: "Castelo de São Jorge",
+      description: "Древняя крепость с видом на Лиссабон",
+      city: "лиссабон",
+      category: "culture",
+      image: "https://via.placeholder.com/300x180?text=Castle"
+    },
+    {
+      name: "Miradouro da Senhora do Monte",
+      description: "Лучший панорамный вид на город",
+      city: "лиссабон",
+      category: "nature",
+      image: "https://via.placeholder.com/300x180?text=Viewpoint"
+    },
+    {
+      name: "Oceanário de Lisboa",
+      description: "Современный океанариум",
+      city: "лиссабон",
+      category: "fun",
+      image: "https://via.placeholder.com/300x180?text=Oceanarium"
+    },
+    {
+      name: "Time Out Market",
+      description: "Фудкорт и рынок в центре города",
+      city: "лиссабон",
+      category: "food",
+      image: "https://via.placeholder.com/300x180?text=Food+Market"
+    },
+    {
+      name: "Centro Colombo",
+      description: "Крупный торговый центр",
+      city: "лиссабон",
+      category: "shopping",
+      image: "https://via.placeholder.com/300x180?text=Shopping+Mall"
+    }
+  ];
+
+  const filtered = dummyPlaces.filter(p =>
+    (!city || p.city.includes(city)) &&
+    (!category || p.category === category)
+  );
+
+  if (filtered.length === 0) {
+    resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
+    return;
+  }
+
+  resultBlock.innerHTML = filtered.map(p => `
+    <div class="card bg-white p-4 rounded-xl shadow flex gap-4 items-start">
+      <img src="${p.image}" alt="${p.name}" class="w-32 h-20 object-cover rounded-md" />
+      <div class="flex-1">
+        <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+        <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+        <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+        <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
+      </div>
+    </div>
+  `).join("");
+});
+
+// 🏷 Функция форматирования категории
+function formatCategory(code) {
+  const map = {
+    nature: "🏞 Природа",
+    culture: "🏰 Культура",
+    fun: "🎢 Развлечения",
+    shopping: "🛍 Шопинг",
+    food: "🍽 Еда"
+  };
+  return map[code] || code;
+}
+
+// 🔠 Первая буква — заглавная
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
   });
 
   // Loader
