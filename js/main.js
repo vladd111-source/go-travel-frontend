@@ -32,6 +32,7 @@ const translations = {
     priceTo: "Цена до",
     ratingMin: "Минимальный рейтинг",
     findHotel: "Найти отель",
+    findSights: "Показать места",
     bookNow: "Забронировать"
   },
   en: {
@@ -53,6 +54,7 @@ const translations = {
     priceTo: "Price to",
     ratingMin: "Min Rating",
     findHotel: "Find Hotel",
+    findSights: "Show Places",
     bookNow: "Book Now"
   }
 };
