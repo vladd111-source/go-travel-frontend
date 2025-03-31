@@ -4,12 +4,25 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // ✅ Генерация session_id
-const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
+const sessionId = localStorage.getItem("session_id") ||
+  (window.crypto?.randomUUID?.() || Date.now().toString());
 localStorage.setItem("session_id", sessionId);
 
 // ✅ Глобальные переменные
 window._telegramId = null;
 window._appLang = localStorage.getItem("lang") || "ru";
+
+// ✅ Плавное появление body
+setTimeout(() => {
+  document.body.classList.remove("opacity-0");
+}, 100);
+
+// ✅ Автофокус на первом input активной вкладки
+setTimeout(() => {
+  const currentTab = localStorage.getItem("activeTab") || "flights";
+  const firstInput = document.querySelector(`#${currentTab} input`);
+  if (firstInput) firstInput.focus();
+}, 200);
 
 // ✅ Переводы
 const translations = {
@@ -119,11 +132,13 @@ function logEventToAnalytics(eventName, eventData = {}) {
     });
 }
 
-// ✅ Трекер событий
+// ✅ Трекер событий (обновлен: защита вне Telegram)
 function trackEvent(name, data = "") {
   const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
   console.log(message);
-  Telegram.WebApp.sendData?.(message);
+  if (window.Telegram?.WebApp?.sendData) {
+    Telegram.WebApp.sendData(message);
+  }
   logEventToAnalytics(name, {
     info: data,
     lang: window._appLang,
@@ -131,7 +146,7 @@ function trackEvent(name, data = "") {
     timestamp: new Date().toISOString(),
   });
 }
-
+// ✅ DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
   if (window.Telegram && Telegram.WebApp) {
     Telegram.WebApp.ready();
@@ -152,20 +167,20 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       console.warn("❌ Не удалось получить Telegram ID — аналитика не будет записана");
     }
-
     // ⏳ Плавное появление
     setTimeout(() => {
       document.body.classList.remove("opacity-0");
     }, 100);
+
+ // ✅ Автофокус на первый input текущей вкладки
+    const currentTab = localStorage.getItem("activeTab") || "flights";
+    setTimeout(() => {
+      const firstInput = document.querySelector(`#${currentTab} input`);
+      if (firstInput) firstInput.focus();
+    }, 200);
   }
 
-  // Автофокус на первом input во вкладке
-  const currentTab = localStorage.getItem("activeTab") || "flights";
-  setTimeout(() => {
-    const firstInput = document.querySelector(`#${currentTab} input`);
-    if (firstInput) firstInput.focus();
-  }, 200);
-
+ // ✅ Переключение языка
   const langSwitcher = document.getElementById("langSwitcher");
   langSwitcher.value = window._appLang;
   langSwitcher.addEventListener("change", (e) => {
@@ -174,6 +189,10 @@ document.addEventListener("DOMContentLoaded", () => {
     applyTranslations(window._appLang);
     trackEvent("Смена языка", window._appLang);
   });
+  // ✅ Восстановление активной вкладки из кэша
+  const lastTab = localStorage.getItem("activeTab") || "flights";
+  showTab(lastTab);
+});
 
   // Кэш поля "Места"
   const placeCityInput = document.getElementById("placeCity");
@@ -196,7 +215,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const lastTab = localStorage.getItem("activeTab") || "flights";
-  showTab(lastTab);
+    showTab(lastTab);
+  } catch (e) {
+    console.error("❌ Ошибка при инициализации DOMContentLoaded:", e);
+  }
 });
 
   // ✅ Чекбокс "Туда и обратно"
