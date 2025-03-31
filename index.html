@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Go Travel ✈️</title>
 
-  <!-- Tailwind (для продакшена лучше использовать через PostCSS) -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Шрифт -->
@@ -18,125 +18,124 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="opacity-0 bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4 font-[Inter]">
- <div class="max-w-2xl mx-auto">
-  <div class="flex justify-between items-center mb-4">
-    <h1 class="text-3xl font-bold">Go Travel ✈️</h1>
-    <select id="langSwitcher" class="text-sm border rounded px-2 py-1">
-      <option value="ru" selected>RU</option>
-      <option value="en">EN</option>
-    </select>
-  </div>
-
-  <div class="flex justify-center mb-4 gap-2">
-    <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('flights')" data-i18n="flights"></button>
-    <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('hotels')" data-i18n="hotels"></button>
-    <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('sights')" data-i18n="sights"></button>
-  </div>
-
-  <!-- ✈️ Авиабилеты -->
-  <div id="flights" class="tab block">
-    <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
-      <input type="text" name="from" class="input" required data-i18n-placeholder="city" />
-      <input type="text" name="to" class="input" required data-i18n-placeholder="city" />
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="label" for="departureDate" data-i18n="departure"></label>
-          <input type="date" name="departureDate" id="departureDate" class="input" required />
-        </div>
-        <div id="returnDateWrapper" class="hidden">
-          <label class="label" for="returnDate" data-i18n="return"></label>
-          <input type="date" name="returnDate" id="returnDate" class="input" />
-        </div>
-      </div>
-
-      <label class="flex items-center gap-2">
-        <input type="checkbox" id="roundTrip" />
-        <span data-i18n="roundTrip"></span>
-      </label>
-
-      <button type="submit" class="btn" data-i18n="findFlights"></button>
-    </form>
-
-    <h2 class="text-lg font-semibold mt-6" data-i18n="hotelResults"></h2>
-    <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
-  </div>
-
-  <!-- 🏨 Отели -->
-  <div id="hotels" class="tab hidden">
-    <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
-      <h3 class="text-base font-semibold mb-2" data-i18n="hotelFilters"></h3>
-      <input type="text" id="hotelCity" class="input" required data-i18n-placeholder="city" />
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="label" for="checkIn" data-i18n="checkIn"></label>
-          <input type="date" id="checkIn" class="input" />
-        </div>
-        <div>
-          <label class="label" for="checkOut" data-i18n="checkOut"></label>
-          <input type="date" id="checkOut" class="input" />
-        </div>
-      </div>
-      <hr />
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="label" for="minPrice" data-i18n="priceFrom"></label>
-          <input type="number" id="minPrice" class="input" min="0" />
-        </div>
-        <div>
-          <label class="label" for="maxPrice" data-i18n="priceTo"></label>
-          <input type="number" id="maxPrice" class="input" min="0" />
-        </div>
-      </div>
-      <div>
-        <label class="label" for="minRating" data-i18n="ratingMin"></label>
-        <input type="number" id="minRating" class="input" min="0" max="10" step="0.1" />
-      </div>
-      <div>
-        <label class="label" for="guests" data-i18n="guests"></label>
-        <input type="number" id="guests" class="input" min="1" />
-      </div>
-      <button type="submit" class="btn" data-i18n="findHotel"></button>
-    </form>
-    <div id="hotelsResult"></div>
-  </div>
-
-<!-- 🌍 Места -->
-<div id="sights" class="tab hidden">
-  <form id="placesForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div>
-        <label class="label" for="placeCity" data-i18n="city"></label>
-        <input id="placeCity" type="text" class="input w-full" data-i18n-placeholder="city" />
-      </div>
-      <div>
-        <label class="label" for="placeCategory">Категория</label>
-        <select id="placeCategory" class="input w-full">
-          <option value="">Все</option>
-          <option value="nature">🏞 Природа</option>
-          <option value="culture">🏰 Культура</option>
-          <option value="fun">🎢 Развлечения</option>
-          <option value="shopping">🛍 Шопинг</option>
-          <option value="food">🍽 Еда</option>
-        </select>
-      </div>
+  <div class="w-full max-w-2xl mx-auto px-2 sm:px-4">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-3xl font-bold">Go Travel ✈️</h1>
+      <select id="langSwitcher" class="text-sm border rounded px-2 py-1">
+        <option value="ru" selected>RU</option>
+        <option value="en">EN</option>
+      </select>
     </div>
-    <button type="submit" class="btn w-full mt-2" data-i18n="findSights">Показать места</button>
-  </form>
 
-  <div id="placesResult" class="grid gap-4 transition-all duration-300"></div>
-</div>
+    <div class="flex justify-center mb-4 gap-2 flex-wrap">
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('flights')" data-i18n="flights"></button>
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('hotels')" data-i18n="hotels"></button>
+      <button class="tab-btn bg-white px-4 py-2 rounded-xl shadow text-sm font-medium" onclick="showTab('sights')" data-i18n="sights"></button>
+    </div>
 
-  <!-- 🔄 Спиннер -->
-  <div id="loadingSpinner" class="hidden text-center my-4 text-gray-500">
-    <span class="loader inline-block w-6 h-6 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></span>
-    <span class="ml-2 align-middle">Загрузка...</span>
+    <!-- ✈️ Авиабилеты -->
+    <div id="flights" class="tab block">
+      <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
+        <input type="text" name="from" class="input" required data-i18n-placeholder="city" />
+        <input type="text" name="to" class="input" required data-i18n-placeholder="city" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="label" for="departureDate" data-i18n="departure"></label>
+            <input type="date" name="departureDate" id="departureDate" class="input" required />
+          </div>
+          <div id="returnDateWrapper" class="hidden">
+            <label class="label" for="returnDate" data-i18n="return"></label>
+            <input type="date" name="returnDate" id="returnDate" class="input" />
+          </div>
+        </div>
+
+        <label class="flex items-center gap-2">
+          <input type="checkbox" id="roundTrip" />
+          <span data-i18n="roundTrip"></span>
+        </label>
+
+        <button type="submit" class="btn" data-i18n="findFlights"></button>
+      </form>
+
+      <h2 class="text-lg font-semibold mt-6" data-i18n="hotelResults"></h2>
+      <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
+    </div>
+
+    <!-- 🏨 Отели -->
+    <div id="hotels" class="tab hidden">
+      <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
+        <h3 class="text-base font-semibold mb-2" data-i18n="hotelFilters"></h3>
+        <input type="text" id="hotelCity" class="input" required data-i18n-placeholder="city" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="label" for="checkIn" data-i18n="checkIn"></label>
+            <input type="date" id="checkIn" class="input" />
+          </div>
+          <div>
+            <label class="label" for="checkOut" data-i18n="checkOut"></label>
+            <input type="date" id="checkOut" class="input" />
+          </div>
+        </div>
+        <hr />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="label" for="minPrice" data-i18n="priceFrom"></label>
+            <input type="number" id="minPrice" class="input" min="0" />
+          </div>
+          <div>
+            <label class="label" for="maxPrice" data-i18n="priceTo"></label>
+            <input type="number" id="maxPrice" class="input" min="0" />
+          </div>
+        </div>
+        <div>
+          <label class="label" for="minRating" data-i18n="ratingMin"></label>
+          <input type="number" id="minRating" class="input" min="0" max="10" step="0.1" />
+        </div>
+        <div>
+          <label class="label" for="guests" data-i18n="guests"></label>
+          <input type="number" id="guests" class="input" min="1" />
+        </div>
+        <button type="submit" class="btn" data-i18n="findHotel"></button>
+      </form>
+      <div id="hotelsResult"></div>
+    </div>
+
+    <!-- 🌍 Места -->
+    <div id="sights" class="tab hidden">
+      <form id="placesForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="label" for="placeCity" data-i18n="city"></label>
+            <input id="placeCity" type="text" class="input w-full" data-i18n-placeholder="city" />
+          </div>
+          <div>
+            <label class="label" for="placeCategory">Категория</label>
+            <select id="placeCategory" class="input w-full">
+              <option value="">Все</option>
+              <option value="nature">🏞 Природа</option>
+              <option value="culture">🏰 Культура</option>
+              <option value="fun">🎢 Развлечения</option>
+              <option value="shopping">🛍 Шопинг</option>
+              <option value="food">🍽 Еда</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn w-full mt-2 sm:w-auto" data-i18n="findSights">Показать места</button>
+      </form>
+
+      <div id="placesResult" class="grid gap-4 transition-all duration-300"></div>
+    </div>
+
+    <!-- 🔄 Спиннер -->
+    <div id="loadingSpinner" class="hidden text-center my-4 text-gray-500">
+      <span class="loader inline-block w-6 h-6 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></span>
+      <span class="ml-2 align-middle">Загрузка...</span>
+    </div>
   </div>
 
-  <!-- ✅ Только один подключенный модуль -->
+  <!-- Подключение Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
- <script src="js/main.js"></script>
-
-
+  <script src="js/main.js"></script>
 </body>
 </html>
