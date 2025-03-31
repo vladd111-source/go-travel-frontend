@@ -359,20 +359,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     });
   }, 50);
 });
-
-    resultBlock.innerHTML = filtered.map(p => `
-      <div class="card bg-white p-4 rounded-xl shadow flex gap-4 items-start">
-        <img src="${p.image}" alt="${p.name}" class="w-32 h-20 object-cover rounded-md" />
-        <div class="flex-1">
-          <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-          <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-          <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
-          <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
-        </div>
-      </div>
-    `).join("");
-  });
-
+  
   function formatCategory(code) {
     const map = {
       nature: "🏞 Природа",
