@@ -101,17 +101,17 @@
     <div id="hotelsResult"></div>
   </div>
 
- <!-- 🌍 Места -->
+<!-- 🌍 Места -->
 <div id="sights" class="tab hidden">
-  <form id="placesForm" class="bg-white p-4 rounded-xl shadow mb-4">
-    <div class="flex flex-wrap items-end gap-4">
+  <form id="placesForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium mb-1" for="placeCity">Город</label>
-        <input id="placeCity" type="text" placeholder="Введите город" class="border px-3 py-2 rounded w-48">
+        <label class="label" for="placeCity" data-i18n="city"></label>
+        <input id="placeCity" type="text" class="input w-full" data-i18n-placeholder="city" />
       </div>
       <div>
-        <label class="block text-sm font-medium mb-1" for="placeCategory">Категория</label>
-        <select id="placeCategory" class="border px-3 py-2 rounded w-48">
+        <label class="label" for="placeCategory">Категория</label>
+        <select id="placeCategory" class="input w-full">
           <option value="">Все</option>
           <option value="nature">🏞 Природа</option>
           <option value="culture">🏰 Культура</option>
@@ -120,13 +120,12 @@
           <option value="food">🍽 Еда</option>
         </select>
       </div>
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Показать места</button>
     </div>
+    <button type="submit" class="btn w-full mt-2" data-i18n="findSights">Показать места</button>
   </form>
 
   <div id="placesResult" class="grid gap-4 transition-all duration-300"></div>
 </div>
-
 
   <!-- 🔄 Спиннер -->
   <div id="loadingSpinner" class="hidden text-center my-4 text-gray-500">
