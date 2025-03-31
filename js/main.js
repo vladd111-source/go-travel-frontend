@@ -321,6 +321,21 @@ document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
       hideLoading();
     });
 });
+// ✅ Показ/скрытие фильтров в отелях
+const hotelFiltersToggle = document.getElementById("hotelFiltersToggle");
+const hotelFiltersSection = document.getElementById("hotelFiltersSection");
+
+if (hotelFiltersToggle && hotelFiltersSection) {
+  const toggleVisibility = () => {
+    hotelFiltersSection.classList.toggle("hidden", !hotelFiltersToggle.checked);
+  };
+
+  // При изменении чекбокса — переключать видимость
+  hotelFiltersToggle.addEventListener("change", toggleVisibility);
+
+  // При загрузке страницы — применить начальное состояние
+  toggleVisibility();
+}
 
 // ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
