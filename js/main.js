@@ -152,8 +152,19 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       console.warn("❌ Не удалось получить Telegram ID — аналитика не будет записана");
     }
-    document.body.classList.remove("opacity-0");
+
+    // ⏳ Плавное появление
+    setTimeout(() => {
+      document.body.classList.remove("opacity-0");
+    }, 100);
   }
+
+  // Автофокус на первом input во вкладке
+  const currentTab = localStorage.getItem("activeTab") || "flights";
+  setTimeout(() => {
+    const firstInput = document.querySelector(`#${currentTab} input`);
+    if (firstInput) firstInput.focus();
+  }, 200);
 
   const langSwitcher = document.getElementById("langSwitcher");
   langSwitcher.value = window._appLang;
@@ -164,8 +175,29 @@ document.addEventListener("DOMContentLoaded", () => {
     trackEvent("Смена языка", window._appLang);
   });
 
+  // Кэш поля "Места"
+  const placeCityInput = document.getElementById("placeCity");
+  const placeCategorySelect = document.getElementById("placeCategory");
+
+  if (placeCityInput) {
+    const cachedCity = localStorage.getItem("placeCity");
+    if (cachedCity) placeCityInput.value = cachedCity;
+    placeCityInput.addEventListener("input", (e) => {
+      localStorage.setItem("placeCity", e.target.value.trim());
+    });
+  }
+
+  if (placeCategorySelect) {
+    const cachedCategory = localStorage.getItem("placeCategory");
+    if (cachedCategory) placeCategorySelect.value = cachedCategory;
+    placeCategorySelect.addEventListener("change", (e) => {
+      localStorage.setItem("placeCategory", e.target.value);
+    });
+  }
+
   const lastTab = localStorage.getItem("activeTab") || "flights";
   showTab(lastTab);
+});
 
   // ✅ Чекбокс "Туда и обратно"
   const roundTripCheckbox = document.getElementById("roundTrip");
@@ -186,113 +218,167 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ✅ Горячие предложения
-  const hotDealsContainer = document.getElementById("hotDeals");
-  if (hotDealsContainer) {
-    supabase.from("go_travel").select("*")
-      .then(({ data, error }) => {
-        if (error) throw error;
-        const t = translations[window._appLang];
-        hotDealsContainer.innerHTML = data.map(deal => `
-          <div class="bg-white p-4 rounded-xl shadow">
-            ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
-            📅 ${deal.date}<br>
-            <span class="text-red-600 font-semibold">$${deal.price}</span><br>
-            <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
-          </div>
-        `).join("");
-        setTimeout(() => {
-          document.querySelectorAll(".card").forEach(card => card.classList.add("visible"));
-        }, 50);
-      })
-      .catch(err => {
-        hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
-      });
-  }
+const hotDealsContainer = document.getElementById("hotDeals");
+if (hotDealsContainer) {
+  supabase.from("go_travel").select("*")
+    .then(({ data, error }) => {
+      if (error) throw error;
+      const t = translations[window._appLang];
+      hotDealsContainer.innerHTML = data.map(deal => `
+        <div class="card bg-white p-4 rounded-xl shadow transition-all duration-300 transform opacity-0 scale-95">
+          ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
+          📅 ${deal.date}<br>
+          <span class="text-red-600 font-semibold">$${deal.price}</span><br>
+          <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
+        </div>
+      `).join("");
+
+      // ✨ Плавная анимация появления карточек
+      setTimeout(() => {
+        document.querySelectorAll("#hotDeals .card").forEach(card => {
+          card.classList.remove("opacity-0", "scale-95");
+          card.classList.add("opacity-100", "scale-100");
+        });
+      }, 50);
+    })
+    .catch(err => {
+      hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
+    });
+}
 
   // ✅ Поиск отелей
-  document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    showLoading();
-    const city = document.getElementById("hotelCity").value.trim();
-    const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
-    const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
-    const minRating = parseFloat(document.getElementById("minRating").value) || 0;
+const hotelCityInput = document.getElementById("hotelCity");
+if (hotelCityInput) {
+  hotelCityInput.value = localStorage.getItem("lastHotelCity") || "";
+  hotelCityInput.setAttribute("autofocus", "autofocus");
+}
 
-    fetch("https://go-travel-backend.vercel.app/api/hotels")
-      .then(res => res.json())
-      .then(hotels => {
-        const filtered = hotels.filter(h =>
-          h.price >= minPrice &&
-          h.price <= maxPrice &&
-          h.rating >= minRating &&
-          (!city || h.city.toLowerCase().includes(city.toLowerCase()))
-        );
+document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  showLoading();
 
-        const t = translations[window._appLang];
-        const resultBlock = document.getElementById("hotelsResult");
-        resultBlock.classList.remove("visible");
-        resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-          filtered.length ? filtered.map(h => `
-            <div class="card bg-white border p-4 rounded-xl mb-2">
-              <strong>${h.name}</strong> (${h.city})<br>
-              Цена: $${h.price} / ночь<br>
-              Рейтинг: ${h.rating}<br>
-              <button class="btn mt-2 w-full" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
-            </div>`).join("") :
-          `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-        );
-        setTimeout(() => resultBlock.classList.add("visible"), 50);
-        trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
-        hideLoading();
-      })
-      .catch(err => {
-        document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
-        hideLoading();
-      });
-  });
+  const city = hotelCityInput.value.trim();
+  localStorage.setItem("lastHotelCity", city);
+
+  const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
+  const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
+  const minRating = parseFloat(document.getElementById("minRating").value) || 0;
+
+  fetch("https://go-travel-backend.vercel.app/api/hotels")
+    .then(res => res.json())
+    .then(hotels => {
+      const filtered = hotels.filter(h =>
+        h.price >= minPrice &&
+        h.price <= maxPrice &&
+        h.rating >= minRating &&
+        (!city || h.city.toLowerCase().includes(city.toLowerCase()))
+      );
+
+      const t = translations[window._appLang];
+      const resultBlock = document.getElementById("hotelsResult");
+      resultBlock.classList.remove("visible");
+
+      resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+        filtered.length ? filtered.map(h => `
+          <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
+            <strong>${h.name}</strong> (${h.city})<br>
+            Цена: $${h.price} / ночь<br>
+            Рейтинг: ${h.rating}<br>
+            <button class="btn mt-2 w-full" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
+          </div>
+        `).join("") :
+        `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+      );
+
+      // ✨ Анимация появления
+      setTimeout(() => {
+        document.querySelectorAll("#hotelsResult .card").forEach(card => {
+          card.classList.remove("opacity-0", "scale-95");
+          card.classList.add("opacity-100", "scale-100");
+        });
+      }, 50);
+
+      trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
+      hideLoading();
+    })
+    .catch(err => {
+      document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
+      hideLoading();
+    });
+});
 
   // ✅ Поиск рейсов
-  document.getElementById("search-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const from = e.target.from.value.trim();
-    const to = e.target.to.value.trim();
-    const departureDate = e.target.departureDate.value;
+const fromInput = document.getElementById("from");
+const toInput = document.getElementById("to");
+const departureInput = document.getElementById("departureDate");
 
-    showLoading();
+if (fromInput && toInput && departureInput) {
+  fromInput.value = localStorage.getItem("lastFrom") || "";
+  toInput.value = localStorage.getItem("lastTo") || "";
+  departureInput.value = localStorage.getItem("lastDepartureDate") || "";
+  fromInput.setAttribute("autofocus", "autofocus");
+}
 
-    fetch("https://go-travel-backend.vercel.app/api/flights")
-      .then(res => res.json())
-      .then(flights => {
-        const match = flights.find(f =>
-          f.from.toLowerCase() === from.toLowerCase() &&
-          f.to.toLowerCase() === to.toLowerCase()
-        );
+document.getElementById("search-form")?.addEventListener("submit", (e) => {
+  e.preventDefault();
 
-        if (match) {
-          const msg = `✈️ Нашли рейс\n🛫 ${match.from} → 🛬 ${match.to}\n📅 ${match.date}\n💰 $${match.price}`;
-          Telegram.WebApp.sendData?.(msg);
-          trackEvent("Поиск рейса", msg);
-        } else {
-          Telegram.WebApp.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
-          trackEvent("Поиск рейса", `Не найдено: ${from} → ${to}, ${departureDate}`);
-        }
-      })
-      .catch(err => {
-        console.error("Ошибка запроса рейсов:", err);
-        Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
-        trackEvent("Ошибка загрузки рейсов", err.message);
-      })
-      .finally(() => {
-        hideLoading();
-      });
-  });
+  const from = fromInput.value.trim();
+  const to = toInput.value.trim();
+  const departureDate = departureInput.value;
 
-  // ✅ Поиск мест
+  localStorage.setItem("lastFrom", from);
+  localStorage.setItem("lastTo", to);
+  localStorage.setItem("lastDepartureDate", departureDate);
+
+  showLoading();
+
+  fetch("https://go-travel-backend.vercel.app/api/flights")
+    .then(res => res.json())
+    .then(flights => {
+      const match = flights.find(f =>
+        f.from.toLowerCase() === from.toLowerCase() &&
+        f.to.toLowerCase() === to.toLowerCase()
+      );
+
+      if (match) {
+        const msg = `✈️ Нашли рейс\n🛫 ${match.from} → 🛬 ${match.to}\n📅 ${match.date}\n💰 $${match.price}`;
+        Telegram.WebApp.sendData?.(msg);
+        trackEvent("Поиск рейса", msg);
+      } else {
+        Telegram.WebApp.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
+        trackEvent("Поиск рейса", `Не найдено: ${from} → ${to}, ${departureDate}`);
+      }
+    })
+    .catch(err => {
+      console.error("Ошибка запроса рейсов:", err);
+      Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
+      trackEvent("Ошибка загрузки рейсов", err.message);
+    })
+    .finally(() => {
+      hideLoading();
+    });
+});
+
+ // ✅ Поиск мест
+const placeCityInput = document.getElementById("placeCity");
+const placeCategorySelect = document.getElementById("placeCategory");
+const resultBlock = document.getElementById("placesResult");
+
+// Автозаполнение и фокус
+if (placeCityInput && placeCategorySelect) {
+  placeCityInput.value = localStorage.getItem("lastPlaceCity") || "";
+  placeCategorySelect.value = localStorage.getItem("lastPlaceCategory") || "";
+  placeCityInput.setAttribute("autofocus", "autofocus");
+}
+
 document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   e.preventDefault();
-  const city = document.getElementById("placeCity").value.trim().toLowerCase();
-  const category = document.getElementById("placeCategory").value;
-  const resultBlock = document.getElementById("placesResult");
+  const city = placeCityInput.value.trim().toLowerCase();
+  const category = placeCategorySelect.value;
+
+  // Кэширование
+  localStorage.setItem("lastPlaceCity", city);
+  localStorage.setItem("lastPlaceCategory", category);
 
   const dummyPlaces = [
     {
@@ -358,6 +444,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       card.classList.remove("opacity-0", "scale-95");
       card.classList.add("opacity-100", "scale-100");
     });
+    resultBlock.scrollIntoView({ behavior: "smooth" });
   }, 50);
 });
   
