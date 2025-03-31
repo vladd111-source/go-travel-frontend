@@ -31,6 +31,8 @@ body {
   padding: 0.5rem 1rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 100%;
+  text-align: center;
 }
 .btn:hover {
   transform: scale(1.03);
@@ -84,12 +86,21 @@ hr {
 .card {
   opacity: 0;
   margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   transform: translateY(10px);
   animation: fadeInUp 0.4s ease forwards;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .card.visible {
   transform: translateY(0);
   opacity: 1;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 .card:nth-child(1) { animation-delay: 0.05s; }
 .card:nth-child(2) { animation-delay: 0.1s; }
@@ -114,7 +125,7 @@ hr {
   transform: translateY(0);
 }
 
-/* ✅ Результаты мест (sights) */
+/* Результаты мест (sights) */
 #placesResult {
   opacity: 0;
   transform: translateY(10px);
@@ -125,26 +136,14 @@ hr {
   transform: translateY(0);
 }
 
-/* ✅ Карточки мест */
-#placesResult .card {
-  background-color: white;
-  border-radius: 1rem;
-  padding: 1rem;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Карточки мест */
+#placesResult .card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
 }
-#placesResult .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* ✅ Анимация карточек мест по очереди */
-#placesResult .card:nth-child(1) { animation-delay: 0.05s; }
-#placesResult .card:nth-child(2) { animation-delay: 0.1s; }
-#placesResult .card:nth-child(3) { animation-delay: 0.15s; }
-#placesResult .card:nth-child(4) { animation-delay: 0.2s; }
-#placesResult .card:nth-child(5) { animation-delay: 0.25s; }
-#placesResult .card:nth-child(6) { animation-delay: 0.3s; }
 
 /* Спиннер */
 .loader {
@@ -164,4 +163,24 @@ hr {
 /* Обязательно ВНЕ анимаций */
 .hidden {
   display: none !important;
+}
+
+/* Мобильные адаптации */
+@media (max-width: 400px) {
+  .text-sm {
+    font-size: 0.75rem !important;
+  }
+  .text-base {
+    font-size: 0.875rem !important;
+  }
+  .text-lg {
+    font-size: 1rem !important;
+  }
+  .btn {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+  .card {
+    padding: 0.75rem;
+  }
 }
