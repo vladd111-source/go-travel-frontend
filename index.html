@@ -102,22 +102,21 @@
   </div>
 
   <!-- 🌍 Места -->
-  <div id="sights" class="tab hidden">
-    <div class="grid gap-4">
-      <div class="bg-white p-4 rounded-xl shadow">
-        <h3 class="text-lg font-semibold">Castelo de São Jorge</h3>
-        <p class="text-sm text-gray-500">⭐ 4.7 | Лиссабон</p>
-      </div>
-      <div class="bg-white p-4 rounded-xl shadow">
-        <h3 class="text-lg font-semibold">Miradouro da Senhora do Monte</h3>
-        <p class="text-sm text-gray-500">⭐ 4.8 | Панорамный вид</p>
-      </div>
-      <div class="bg-white p-4 rounded-xl shadow">
-        <h3 class="text-lg font-semibold">Oceanário de Lisboa</h3>
-        <p class="text-sm text-gray-500">⭐ 4.6 | Один из лучших океанариумов Европы</p>
-      </div>
-    </div>
-  </div>
+<div id="sights" class="tab hidden">
+  <form id="placesForm" class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <input id="placeCity" type="text" placeholder="Введите город" class="border px-3 py-2 rounded shadow" />
+    <select id="placeCategory" class="border px-3 py-2 rounded shadow">
+      <option value="">Все категории</option>
+      <option value="nature">🏞 Природа</option>
+      <option value="culture">🏰 Культура</option>
+      <option value="fun">🎢 Развлечения</option>
+      <option value="shopping">🛍 Шопинг</option>
+      <option value="food">🍽 Еда</option>
+    </select>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded shadow">Показать места</button>
+  </form>
+
+  <div id="placesResult" class="grid gap-4"></div>
 </div>
 
   <!-- 🔄 Спиннер -->
