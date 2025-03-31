@@ -17,13 +17,6 @@ setTimeout(() => {
   document.body.classList.remove("opacity-0");
 }, 100);
 
-// ✅ Автофокус на первом input активной вкладки
-setTimeout(() => {
-  const currentTab = localStorage.getItem("activeTab") || "flights";
-  const firstInput = document.querySelector(`#${currentTab} input`);
-  if (firstInput) firstInput.focus();
-}, 200);
-
 // ✅ Переводы
 const translations = {
   ru: {
@@ -146,137 +139,96 @@ function trackEvent(name, data = "") {
     timestamp: new Date().toISOString(),
   });
 }
-// ✅ DOMContentLoaded
+// ✅ DOMContentLoaded и инициализация приложения
+
 document.addEventListener("DOMContentLoaded", () => {
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.ready();
-    console.log("📦 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
+  try {
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.ready();
+      console.log("📦 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
 
-    const user = Telegram.WebApp.initDataUnsafe?.user;
-    if (user && user.id) {
-      window._telegramId = user.id.toString();
-      console.log("✅ Telegram ID установлен:", window._telegramId);
-
-      window._appLang = localStorage.getItem("lang") || "ru";
-      applyTranslations(window._appLang);
-
-      trackEvent("Загрузка приложения", {
-        lang: window._appLang,
-        timestamp: new Date().toISOString(),
-      });
-    } else {
-      console.warn("❌ Не удалось получить Telegram ID — аналитика не будет записана");
+      const user = Telegram.WebApp.initDataUnsafe?.user;
+      if (user && user.id) {
+        window._telegramId = user.id.toString();
+        console.log("✅ Telegram ID установлен:", window._telegramId);
+      } else {
+        console.warn("❌ Не удалось получить Telegram ID — аналитика не будет записана");
+      }
     }
-   // ⏳ Плавное появление после полной инициализации
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    document.body.classList.remove("opacity-0");
-  }, 100);
-});
 
-// 🎯 Автофокус на первом input текущей вкладки
-setTimeout(() => {
-  const currentTab = localStorage.getItem("activeTab") || "flights";
-  const tabEl = document.getElementById(currentTab);
-  if (tabEl) {
-    const firstInput = tabEl.querySelector("input");
-    if (firstInput) firstInput.focus();
-  }
-}, 200);
-  }
-
- // ✅ Переключение языка
-  const langSwitcher = document.getElementById("langSwitcher");
-  langSwitcher.value = window._appLang;
-  langSwitcher.addEventListener("change", (e) => {
-    window._appLang = e.target.value;
-    localStorage.setItem("lang", window._appLang);
+    // Установка языка и перевод
+    window._appLang = localStorage.getItem("lang") || "ru";
     applyTranslations(window._appLang);
-    trackEvent("Смена языка", window._appLang);
-  });
-  // ✅ Восстановление активной вкладки из кэша
-  const lastTab = localStorage.getItem("activeTab") || "flights";
-  showTab(lastTab);
-});
 
-  // Кэш поля "Места"
-  const placeCityInput = document.getElementById("placeCity");
-  const placeCategorySelect = document.getElementById("placeCategory");
+    // Переключение языка
+    const langSwitcher = document.getElementById("langSwitcher");
+    if (langSwitcher) {
+      langSwitcher.value = window._appLang;
+      langSwitcher.addEventListener("change", (e) => {
+        window._appLang = e.target.value;
+        localStorage.setItem("lang", window._appLang);
+        applyTranslations(window._appLang);
+        trackEvent("Смена языка", window._appLang);
+      });
+    }
 
-  if (placeCityInput) {
-    const cachedCity = localStorage.getItem("placeCity");
-    if (cachedCity) placeCityInput.value = cachedCity;
-    placeCityInput.addEventListener("input", (e) => {
-      localStorage.setItem("placeCity", e.target.value.trim());
-    });
-  }
-
-  if (placeCategorySelect) {
-    const cachedCategory = localStorage.getItem("placeCategory");
-    if (cachedCategory) placeCategorySelect.value = cachedCategory;
-    placeCategorySelect.addEventListener("change", (e) => {
-      localStorage.setItem("placeCategory", e.target.value);
-    });
-  }
-
-  const lastTab = localStorage.getItem("activeTab") || "flights";
+    // Восстановление активной вкладки
+    const lastTab = localStorage.getItem("activeTab") || "flights";
     showTab(lastTab);
+
+    // Автофокус на первом input текущей вкладки
+    setTimeout(() => {
+      const tabEl = document.getElementById(lastTab);
+      if (tabEl) {
+        const firstInput = tabEl.querySelector("input");
+        if (firstInput) firstInput.focus();
+      }
+    }, 200);
+
+    // Плавное появление
+    setTimeout(() => {
+      document.body.classList.remove("opacity-0");
+    }, 100);
+
+    // Кэш поля "Места"
+    const placeCityInput = document.getElementById("placeCity");
+    const placeCategorySelect = document.getElementById("placeCategory");
+
+    if (placeCityInput) {
+      const cachedCity = localStorage.getItem("placeCity");
+      if (cachedCity) placeCityInput.value = cachedCity;
+      placeCityInput.addEventListener("input", (e) => {
+        localStorage.setItem("placeCity", e.target.value.trim());
+      });
+    }
+
+    if (placeCategorySelect) {
+      const cachedCategory = localStorage.getItem("placeCategory");
+      if (cachedCategory) placeCategorySelect.value = cachedCategory;
+      placeCategorySelect.addEventListener("change", (e) => {
+        localStorage.setItem("placeCategory", e.target.value);
+      });
+    }
+
+    // Отправка события аналитики о загрузке
+    trackEvent("Загрузка приложения", {
+      lang: window._appLang,
+      timestamp: new Date().toISOString(),
+    });
   } catch (e) {
     console.error("❌ Ошибка при инициализации DOMContentLoaded:", e);
   }
 });
 
-  // ✅ Чекбокс "Туда и обратно"
-  const roundTripCheckbox = document.getElementById("roundTrip");
-  const returnDateWrapper = document.getElementById("returnDateWrapper");
-  const returnDateInput = document.getElementById("returnDate");
-  if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
-    const updateReturnDateVisibility = () => {
-      if (roundTripCheckbox.checked) {
-        returnDateWrapper.classList.remove("hidden");
-      } else {
-        returnDateWrapper.classList.add("hidden");
-      }
-      returnDateInput.required = roundTripCheckbox.checked;
-      if (!roundTripCheckbox.checked) returnDateInput.value = "";
-    };
-    updateReturnDateVisibility();
-    roundTripCheckbox.addEventListener("change", updateReturnDateVisibility);
-  }
-
-  // ✅ Горячие предложения
-const hotDealsContainer = document.getElementById("hotDeals");
-if (hotDealsContainer) {
-  supabase.from("go_travel").select("*")
-    .then(({ data, error }) => {
-      if (error) throw error;
-      const t = translations[window._appLang];
-      hotDealsContainer.innerHTML = data.map(deal => `
-        <div class="card bg-white p-4 rounded-xl shadow transition-all duration-300 transform opacity-0 scale-95">
-          ✈️ <strong>${deal.from}</strong> → <strong>${deal.to}</strong><br>
-          📅 ${deal.date}<br>
-          <span class="text-red-600 font-semibold">$${deal.price}</span><br>
-          <button class="btn mt-2 w-full" onclick="bookFlight('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">${t.bookNow}</button>
-        </div>
-      `).join("");
-
-      // ✨ Плавная анимация появления карточек
-      setTimeout(() => {
-        document.querySelectorAll("#hotDeals .card").forEach(card => {
-          card.classList.remove("opacity-0", "scale-95");
-          card.classList.add("opacity-100", "scale-100");
-        });
-      }, 50);
-    })
-    .catch(err => {
-      hotDealsContainer.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки рейсов.</p>";
-    });
-}
-
-  // ✅ Поиск отелей
+ // ✅ Поиск отелей
 const hotelCityInput = document.getElementById("hotelCity");
+
 if (hotelCityInput) {
-  hotelCityInput.value = localStorage.getItem("lastHotelCity") || "";
+  // ✅ Восстановление кэша города
+  const cachedCity = localStorage.getItem("lastHotelCity");
+  if (cachedCity) hotelCityInput.value = cachedCity;
+
+  // ✅ Установка автофокуса
   hotelCityInput.setAttribute("autofocus", "autofocus");
 }
 
@@ -285,7 +237,7 @@ document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
   showLoading();
 
   const city = hotelCityInput.value.trim();
-  localStorage.setItem("lastHotelCity", city);
+  localStorage.setItem("lastHotelCity", city); // ✅ Кэшируем введённый город
 
   const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
   const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
@@ -317,7 +269,7 @@ document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
         `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
       );
 
-      // ✨ Анимация появления
+      // ✨ Плавное появление карточек
       setTimeout(() => {
         document.querySelectorAll("#hotelsResult .card").forEach(card => {
           card.classList.remove("opacity-0", "scale-95");
@@ -325,24 +277,35 @@ document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
         });
       }, 50);
 
-      trackEvent("Поиск отеля", `Город: ${city}, Цена: $${minPrice}–${maxPrice}, Рейтинг: от ${minRating}`);
+      trackEvent("Поиск отеля", {
+  city,
+  minPrice,
+  maxPrice,
+  minRating,
+  resultCount: filtered.length
+});
       hideLoading();
+
     })
     .catch(err => {
+      console.error("❌ Ошибка загрузки отелей:", err);
       document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
       hideLoading();
     });
 });
 
-  // ✅ Поиск рейсов
+// ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
 const toInput = document.getElementById("to");
 const departureInput = document.getElementById("departureDate");
 
 if (fromInput && toInput && departureInput) {
+  // ✅ Восстановление предыдущего ввода
   fromInput.value = localStorage.getItem("lastFrom") || "";
   toInput.value = localStorage.getItem("lastTo") || "";
   departureInput.value = localStorage.getItem("lastDepartureDate") || "";
+
+  // ✅ Автофокус
   fromInput.setAttribute("autofocus", "autofocus");
 }
 
@@ -353,13 +316,14 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
   const to = toInput.value.trim();
   const departureDate = departureInput.value;
 
+  // ✅ Сохраняем введённые значения
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
 
   showLoading();
 
-fetch("https://go-travel-backend.vercel.app/api/flights")
+  fetch("https://go-travel-backend.vercel.app/api/flights")
     .then(res => res.json())
     .then(flights => {
       const match = flights.find(f =>
@@ -377,7 +341,7 @@ fetch("https://go-travel-backend.vercel.app/api/flights")
       }
     })
     .catch(err => {
-      console.error("Ошибка запроса рейсов:", err);
+      console.error("❌ Ошибка запроса рейсов:", err);
       Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
       trackEvent("Ошибка загрузки рейсов", err.message);
     })
@@ -386,32 +350,26 @@ fetch("https://go-travel-backend.vercel.app/api/flights")
     });
 });
 
- // ✅ Поиск мест
+// ✅ Поиск мест
 const placeCityInput = document.getElementById("placeCity");
 const placeCategorySelect = document.getElementById("placeCategory");
 const resultBlock = document.getElementById("placesResult");
 
-// Автозаполнение и фокус
-if (placeCityInput && placeCategorySelect) {
-  placeCityInput.value = localStorage.getItem("lastPlaceCity") || "";
-  placeCategorySelect.value = localStorage.getItem("lastPlaceCategory") || "";
-  placeCityInput.setAttribute("autofocus", "autofocus");
-}
-// ✅ Поиск мест
+// ✅ Автофокус на поле города
+placeCityInput.setAttribute("autofocus", "autofocus");
+
+// ✅ Обработчик формы
 document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   e.preventDefault();
-  const cityInput = document.getElementById("placeCity");
-  const categoryInput = document.getElementById("placeCategory");
 
-  const city = cityInput.value.trim().toLowerCase();
-  const category = categoryInput.value;
+  const city = placeCityInput.value.trim().toLowerCase();
+  const category = placeCategorySelect.value;
 
   // ✅ Кэшируем значения
-  localStorage.setItem("place_city", city);
-  localStorage.setItem("place_category", category);
+  localStorage.setItem("placeCity", city);
+  localStorage.setItem("placeCategory", category);
 
-  const resultBlock = document.getElementById("placesResult");
-
+  // ✅ Моковые места
   const dummyPlaces = [
     {
       name: "Castelo de São Jorge",
@@ -450,11 +408,13 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     }
   ];
 
+  // ✅ Фильтрация
   const filtered = dummyPlaces.filter(p =>
     (!city || p.city.includes(city)) &&
     (!category || p.category === category)
   );
 
+  // ✅ Вывод результатов
   if (filtered.length === 0) {
     resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
     return;
@@ -470,45 +430,37 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     </div>
   `).join("");
 
-  // ✨ Анимация появления карточек
+  animateCards("#placesResult .card");
+
+  // 📊 Трекинг
+  trackEvent("Поиск мест", { city, category });
+});
+ // ✅ Форматирование категории (иконка + текст)
+function formatCategory(code) {
+  const map = {
+    nature: "🏞 Природа",
+    culture: "🏰 Культура",
+    fun: "🎢 Развлечения",
+    shopping: "🛍 Шопинг",
+    food: "🍽 Еда"
+  };
+  return map[code] || code;
+}
+
+// ✅ Заглавная первая буква строки
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// ✅ Анимация карточек (универсальная функция для любых блоков)
+function animateCards(selector) {
   setTimeout(() => {
-    document.querySelectorAll("#placesResult .card").forEach(card => {
+    document.querySelectorAll(selector).forEach(card => {
       card.classList.remove("opacity-0", "scale-95");
       card.classList.add("opacity-100", "scale-100");
     });
   }, 50);
-});
-
-// ✅ Восстановление значений из кэша
-document.getElementById("placeCity").value = localStorage.getItem("place_city") || "";
-document.getElementById("placeCategory").value = localStorage.getItem("place_category") || "";
-
-// ⏳ Плавное появление
-setTimeout(() => {
-  document.body.classList.remove("opacity-0");
-}, 100);
-
-// ✅ Автофокус на первом input во вкладке
-const currentTab = localStorage.getItem("activeTab") || "flights";
-setTimeout(() => {
-  const firstInput = document.querySelector(`#${currentTab} input`);
-  if (firstInput) firstInput.focus();
-}, 200);
-  
-  function formatCategory(code) {
-    const map = {
-      nature: "🏞 Природа",
-      culture: "🏰 Культура",
-      fun: "🎢 Развлечения",
-      shopping: "🛍 Шопинг",
-      food: "🍽 Еда"
-    };
-    return map[code] || code;
-  }
-
-  function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+}
   // Loader
   function showLoading() {
     document.getElementById("loadingSpinner")?.classList.remove("hidden");
