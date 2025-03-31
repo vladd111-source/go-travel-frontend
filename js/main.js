@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window._appLang = localStorage.getItem("lang") || "ru";
     applyTranslations(window._appLang);
 
-    // Переключение языка
+    // ✅ Переключение языка
     const langSwitcher = document.getElementById("langSwitcher");
     if (langSwitcher) {
       langSwitcher.value = window._appLang;
@@ -171,7 +171,35 @@ document.addEventListener("DOMContentLoaded", () => {
         trackEvent("Смена языка", window._appLang);
       });
     }
+    // ✅ Чекбокс "Туда и обратно"
+const roundTripCheckbox = document.getElementById("roundTrip");
+const returnDateWrapper = document.getElementById("returnDateWrapper");
+const returnDateInput = document.getElementById("returnDate");
 
+if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
+  const updateReturnDateVisibility = () => {
+    if (roundTripCheckbox.checked) {
+      returnDateWrapper.classList.remove("hidden");
+    } else {
+      returnDateWrapper.classList.add("hidden");
+    }
+    returnDateInput.required = roundTripCheckbox.checked;
+    if (!roundTripCheckbox.checked) returnDateInput.value = "";
+  };
+
+  // ✅ Восстанавливаем состояние при старте
+  const saved = localStorage.getItem("roundTripChecked");
+  if (saved === "1") {
+    roundTripCheckbox.checked = true;
+  }
+  updateReturnDateVisibility();
+
+  // ✅ Сохраняем изменения
+  roundTripCheckbox.addEventListener("change", () => {
+    updateReturnDateVisibility();
+    localStorage.setItem("roundTripChecked", roundTripCheckbox.checked ? "1" : "0");
+  });
+}
     // Восстановление активной вкладки
     const lastTab = localStorage.getItem("activeTab") || "flights";
     showTab(lastTab);
