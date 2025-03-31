@@ -256,16 +256,16 @@ if (hotelCityInput) {
   const cachedCity = localStorage.getItem("lastHotelCity");
   if (cachedCity) hotelCityInput.value = cachedCity;
 
-  // ✅ Установка автофокуса
-  hotelCityInput.setAttribute("autofocus", "autofocus");
-}
+ // ✅ Установка автофокуса
+hotelCityInput.setAttribute("autofocus", "autofocus");
 
+// ✅ Обработчик формы отелей
 document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
   e.preventDefault();
   showLoading();
 
   const city = hotelCityInput.value.trim();
-  localStorage.setItem("lastHotelCity", city); // ✅ Кэшируем введённый город
+  localStorage.setItem("lastHotelCity", city);
 
   const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
   const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
@@ -297,23 +297,19 @@ document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
         `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
       );
 
-      // ✨ Плавное появление карточек
-      setTimeout(() => {
-        document.querySelectorAll("#hotelsResult .card").forEach(card => {
-          card.classList.remove("opacity-0", "scale-95");
-          card.classList.add("opacity-100", "scale-100");
-        });
-      }, 50);
+      // ✨ Анимация карточек
+      animateCards("#hotelsResult .card");
 
+      // 📈 Трекинг
       trackEvent("Поиск отеля", {
-  city,
-  minPrice,
-  maxPrice,
-  minRating,
-  resultCount: filtered.length
-});
-      hideLoading();
+        city,
+        minPrice,
+        maxPrice,
+        minRating,
+        resultCount: filtered.length
+      });
 
+      hideLoading();
     })
     .catch(err => {
       console.error("❌ Ошибка загрузки отелей:", err);
@@ -321,6 +317,7 @@ document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
       hideLoading();
     });
 });
+
 // ✅ Показ/скрытие фильтров в отелях
 const hotelFiltersToggle = document.getElementById("hotelFiltersToggle");
 const hotelFiltersSection = document.getElementById("hotelFiltersSection");
@@ -330,13 +327,9 @@ if (hotelFiltersToggle && hotelFiltersSection) {
     hotelFiltersSection.classList.toggle("hidden", !hotelFiltersToggle.checked);
   };
 
-  // При изменении чекбокса — переключать видимость
   hotelFiltersToggle.addEventListener("change", toggleVisibility);
-
-  // При загрузке страницы — применить начальное состояние
-  toggleVisibility();
+  toggleVisibility(); // при загрузке страницы
 }
-
 // ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
 const toInput = document.getElementById("to");
