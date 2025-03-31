@@ -285,13 +285,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ✅ Поиск мест
-  document.getElementById("placeForm")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const city = document.getElementById("placeCity").value.trim().toLowerCase();
-    const category = document.getElementById("placeCategory").value;
-    const resultBlock = document.getElementById("placesResult");
+document.getElementById("placeForm")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const city = document.getElementById("placeCity").value.trim().toLowerCase();
+  const category = document.getElementById("placeCategory").value;
+  const resultBlock = document.getElementById("placesResult");
 
-    const dummyPlaces = [
+  const dummyPlaces = [
       {
         name: "Castelo de São Jorge",
         description: "Древняя крепость с видом на Лиссабон",
