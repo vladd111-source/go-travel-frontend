@@ -552,4 +552,4 @@ function animateCards(selector) {
     const duration = Math.round((Date.now() - appStart) / 1000);
     logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
   });
-});
+};
