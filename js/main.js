@@ -140,35 +140,25 @@ function trackEvent(name, data = "") {
   });
 }
 // ✅ DOMContentLoaded и инициализация приложения
-
 document.addEventListener("DOMContentLoaded", () => {
-  // ✨ Плавное появление
-  setTimeout(() => {
-    document.body.classList.remove("opacity-0");
-  }, 100);
-
   try {
+    // Telegram init
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
       console.log("📦 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
-
       const user = Telegram.WebApp.initDataUnsafe?.user;
       if (user && user.id) {
         window._telegramId = user.id.toString();
         console.log("✅ Telegram ID установлен:", window._telegramId);
       } else {
-        console.warn("❌ Не удалось получить Telegram ID — аналитика не будет записана");
+        console.warn("❌ Не удалось получить Telegram ID");
       }
     }
-  } catch (e) {
-    console.error("❌ Ошибка инициализации Telegram WebApp:", e);
-  }
-});
-    // Установка языка и перевод
+
+    // Установка языка
     window._appLang = localStorage.getItem("lang") || "ru";
     applyTranslations(window._appLang);
 
-    // ✅ Переключение языка
     const langSwitcher = document.getElementById("langSwitcher");
     if (langSwitcher) {
       langSwitcher.value = window._appLang;
@@ -179,6 +169,35 @@ document.addEventListener("DOMContentLoaded", () => {
         trackEvent("Смена языка", window._appLang);
       });
     }
+
+    // Показ активной вкладки
+    const lastTab = localStorage.getItem("activeTab") || "flights";
+    showTab(lastTab);
+
+    // Автофокус
+    setTimeout(() => {
+      const tabEl = document.getElementById(lastTab);
+      if (tabEl) {
+        const firstInput = tabEl.querySelector("input");
+        if (firstInput) firstInput.focus();
+      }
+    }, 200);
+
+    // Показываем body
+    setTimeout(() => {
+      document.body.classList.remove("opacity-0");
+    }, 100);
+
+    // Трекинг запуска
+    trackEvent("Загрузка приложения", {
+      lang: window._appLang,
+      timestamp: new Date().toISOString(),
+    });
+
+  } catch (e) {
+    console.error("❌ Ошибка при инициализации:", e);
+  }
+});
     // ✅ Чекбокс "Туда и обратно"
 const roundTripCheckbox = document.getElementById("roundTrip");
 const returnDateWrapper = document.getElementById("returnDateWrapper");
