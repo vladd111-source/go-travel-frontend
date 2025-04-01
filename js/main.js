@@ -142,7 +142,7 @@ function trackEvent(name, data = "") {
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
   try {
-    // Telegram init
+    // ✅ Telegram init
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
       console.log("📦 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Установка языка
+    // ✅ Установка языка
     window._appLang = localStorage.getItem("lang") || "ru";
     applyTranslations(window._appLang);
 
@@ -170,11 +170,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Показ активной вкладки
+    // ✅ Восстановление активной вкладки
     const lastTab = localStorage.getItem("activeTab") || "flights";
     showTab(lastTab);
 
-    // Автофокус
+    // ✅ Автофокус
     setTimeout(() => {
       const tabEl = document.getElementById(lastTab);
       if (tabEl) {
@@ -183,12 +183,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }, 200);
 
-    // Показываем body
+    // ✅ Плавное появление
     setTimeout(() => {
       document.body.classList.remove("opacity-0");
     }, 100);
 
-    // Трекинг запуска
+    // ✅ Отправка события аналитики
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
       timestamp: new Date().toISOString(),
