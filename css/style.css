@@ -1,12 +1,19 @@
-/* Базовые стили */
+/* ===== Базовые стили ===== */
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f7f7f7;
+  transition: opacity 0.3s ease;
+}
+body.opacity-0 {
+  opacity: 0;
+}
+body.opacity-100 {
+  opacity: 1;
 }
 
-/* Поля ввода */
+/* ===== Поля ввода ===== */
 .input {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -15,6 +22,8 @@ body {
   border: 1px solid #d1d5db;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   font-size: 0.875rem;
+  background-color: white;
+  color: #111827;
 }
 .input:focus {
   border-color: #60a5fa;
@@ -22,7 +31,16 @@ body {
   box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
 }
 
-/* Кнопка */
+/* ===== Селекты ===== */
+select.input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' fill='gray' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
+
+/* ===== Кнопка ===== */
 .btn {
   background: linear-gradient(to right, #3b82f6, #6366f1);
   color: white;
@@ -43,7 +61,7 @@ body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-/* Вкладки */
+/* ===== Вкладки ===== */
 .tab {
   display: none;
   opacity: 0;
@@ -57,8 +75,10 @@ body {
 }
 
 /* Активная кнопка вкладки */
-.tab-btn.bg-blue-100 {
+.tab-btn.active {
   background-color: #bfdbfe;
+  font-weight: 600;
+  color: #1e3a8a;
 }
 
 /* Подписи */
@@ -93,6 +113,7 @@ hr {
   transform: translateY(10px);
   animation: fadeInUp 0.4s ease forwards;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 .card.visible {
   transform: translateY(0);
@@ -115,22 +136,13 @@ hr {
 }
 
 /* Результаты отелей */
-#hotelsResult {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-#hotelsResult.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Результаты мест (sights) */
+#hotelsResult,
 #placesResult {
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
+#hotelsResult.visible,
 #placesResult.visible {
   opacity: 1;
   transform: translateY(0);
@@ -158,6 +170,18 @@ hr {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Плавное скрытие секций фильтров */
+#hotelFilters {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+#hotelFilters.hidden {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 /* Обязательно ВНЕ анимаций */
