@@ -282,10 +282,6 @@ if (hotelFiltersToggle && hotelFiltersSection) {
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
       timestamp: new Date().toISOString(),
-    });
-  } catch (e) {
-    console.error("❌ Ошибка при инициализации DOMContentLoaded:", e);
-  }
 });
 
  // ✅ Поиск отелей
