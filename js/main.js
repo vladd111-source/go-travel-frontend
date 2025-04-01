@@ -142,6 +142,11 @@ function trackEvent(name, data = "") {
 // ✅ DOMContentLoaded и инициализация приложения
 
 document.addEventListener("DOMContentLoaded", () => {
+  // ✨ Плавное появление
+  setTimeout(() => {
+    document.body.classList.remove("opacity-0");
+  }, 100);
+
   try {
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
@@ -155,7 +160,10 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("❌ Не удалось получить Telegram ID — аналитика не будет записана");
       }
     }
-
+  } catch (e) {
+    console.error("❌ Ошибка инициализации Telegram WebApp:", e);
+  }
+});
     // Установка языка и перевод
     window._appLang = localStorage.getItem("lang") || "ru";
     applyTranslations(window._appLang);
