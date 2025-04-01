@@ -161,18 +161,17 @@
     <span class="ml-2 align-middle">Загрузка...</span>
   </div>
 
-  <!-- Подключение Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="js/main.js"></script>
+ <!-- Плавное появление -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+      document.body.classList.remove("opacity-0");
+    }, 100);
+  });
+</script>
 
-  <!-- Плавное появление -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      setTimeout(() => {
-        document.body.classList.remove("opacity-0");
-      }, 100);
-    });
-  </script>
-  <script src="js/main.js"></script>
+<!-- Подключение Supabase и main.js -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
