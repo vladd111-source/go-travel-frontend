@@ -231,7 +231,7 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     const lastTab = localStorage.getItem("activeTab") || "flights";
     showTab(lastTab);
     
-    // ✅ Показ/скрытие фильтров в отелях по чекбоксу
+   // ✅ Показ/скрытие фильтров в отелях по чекбоксу
 const hotelFiltersToggle = document.getElementById("toggleFilters");
 const hotelFiltersSection = document.getElementById("hotelFilters");
 
@@ -244,49 +244,50 @@ if (hotelFiltersToggle && hotelFiltersSection) {
   toggleVisibility(); // при загрузке страницы
 }
 
-    // Автофокус на первом input текущей вкладки
-    setTimeout(() => {
-      const tabEl = document.getElementById(lastTab);
-      if (tabEl) {
-        const firstInput = tabEl.querySelector("input");
-        if (firstInput) firstInput.focus();
-      }
-    }, 200);
-
-    // Плавное появление
-    setTimeout(() => {
-      document.body.classList.remove("opacity-0");
-    }, 100);
-
-    // Кэш поля "Места"
-    const placeCityInput = document.getElementById("placeCity");
-    const placeCategorySelect = document.getElementById("placeCategory");
-
-    if (placeCityInput) {
-      const cachedCity = localStorage.getItem("placeCity");
-      if (cachedCity) placeCityInput.value = cachedCity;
-      placeCityInput.addEventListener("input", (e) => {
-        localStorage.setItem("placeCity", e.target.value.trim());
-      });
-    }
-
-    if (placeCategorySelect) {
-      const cachedCategory = localStorage.getItem("placeCategory");
-      if (cachedCategory) placeCategorySelect.value = cachedCategory;
-      placeCategorySelect.addEventListener("change", (e) => {
-        localStorage.setItem("placeCategory", e.target.value);
-      });
-    }
-
-    // Отправка события аналитики о загрузке
-    trackEvent("Загрузка приложения", {
-      lang: window._appLang,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (e) {
-    console.error("❌ Ошибка при инициализации DOMContentLoaded:", e);
+// ✅ Автофокус на первом input текущей вкладки
+setTimeout(() => {
+  const tabEl = document.getElementById(lastTab);
+  if (tabEl) {
+    const firstInput = tabEl.querySelector("input");
+    if (firstInput) firstInput.focus();
   }
+}, 200);
+
+// ✅ Плавное появление
+setTimeout(() => {
+  document.body.classList.remove("opacity-0");
+}, 100);
+
+// ✅ Кэш поля "Места"
+const placeCityInput = document.getElementById("placeCity");
+const placeCategorySelect = document.getElementById("placeCategory");
+
+if (placeCityInput) {
+  const cachedCity = localStorage.getItem("placeCity");
+  if (cachedCity) placeCityInput.value = cachedCity;
+  placeCityInput.addEventListener("input", (e) => {
+    localStorage.setItem("placeCity", e.target.value.trim());
+  });
+}
+
+if (placeCategorySelect) {
+  const cachedCategory = localStorage.getItem("placeCategory");
+  if (cachedCategory) placeCategorySelect.value = cachedCategory;
+  placeCategorySelect.addEventListener("change", (e) => {
+    localStorage.setItem("placeCategory", e.target.value);
+  });
+}
+
+// ✅ Отправка события аналитики о загрузке
+trackEvent("Загрузка приложения", {
+  lang: window._appLang,
+  timestamp: new Date().toISOString(),
 });
+
+// 👇 вот она — закрывающая скобка для try!
+catch (e) {
+  console.error("❌ Ошибка при инициализации DOMContentLoaded:", e);
+}
 
  // ✅ Поиск отелей
 const hotelCityInput = document.getElementById("hotelCity");
