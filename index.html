@@ -58,34 +58,34 @@
 </div>
 
   <!-- ✈️ Авиабилеты -->
-  <div id="flights" class="tab block">
-    <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
-      <input type="text" name="from" class="input" required data-i18n-placeholder="city" />
-      <input type="text" name="to" class="input" required data-i18n-placeholder="city" />
+<div id="flights" class="tab block">
+  <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
+    <input type="text" name="from" id="from" class="input" required data-i18n-placeholder="city" />
+    <input type="text" name="to" id="to" class="input" required data-i18n-placeholder="city" />
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="label" for="departureDate" data-i18n="departure"></label>
-          <input type="date" name="departureDate" id="departureDate" class="input" required />
-        </div>
-        <div id="returnDateWrapper" class="hidden">
-          <label class="label" for="returnDate" data-i18n="return"></label>
-          <input type="date" name="returnDate" id="returnDate" class="input" />
-        </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="label" for="departureDate" data-i18n="departure"></label>
+        <input type="date" name="departureDate" id="departureDate" class="input" required />
       </div>
+      <div id="returnDateWrapper" class="hidden">
+        <label class="label" for="returnDate" data-i18n="return"></label>
+        <input type="date" name="returnDate" id="returnDate" class="input" />
+      </div>
+    </div>
 
-      <label class="flex items-center gap-2">
-        <input type="checkbox" id="roundTrip" />
-        <span data-i18n="roundTrip"></span>
-      </label>
+    <label class="flex items-center gap-2">
+      <input type="checkbox" id="roundTrip" />
+      <span data-i18n="roundTrip"></span>
+    </label>
 
-      <button type="submit" class="btn w-full sm:w-auto" data-i18n="findFlights"></button>
-    </form>
+    <button type="submit" class="btn w-full sm:w-auto" data-i18n="findFlights"></button>
+  </form>
 
-    <h2 class="text-lg font-semibold mt-6" data-i18n="hotelResults"></h2>
-    <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
-  </div>
-
+  <h2 class="text-lg font-semibold mt-6" data-i18n="hotelResults"></h2>
+  <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
+</div>
+  
   <!-- 🏨 Отели -->
   <div id="hotels" class="tab hidden">
     <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
