@@ -281,7 +281,7 @@ if (hotelFiltersToggle && hotelFiltersSection) {
     // Отправка события аналитики о загрузке
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (e) {
     console.error("❌ Ошибка при инициализации DOMContentLoaded:", e);
