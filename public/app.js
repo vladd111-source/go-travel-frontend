@@ -381,18 +381,18 @@ if (hotelCityInput) {
 
 // ✅ Показ/скрытие фильтров в отелях
 //const 
-hotelFiltersToggle = document.getElementById("hotelFiltersToggle");
+//hotelFiltersToggle = document.getElementById("hotelFiltersToggle");
 //const 
-hotelFiltersSection = document.getElementById("hotelFiltersSection");
+//hotelFiltersSection = document.getElementById("hotelFiltersSection");
 
-if (hotelFiltersToggle && hotelFiltersSection) {
-  const toggleVisibility = () => {
-    hotelFiltersSection.classList.toggle("hidden", !hotelFiltersToggle.checked);
-  };
+//if (hotelFiltersToggle && hotelFiltersSection) {
+ //// const toggleVisibility = () => {
+//    hotelFiltersSection.classList.toggle("hidden", !hotelFiltersToggle.checked);
+//  };
 
-  hotelFiltersToggle.addEventListener("change", toggleVisibility);
-  toggleVisibility(); // при загрузке страницы
-} 
+//  hotelFiltersToggle.addEventListener("change", toggleVisibility);
+ // toggleVisibility(); // при загрузке страницы
+//} 
 
 // ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
