@@ -479,9 +479,9 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
 });
 
 // ✅ Поиск мест
-//const 
+const 
 placeCityInput = document.getElementById("placeCity");
-//const 
+const 
 placeCategorySelect = document.getElementById("placeCategory");
 const resultBlock = document.getElementById("placesResult");
 
