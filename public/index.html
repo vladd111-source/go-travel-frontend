@@ -129,13 +129,19 @@
   </div>
 </div>
 
-    <!-- ⭐️ Рейтинг -->
+       <!-- ⭐️ Поле рейтинга -->
     <div class="col-span-2">
-      <label class="label" for="minRating" data-i18n="ratingMin">Рейтинг</label>
-      <input type="number" id="minRating" class="input" min="0" max="10" step="1" />
+      <label for="minRating" class="label" data-i18n="ratingMin">Рейтинг</label>
+      <input
+        type="number"
+        id="minRating"
+        class="input"
+        min="0"
+        max="10"
+        step="1"
+        placeholder="от 0 до 10"
+      />
     </div>
-  </div>
-</div>
 
       <button type="submit" class="btn w-full sm:w-auto" data-i18n="findHotel"></button>
     </form>
