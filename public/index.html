@@ -84,70 +84,72 @@
     <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
   </div>
 
-  <!-- 🏨 Отели -->
-  <div id="hotels" class="tab hidden">
-    <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
-      <h3 class="text-base font-semibold mb-2" data-i18n="hotelFilters"></h3>
-      <input type="text" id="hotelCity" class="input" required data-i18n-placeholder="city" />
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="label" for="checkIn" data-i18n="checkIn"></label>
-          <input type="date" id="checkIn" class="input" />
-        </div>
-        <div>
-          <label class="label" for="checkOut" data-i18n="checkOut"></label>
-          <input type="date" id="checkOut" class="input" />
-        </div>
+<!-- 🏨 Отели -->
+<div id="hotels" class="tab hidden">
+  <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
+    <h3 class="text-base font-semibold mb-2" data-i18n="hotelFilters"></h3>
+    <input type="text" id="hotelCity" class="input" required data-i18n-placeholder="city" />
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="label" for="checkIn" data-i18n="checkIn"></label>
+        <input type="date" id="checkIn" class="input" />
       </div>
-
-    <div class="mt-4">
-  <label for="toggleFilters" class="label flex items-center gap-2">
-    <input type="checkbox" id="toggleFilters" class="checkbox" />
-    <span>Фильтры</span>
-  </label>
-</div>
-
-    <div id="hotelFilters" class="hidden mt-2">
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    
- <!-- 💰 Новый ползунок с tooltip -->
-<div class="col-span-2">
-  <label for="priceRange" class="label block mb-1" data-i18n="priceTo">Цена</label>
-<div class="relative w-full">
-  <input
-    type="range"
-    id="priceRange"
-    min="0"
-    max="500"
-    step="10"
-    value="250"
-    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500 slider-thumb" />
-  
-  <div id="priceTooltip"
-       class="absolute -top-8 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow transition-all pointer-events-none">
-    $150
-  </div>
-</div>
-
-       <!-- ⭐️ Поле рейтинга -->
-    <div class="col-span-2">
-      <label for="minRating" class="label" data-i18n="ratingMin">Рейтинг</label>
-      <input
-        type="number"
-        id="minRating"
-        class="input"
-        min="0"
-        max="10"
-        step="1"
-        placeholder="от 0 до 10"
-      />
+      <div>
+        <label class="label" for="checkOut" data-i18n="checkOut"></label>
+        <input type="date" id="checkOut" class="input" />
+      </div>
     </div>
 
-      <button type="submit" class="btn w-full sm:w-auto" data-i18n="findHotel"></button>
-    </form>
-    <div id="hotelsResult"></div>
-  </div>
+    <div class="mt-4">
+      <label for="toggleFilters" class="label flex items-center gap-2">
+        <input type="checkbox" id="toggleFilters" class="checkbox" />
+        <span>Фильтры</span>
+      </label>
+    </div>
 
+    <div id="hotelFilters" class="hidden mt-2">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
+ <!-- 💰 Ползунок с tooltip -->
+        <div class="col-span-2">
+          <label for="priceRange" class="label block mb-1" data-i18n="priceTo">Цена</label>
+          <div class="relative w-full">
+            <input
+              type="range"
+              id="priceRange"
+              min="0"
+              max="500"
+              step="10"
+              value="250"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500 slider-thumb" />
+            <div id="priceTooltip"
+              class="absolute -top-8 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow transition-all pointer-events-none">
+              $250
+            </div>
+          </div>
+        </div>
+
+       <!-- ⭐️ Рейтинг -->
+        <div class="col-span-2">
+          <label for="minRating" class="label" data-i18n="ratingMin">Рейтинг</label>
+          <input
+            type="number"
+            id="minRating"
+            class="input"
+            min="0"
+            max="10"
+            step="1"
+            placeholder="от 0 до 10" />
+        </div>
+
+      </div>
+    </div>
+
+    <button type="submit" class="btn w-full sm:w-auto" data-i18n="findHotel"></button>
+  </form>
+  <div id="hotelsResult"></div>
+</div> <!-- ✅ Закрытие блока отелей -->
+  
   <!-- 🌍 Места -->
   <div id="sights" class="tab hidden">
     <form id="placeForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
