@@ -389,7 +389,8 @@ if (hotelCityInput) {
 // ✅ Показ/скрытие фильтров в отелях
 //const 
 hotelFiltersToggle = document.getElementById("hotelFiltersToggle");
-const hotelFiltersSection = document.getElementById("hotelFiltersSection");
+//const 
+hotelFiltersSection = document.getElementById("hotelFiltersSection");
 
 if (hotelFiltersToggle && hotelFiltersSection) {
   const toggleVisibility = () => {
