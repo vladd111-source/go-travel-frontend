@@ -238,7 +238,15 @@ const hotelFiltersSection = document.getElementById("hotelFilters");
 
 if (hotelFiltersToggle && hotelFiltersSection) {
   const toggleVisibility = () => {
-    hotelFiltersSection.classList.toggle("hidden", !hotelFiltersToggle.checked);
+    const isVisible = hotelFiltersToggle.checked;
+    hotelFiltersSection.classList.toggle("hidden", !isVisible);
+
+    // ✅ Пересчёт tooltip позиции после отображения
+    if (isVisible) {
+      requestAnimationFrame(() => {
+        updatePriceTooltip(); // эта функция должна быть заранее объявлена
+      });
+    }
   };
 
   hotelFiltersToggle.addEventListener("change", toggleVisibility);
