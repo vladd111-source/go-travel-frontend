@@ -309,10 +309,11 @@ function updatePriceTooltip() {
   priceTooltip.textContent = `$${value}`;
 
   const percent = (value - priceRange.min) / (priceRange.max - priceRange.min);
-  const tooltipOffset = percent * priceRange.offsetWidth;
+  const sliderWidth = priceRange.offsetWidth;
+  const thumbWidth = 32; // размер бегунка
+  const offset = percent * (sliderWidth - thumbWidth) + thumbWidth / 2;
 
-  priceTooltip.style.left = `${tooltipOffset}px`;
-  priceTooltip.style.transform = `translateX(-50%)`;
+  priceTooltip.style.left = `${offset}px`;
 }
 
 if (priceRange && priceTooltip) {
