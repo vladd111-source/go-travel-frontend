@@ -249,22 +249,22 @@ if (hotelFiltersToggle && hotelFiltersSection) {
   hotelFiltersToggle.addEventListener("change", toggleVisibility);
   toggleVisibility(); // при загрузке
 }
+// ✅ Автофокус на первом input текущей активной вкладки
+setTimeout(() => {
+  const lastTab = document.querySelector(".tab.active")?.id || "flights"; // по умолчанию flights
+  const tabEl = document.getElementById(lastTab);
+  if (tabEl) {
+    const firstInput = tabEl.querySelector("input");
+    if (firstInput) firstInput.focus();
+  }
+}, 200);
 
-    // Автофокус на первом input текущей вкладки
-    setTimeout(() => {
-      const tabEl = document.getElementById(lastTab);
-      if (tabEl) {
-        const firstInput = tabEl.querySelector("input");
-        if (firstInput) firstInput.focus();
-      }
-    }, 200);
+// ✅ Плавное появление
+setTimeout(() => {
+  document.body.classList.remove("opacity-0");
+}, 100);
 
-    // Плавное появление
-    setTimeout(() => {
-      document.body.classList.remove("opacity-0");
-    }, 100);
-
-    // Кэш поля "Места"
+    //✅ Кэш поля "Места"
     const placeCityInput = document.getElementById("placeCity");
     const placeCategorySelect = document.getElementById("placeCategory");
 
@@ -284,7 +284,7 @@ if (hotelFiltersToggle && hotelFiltersSection) {
       });
     }
 
-    // Отправка события аналитики о загрузке
+    //✅ Отправка события аналитики о загрузке
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
       timestamp: new Date().toISOString(),
