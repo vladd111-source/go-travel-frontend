@@ -296,74 +296,94 @@ if (priceRange && priceRangeValue) {
       timestamp: new Date().toISOString(),
 });
 
- // ✅ Поиск отелей
+// ✅ Поиск отелей
 const hotelCityInput = document.getElementById("hotelCity");
+
+// ✅ Tooltip над ползунком цены
+const priceRange = document.getElementById("priceRange");
+const priceTooltip = document.getElementById("priceTooltip");
+
+function updatePriceTooltip() {
+  const value = priceRange.value;
+  priceTooltip.textContent = `$${value}`;
+
+  const percent = (value - priceRange.min) / (priceRange.max - priceRange.min);
+  const tooltipOffset = percent * priceRange.offsetWidth;
+
+  priceTooltip.style.left = `${tooltipOffset}px`;
+  priceTooltip.style.transform = `translateX(-50%)`;
+}
+
+if (priceRange && priceTooltip) {
+  priceRange.addEventListener("input", updatePriceTooltip);
+  window.addEventListener("resize", updatePriceTooltip);
+  updatePriceTooltip(); // initial
+}
 
 if (hotelCityInput) {
   // ✅ Восстановление кэша города
   const cachedCity = localStorage.getItem("lastHotelCity");
   if (cachedCity) hotelCityInput.value = cachedCity;
 
- // ✅ Установка автофокуса
-hotelCityInput.setAttribute("autofocus", "autofocus");
+  // ✅ Установка автофокуса
+  hotelCityInput.setAttribute("autofocus", "autofocus");
 
-// ✅ Обработчик формы отелей
-document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  showLoading();
+  // ✅ Обработчик формы отелей
+  document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    showLoading();
 
-  const city = hotelCityInput.value.trim();
-  localStorage.setItem("lastHotelCity", city);
+    const city = hotelCityInput.value.trim();
+    localStorage.setItem("lastHotelCity", city);
 
-  const maxPrice = parseFloat(priceRange.value) || Infinity;
-  const minRating = parseFloat(document.getElementById("minRating").value) || 0;
+    const maxPrice = parseFloat(priceRange.value) || Infinity;
+    const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
-  fetch("https://go-travel-backend.vercel.app/api/hotels")
-    .then(res => res.json())
-    .then(hotels => {
-      const filtered = hotels.filter(h =>
-        h.price >= minPrice &&
-        h.price <= maxPrice &&
-        h.rating >= minRating &&
-        (!city || h.city.toLowerCase().includes(city.toLowerCase()))
-      );
+    fetch("https://go-travel-backend.vercel.app/api/hotels")
+      .then(res => res.json())
+      .then(hotels => {
+        const filtered = hotels.filter(h =>
+          h.price <= maxPrice &&
+          h.rating >= minRating &&
+          (!city || h.city.toLowerCase().includes(city.toLowerCase()))
+        );
 
-      const t = translations[window._appLang];
-      const resultBlock = document.getElementById("hotelsResult");
-      resultBlock.classList.remove("visible");
+        const t = translations[window._appLang];
+        const resultBlock = document.getElementById("hotelsResult");
+        resultBlock.classList.remove("visible");
 
-      resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-        filtered.length ? filtered.map(h => `
-          <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
-            <strong>${h.name}</strong> (${h.city})<br>
-            Цена: $${h.price} / ночь<br>
-            Рейтинг: ${h.rating}<br>
-            <button class="btn mt-2 w-full" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
-          </div>
-        `).join("") :
-        `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-      );
+        resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+          filtered.length ? filtered.map(h => `
+            <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
+              <strong>${h.name}</strong> (${h.city})<br>
+              Цена: $${h.price} / ночь<br>
+              Рейтинг: ${h.rating}<br>
+              <button class="btn mt-2 w-full" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
+            </div>
+          `).join("") :
+          `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+        );
 
-      // ✨ Анимация карточек
-      animateCards("#hotelsResult .card");
+        // ✨ Анимация карточек
+        animateCards("#hotelsResult .card");
 
-      // 📈 Трекинг
-      trackEvent("Поиск отеля", {
-        city,
-        minPrice,
-        maxPrice,
-        minRating,
-        resultCount: filtered.length
+        // 📈 Трекинг
+        trackEvent("Поиск отеля", {
+          city,
+          maxPrice,
+          minRating,
+          resultCount: filtered.length
+        });
+
+        hideLoading();
+      })
+      .catch(err => {
+        console.error("❌ Ошибка загрузки отелей:", err);
+        document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
+        hideLoading();
       });
-
-      hideLoading();
-    })
-    .catch(err => {
-      console.error("❌ Ошибка загрузки отелей:", err);
-      document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
-      hideLoading();
-    });
-});
+  });
+}
 
 // ✅ Показ/скрытие фильтров в отелях
 const hotelFiltersToggle = document.getElementById("hotelFiltersToggle");
@@ -377,6 +397,7 @@ if (hotelFiltersToggle && hotelFiltersSection) {
   hotelFiltersToggle.addEventListener("change", toggleVisibility);
   toggleVisibility(); // при загрузке страницы
 }
+
 // ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
 const toInput = document.getElementById("to");
