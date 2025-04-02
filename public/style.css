@@ -209,18 +209,6 @@ hr {
   overflow: hidden;
 }
 
-/* Подсветка активной зоны ползунка */
-input[type="range"]::-webkit-slider-runnable-track {
-  height: 0.5rem;
-  background: linear-gradient(to right, #3b82f6 var(--val, 50%), #d1d5db var(--val, 50%));
-  border-radius: 9999px;
-}
-input[type="range"]::-moz-range-track {
-  height: 0.5rem;
-  background: #d1d5db;
-  border-radius: 9999px;
-}
-
 input[type="range"].slider-thumb::-webkit-slider-thumb {
   appearance: none;
   height: 32px;
@@ -231,7 +219,7 @@ input[type="range"].slider-thumb::-webkit-slider-thumb {
   box-shadow: 0 0 3px rgba(0,0,0,0.25);
   cursor: pointer;
   transition: background 0.3s ease;
-  margin-top: -22px; /* to center thumb vertically on track */
+  margin-top: -14px;
 }
 input[type="range"].slider-thumb::-moz-range-thumb {
   height: 32px;
@@ -273,7 +261,6 @@ input[type="range"].slider-thumb::-moz-range-thumb {
     padding: 0.75rem;
   }
 
-  /* ===== Bottom sheet фильтр на мобилке ===== */
   #hotelFilters {
     position: fixed;
     bottom: 0;
