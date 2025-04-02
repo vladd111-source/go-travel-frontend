@@ -175,9 +175,16 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // ✅ Восстановление активной вкладки
-    const lastTab = localStorage.getItem("activeTab") || "flights";
-    showTab(lastTab);
+   // ✅ Восстановление активной вкладки
+let lastTab = localStorage.getItem("activeTab") || "flights";
+
+// 🛠 Исправляем старое значение "sights" на новое "places"
+if (lastTab === "sights") {
+  lastTab = "places";
+  localStorage.setItem("activeTab", "places");
+}
+
+showTab(lastTab);
 
     // ✅ Автофокус
     setTimeout(() => {
