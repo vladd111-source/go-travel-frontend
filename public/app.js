@@ -396,7 +396,7 @@ if (hotelFiltersToggle && hotelFiltersSection) {
 
   hotelFiltersToggle.addEventListener("change", toggleVisibility);
   toggleVisibility(); // при загрузке страницы
-}
+} 
 
 // ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
