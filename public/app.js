@@ -300,7 +300,8 @@ if (priceRange && priceRangeValue) {
 const hotelCityInput = document.getElementById("hotelCity");
 
 // ✅ Tooltip над ползунком цены
-// const priceRange = document.getElementById("priceRange");
+// const 
+priceRange = document.getElementById("priceRange");
 const priceTooltip = document.getElementById("priceTooltip");
 
 function updatePriceTooltip() {
@@ -386,7 +387,8 @@ if (hotelCityInput) {
 }
 
 // ✅ Показ/скрытие фильтров в отелях
-const hotelFiltersToggle = document.getElementById("hotelFiltersToggle");
+//const 
+hotelFiltersToggle = document.getElementById("hotelFiltersToggle");
 const hotelFiltersSection = document.getElementById("hotelFiltersSection");
 
 if (hotelFiltersToggle && hotelFiltersSection) {
