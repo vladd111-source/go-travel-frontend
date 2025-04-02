@@ -306,17 +306,19 @@ function updatePriceTooltip() {
 }
 
 if (priceRange && priceTooltip) {
-  // ✅ Обновляем при вводе
+  // ✅ Установка стартового значения и центрирование тултипа после полной отрисовки
+  window.addEventListener("load", () => {
+    priceRange.value = 250;
+    requestAnimationFrame(() => {
+      updatePriceTooltip();
+    });
+  });
+
+  // ✅ Обновление при изменении
   priceRange.addEventListener("input", updatePriceTooltip);
 
-  // ✅ Обновляем при ресайзе
+  // ✅ Обновление при изменении размера окна
   window.addEventListener("resize", updatePriceTooltip);
-
-  // ✅ Обновляем после полной загрузки страницы
-  window.addEventListener("load", () => {
-    priceRange.value = 250; // Устанавливаем начальное значение
-    setTimeout(updatePriceTooltip, 0); // Центруем тултип
-  });
 }
 
 if (hotelCityInput) {
