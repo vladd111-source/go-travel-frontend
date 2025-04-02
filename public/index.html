@@ -112,9 +112,11 @@
     
    <!-- 💰 Цена до -->
 <div class="col-span-2">
-  <label class="label block mb-1" for="priceRange">💰 Цена до</label>
-  <input type="range" id="priceRange" min="0" max="500" step="10" value="150"
-         class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500">
+  <label class="label block mb-1" for="priceRange">Цена</label>
+  <div class="relative w-full">
+    <input type="range" id="priceRange" min="0" max="600" step="10" value="300"
+           class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600 slider-thumb" />
+  </div>
   <p class="text-sm text-gray-600 mt-2">
     до <span id="priceRangeValue">150</span> $
   </p>
