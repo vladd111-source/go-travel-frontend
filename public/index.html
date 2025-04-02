@@ -110,17 +110,17 @@
     <div id="hotelFilters" class="hidden mt-2">
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
     
-   <!-- 💰 Цена до -->
-<div class="col-span-2">
-  <label class="label block mb-1" for="priceRange">Цена</label>
-  <div class="relative w-full">
-    <input type="range" id="priceRange" min="0" max="600" step="10" value="300"
-           class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600 slider-thumb" />
-  </div>
-  <p class="text-sm text-gray-600 mt-2">
-    до <span id="priceRangeValue">200</span> $
-  </p>
-</div>
+ <!-- 💰 Новый ползунок с tooltip -->
+    <div class="col-span-2">
+      <label for="priceRange" class="label block mb-1" data-i18n="priceTo">💰 Цена до</label>
+      <div class="relative w-full">
+        <div id="priceTooltip" class="absolute -top-6 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow transition-all">
+          $150
+        </div>
+        <input type="range" id="priceRange" min="0" max="500" step="10" value="150"
+               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500 slider-thumb" />
+      </div>
+    </div>
 
     <!-- ⭐️ Рейтинг -->
     <div class="col-span-2">
