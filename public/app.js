@@ -288,6 +288,7 @@ if (hotelFiltersToggle && hotelFiltersSection) {
 // ✅ Поиск отелей
 const hotelCityInput = document.getElementById("hotelCity");
 
+//✅ Ползунок в фильтрах
 const priceRange = document.getElementById("priceRange");
 const priceTooltip = document.getElementById("priceTooltip");
 
@@ -305,12 +306,16 @@ function updatePriceTooltip() {
 }
 
 if (priceRange && priceTooltip) {
+  // ✅ Обновляем при вводе
   priceRange.addEventListener("input", updatePriceTooltip);
+
+  // ✅ Обновляем при ресайзе
   window.addEventListener("resize", updatePriceTooltip);
 
-  // ⏱ Инициализация после полной загрузки с небольшой задержкой
+  // ✅ Обновляем после полной загрузки страницы
   window.addEventListener("load", () => {
-    setTimeout(updatePriceTooltip, 0);
+    priceRange.value = 250; // Устанавливаем начальное значение
+    setTimeout(updatePriceTooltip, 0); // Центруем тултип
   });
 }
 
