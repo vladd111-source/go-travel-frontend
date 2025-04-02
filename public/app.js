@@ -197,10 +197,20 @@ document.addEventListener("DOMContentLoaded", () => {
 const ratingInput = document.getElementById("minRating");
 
 if (ratingInput) {
+  // Ограничение: от 0 до 10
   ratingInput.addEventListener("input", () => {
     let val = parseInt(ratingInput.value);
     if (val > 10) ratingInput.value = 10;
-    if (val < 0) ratingInput.value = 0;
+    if (val < 0 || isNaN(val)) ratingInput.value = '';
+  });
+
+  // Блокируем символы кроме цифр
+  ratingInput.addEventListener("keydown", (e) => {
+    const invalidKeys = ["e", "E", "+", "-", ".", ","];
+
+    if (invalidKeys.includes(e.key)) {
+      e.preventDefault();
+    }
   });
 }
     // ✅ Отправка события аналитики
