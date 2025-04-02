@@ -305,13 +305,14 @@ priceRange = document.getElementById("priceRange");
 const priceTooltip = document.getElementById("priceTooltip");
 
 function updatePriceTooltip() {
-  const value = priceRange.value;
+  const value = parseInt(priceRange.value);
   priceTooltip.textContent = `$${value}`;
 
+  // точное позиционирование по ширине
+  const rangeWidth = priceRange.offsetWidth;
+  const thumbWidth = 32; // ширина бегунка
   const percent = (value - priceRange.min) / (priceRange.max - priceRange.min);
-  const sliderWidth = priceRange.offsetWidth;
-  const thumbWidth = 32; // размер бегунка
-  const offset = percent * (sliderWidth - thumbWidth) + thumbWidth / 2;
+  const offset = percent * (rangeWidth - thumbWidth) + thumbWidth / 2;
 
   priceTooltip.style.left = `${offset}px`;
 }
