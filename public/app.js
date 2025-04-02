@@ -325,7 +325,6 @@ if (priceRange) {
 
   // ✅ Обновление при изменении размера окна
   window.addEventListener("resize", updatePriceTooltip);
-}
 
 if (hotelCityInput) {
   // ✅ Восстановление кэша города
