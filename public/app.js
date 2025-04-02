@@ -458,7 +458,8 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
 });
 
 // ✅ Поиск мест
-const placeCityInput = document.getElementById("placeCity");
+//const 
+placeCityInput = document.getElementById("placeCity");
 const placeCategorySelect = document.getElementById("placeCategory");
 const resultBlock = document.getElementById("placesResult");
 
