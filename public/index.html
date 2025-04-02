@@ -109,19 +109,16 @@
 
     <div id="hotelFilters" class="hidden mt-2">
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <!-- 💰 Диапазон цен -->
-    <div class="col-span-2">
-      <label class="label block mb-1" for="priceRangeMin">Диапазон цены</label>
-      <div class="relative h-10">
-        <input type="range" id="priceRangeMin" min="0" max="500" step="10" value="50"
-               class="absolute z-10 w-full h-2 bg-transparent appearance-none pointer-events-none">
-        <input type="range" id="priceRangeMax" min="0" max="500" step="10" value="300"
-               class="absolute z-20 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500">
-      </div>
-      <p class="text-sm text-gray-600 mt-2">
-        от <span id="priceMinValue">50</span> $ до <span id="priceMaxValue">300</span> $
-      </p>
-    </div>
+    
+   <!-- 💰 Цена до -->
+<div class="col-span-2">
+  <label class="label block mb-1" for="priceRange">💰 Цена до</label>
+  <input type="range" id="priceRange" min="0" max="500" step="10" value="150"
+         class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500">
+  <p class="text-sm text-gray-600 mt-2">
+    до <span id="priceRangeValue">150</span> $
+  </p>
+</div>
 
     <!-- ⭐️ Рейтинг -->
     <div class="col-span-2">
