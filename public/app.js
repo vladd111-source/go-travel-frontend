@@ -38,7 +38,7 @@ const translations = {
     checkOut: "Дата выезда",
     priceFrom: "Цена от",
     priceTo: "Цена",
-    ratingMin: "Минимальный рейтинг",
+    ratingMin: "Рейтинг",
     findHotel: "Найти отель",
     findSights: "Показать места",
     bookNow: "Забронировать"
@@ -62,7 +62,7 @@ const translations = {
     checkOut: "Check-out Date",
     priceFrom: "Price from",
     priceTo: "Price",
-    ratingMin: "Min Rating",
+    ratingMin: "Rating",
     findHotel: "Find Hotel",
     findSights: "Show Places",
     bookNow: "Book Now"
