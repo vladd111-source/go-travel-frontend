@@ -64,10 +64,19 @@ select.input {
 
 /* ===== Кнопка "Фильтры" как тумблер-кнопка */
 .toggle-btn {
-  @apply inline-flex items-center px-3 py-1 rounded-full bg-gray-200 text-sm text-gray-700 cursor-pointer transition-colors;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background-color: #e5e7eb;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
 }
 .toggle-btn.active {
-  @apply bg-blue-100 text-blue-800;
+  background-color: #dbeafe;
+  color: #1e40af;
 }
 
 /* ===== Ползунок рейтинга ===== */
@@ -100,6 +109,16 @@ select.input {
   border: 2px solid white;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
   cursor: pointer;
+}
+
+/* ===== Tooltip для цены ===== */
+#priceTooltip {
+  white-space: nowrap;
+  transform: translateX(-50%);
+  font-weight: 600;
+  pointer-events: none;
+  transition: left 0.2s ease;
+  font-size: 0.75rem;
 }
 
 /* ===== Вкладки ===== */
