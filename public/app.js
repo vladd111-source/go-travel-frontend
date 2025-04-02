@@ -232,7 +232,7 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     localStorage.setItem("roundTripChecked", roundTripCheckbox.checked ? "1" : "0");
   });
 }
-    // ✅ Показ/скрытие фильтров в отелях по чекбоксу
+  // ✅ Показ/скрытие фильтров + обновление tooltip
 const hotelFiltersToggle = document.getElementById("toggleFilters");
 const hotelFiltersSection = document.getElementById("hotelFilters");
 
@@ -241,16 +241,13 @@ if (hotelFiltersToggle && hotelFiltersSection) {
     const isVisible = hotelFiltersToggle.checked;
     hotelFiltersSection.classList.toggle("hidden", !isVisible);
 
-    // ✅ Пересчёт tooltip позиции после отображения
     if (isVisible) {
-      requestAnimationFrame(() => {
-        updatePriceTooltip(); // эта функция должна быть заранее объявлена
-      });
+      setTimeout(updatePriceTooltip, 100);
     }
   };
 
   hotelFiltersToggle.addEventListener("change", toggleVisibility);
-  toggleVisibility(); // при загрузке страницы
+  toggleVisibility(); // при загрузке
 }
 
     // Автофокус на первом input текущей вкладки
@@ -296,32 +293,33 @@ if (hotelFiltersToggle && hotelFiltersSection) {
 // ✅ Поиск отелей
 const hotelCityInput = document.getElementById("hotelCity");
 
-//✅ Ползунок в фильтрах
-const priceRange = document.getElementById("priceRange");
-const priceTooltip = document.getElementById("priceTooltip");
-
+// ✅ Центрируем tooltip над ползунком
 function updatePriceTooltip() {
+  const priceRange = document.getElementById("priceRange");
+  const priceTooltip = document.getElementById("priceTooltip");
+
+  if (!priceRange || !priceTooltip) return;
+
   const value = parseInt(priceRange.value);
   priceTooltip.textContent = `$${value}`;
 
   const percent = (value - priceRange.min) / (priceRange.max - priceRange.min);
   const sliderWidth = priceRange.offsetWidth;
-  const thumbWidth = 32; // должен совпадать с CSS
+  const thumbWidth = 32;
   const offset = percent * (sliderWidth - thumbWidth) + thumbWidth / 2;
 
   priceTooltip.style.left = `${offset}px`;
   priceTooltip.style.transform = `translateX(-50%)`;
 }
 
-if (priceRange && priceTooltip) {
-  // ✅ Установка стартового значения и центрирование тултипа после полной отрисовки
-  window.addEventListener("load", () => {
-    priceRange.value = 250;
-    requestAnimationFrame(() => {
-      updatePriceTooltip();
-    });
-  });
-
+// ✅ Инициализация ползунка и tooltip
+const priceRange = document.getElementById("priceRange");
+if (priceRange) {
+  priceRange.value = 250;
+  priceRange.addEventListener("input", updatePriceTooltip);
+  window.addEventListener("resize", updatePriceTooltip);
+  window.addEventListener("load", updatePriceTooltip);
+}
   // ✅ Обновление при изменении
   priceRange.addEventListener("input", updatePriceTooltip);
 
