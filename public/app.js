@@ -193,6 +193,16 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.remove("opacity-0");
     }, 100);
 
+    //💡 Ограничение поля рейтинга (от 0 до 10)
+const ratingInput = document.getElementById("minRating");
+
+if (ratingInput) {
+  ratingInput.addEventListener("input", () => {
+    let val = parseInt(ratingInput.value);
+    if (val > 10) ratingInput.value = 10;
+    if (val < 0) ratingInput.value = 0;
+  });
+}
     // ✅ Отправка события аналитики
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
@@ -390,6 +400,7 @@ if (hotelCityInput) {
       });
   });
 }
+
 // ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
 const toInput = document.getElementById("to");
