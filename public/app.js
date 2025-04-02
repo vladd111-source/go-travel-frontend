@@ -143,6 +143,7 @@ function trackEvent(name, data = "") {
     timestamp: new Date().toISOString(),
   });
 }
+
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
   try {
@@ -258,6 +259,39 @@ if (hotelFiltersToggle && hotelFiltersSection) {
       document.body.classList.remove("opacity-0");
     }, 100);
 
+
+
+
+
+const priceRangeMin = document.getElementById("priceRangeMin");
+const priceRangeMax = document.getElementById("priceRangeMax");
+const priceMinValue = document.getElementById("priceMinValue");
+const priceMaxValue = document.getElementById("priceMaxValue");
+
+function updatePriceRange() {
+  let min = parseInt(priceRangeMin.value);
+  let max = parseInt(priceRangeMax.value);
+
+  if (min > max) {
+    [min, max] = [max, min];
+    priceRangeMin.value = min;
+    priceRangeMax.value = max;
+  }
+
+  priceMinValue.textContent = min;
+  priceMaxValue.textContent = max;
+}
+
+if (priceRangeMin && priceRangeMax) {
+  priceRangeMin.addEventListener("input", updatePriceRange);
+  priceRangeMax.addEventListener("input", updatePriceRange);
+  updatePriceRange();
+}
+
+
+
+
+
     // Кэш поля "Места"
     const placeCityInput = document.getElementById("placeCity");
     const placeCategorySelect = document.getElementById("placeCategory");
@@ -303,8 +337,8 @@ document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
   const city = hotelCityInput.value.trim();
   localStorage.setItem("lastHotelCity", city);
 
-  const minPrice = parseFloat(document.getElementById("minPrice").value) || 0;
-  const maxPrice = parseFloat(document.getElementById("maxPrice").value) || Infinity;
+  const minPrice = parseFloat(priceRangeMin.value) || 0;
+  const maxPrice = parseFloat(priceRangeMax.value) || Infinity;
   const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
   fetch("https://go-travel-backend.vercel.app/api/hotels")
