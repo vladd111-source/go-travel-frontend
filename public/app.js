@@ -259,17 +259,6 @@ if (hotelFiltersToggle && hotelFiltersSection) {
       document.body.classList.remove("opacity-0");
     }, 100);
 
-
-//Ползунок цены
-const priceRange = document.getElementById("priceRange");
-const priceRangeValue = document.getElementById("priceRangeValue");
-
-if (priceRange && priceRangeValue) {
-  priceRange.addEventListener("input", () => {
-    priceRangeValue.textContent = priceRange.value;
-  });
-}
-
     // Кэш поля "Места"
     const placeCityInput = document.getElementById("placeCity");
     const placeCategorySelect = document.getElementById("placeCategory");
@@ -300,27 +289,29 @@ if (priceRange && priceRangeValue) {
 const hotelCityInput = document.getElementById("hotelCity");
 
 // ✅ Tooltip над ползунком цены
-// const 
-priceRange = document.getElementById("priceRange");
+const priceRange = document.getElementById("priceRange");
 const priceTooltip = document.getElementById("priceTooltip");
 
 function updatePriceTooltip() {
   const value = parseInt(priceRange.value);
   priceTooltip.textContent = `$${value}`;
 
-  // точное позиционирование по ширине
-  const rangeWidth = priceRange.offsetWidth;
-  const thumbWidth = 32; // ширина бегунка
   const percent = (value - priceRange.min) / (priceRange.max - priceRange.min);
-  const offset = percent * (rangeWidth - thumbWidth) + thumbWidth / 2;
+  const sliderWidth = priceRange.offsetWidth;
+  const thumbWidth = 32; // важно: соответствует CSS
+  const tooltipWidth = priceTooltip.offsetWidth;
+
+  // Центр бегунка
+  const offset = percent * (sliderWidth - thumbWidth) + thumbWidth / 2;
 
   priceTooltip.style.left = `${offset}px`;
+  priceTooltip.style.transform = `translateX(-50%)`;
 }
 
 if (priceRange && priceTooltip) {
   priceRange.addEventListener("input", updatePriceTooltip);
   window.addEventListener("resize", updatePriceTooltip);
-  updatePriceTooltip(); // initial
+  updatePriceTooltip(); // начальная инициализация
 }
 
 if (hotelCityInput) {
