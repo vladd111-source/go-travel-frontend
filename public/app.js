@@ -312,6 +312,7 @@ if (priceRange && priceTooltip) {
   priceRange.addEventListener("input", updatePriceTooltip);
   window.addEventListener("resize", updatePriceTooltip);
   updatePriceTooltip(); // начальная инициализация
+  window.addEventListener("load", updatePriceTooltip);
 }
 
 if (hotelCityInput) {
@@ -378,22 +379,6 @@ if (hotelCityInput) {
       });
   });
 }
-
-// ✅ Показ/скрытие фильтров в отелях
-//const 
-//hotelFiltersToggle = document.getElementById("hotelFiltersToggle");
-//const 
-//hotelFiltersSection = document.getElementById("hotelFiltersSection");
-
-//if (hotelFiltersToggle && hotelFiltersSection) {
- //// const toggleVisibility = () => {
-//    hotelFiltersSection.classList.toggle("hidden", !hotelFiltersToggle.checked);
-//  };
-
-//  hotelFiltersToggle.addEventListener("change", toggleVisibility);
- // toggleVisibility(); // при загрузке страницы
-//} 
-
 // ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
 const toInput = document.getElementById("to");
