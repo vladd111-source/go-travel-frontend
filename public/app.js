@@ -227,10 +227,6 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     localStorage.setItem("roundTripChecked", roundTripCheckbox.checked ? "1" : "0");
   });
 }
-    // Восстановление активной вкладки
-    const lastTab = localStorage.getItem("activeTab") || "flights";
-    showTab(lastTab);
-    
     // ✅ Показ/скрытие фильтров в отелях по чекбоксу
 const hotelFiltersToggle = document.getElementById("toggleFilters");
 const hotelFiltersSection = document.getElementById("hotelFilters");
