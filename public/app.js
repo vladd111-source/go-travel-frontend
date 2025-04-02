@@ -300,7 +300,7 @@ if (priceRange && priceRangeValue) {
 const hotelCityInput = document.getElementById("hotelCity");
 
 // ✅ Tooltip над ползунком цены
-const priceRange = document.getElementById("priceRange");
+// const priceRange = document.getElementById("priceRange");
 const priceTooltip = document.getElementById("priceTooltip");
 
 function updatePriceTooltip() {
