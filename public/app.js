@@ -440,7 +440,28 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
         f.from.toLowerCase() === from.toLowerCase() &&
         f.to.toLowerCase() === to.toLowerCase()
       );
+// Рендеринг в избранное
+      const hotDeals = document.getElementById("hotDeals");
+hotDeals.innerHTML = flights.map(deal => {
+  const dealId = `${deal.from}-${deal.to}-${deal.date}-${deal.price}`;
+  const favorites = JSON.parse(localStorage.getItem("favFlights") || "[]");
+  const isFavorite = favorites.includes(dealId);
 
+  return `
+    <div class="card bg-white p-4 rounded-xl shadow mb-2 opacity-0 scale-95 transform transition-all duration-300">
+      <strong>${deal.from} → ${deal.to}</strong><br>
+      Дата: ${deal.date}<br>
+      Цена: $${deal.price}<br>
+      <div class="flex justify-between items-center mt-2">
+        <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotDeal('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">Забронировать</button>
+        <button onclick="toggleFavoriteFlight('${dealId}', this)" class="text-xl">${isFavorite ? "💙" : "🤍"}</button>
+      </div>
+    </div>
+  `;
+}).join("");
+
+animateCards("#hotDeals .card");
+      
       if (match) {
         const msg = `✈️ Нашли рейс\n🛫 ${match.from} → 🛬 ${match.to}\n📅 ${match.date}\n💰 $${match.price}`;
         Telegram.WebApp.sendData?.(msg);
@@ -662,4 +683,21 @@ function animateCards(selector) {
   window.addEventListener("beforeunload", () => {
     const duration = Math.round((Date.now() - appStart) / 1000);
     logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
+    //Функция для обработки лайков
+function toggleFavoriteFlight(dealId, btn) {
+  let favorites = JSON.parse(localStorage.getItem("favFlights") || "[]");
+  const index = favorites.indexOf(dealId);
+
+  if (index === -1) {
+    favorites.push(dealId);
+    btn.textContent = "💙";
+  } else {
+    favorites.splice(index, 1);
+    btn.textContent = "🤍";
+  }
+
+  localStorage.setItem("favFlights", JSON.stringify(favorites));
+  trackEvent("Избранный рейс", { dealId, action: index === -1 ? "add" : "remove" });
+}
+
   });
