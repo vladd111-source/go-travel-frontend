@@ -817,4 +817,4 @@ function toggleFavoritePlace(place, btn) {
   trackEvent("Избранное место", { place, action: exists ? "remove" : "add" });
 }
     }
-      
+  }
