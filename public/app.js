@@ -595,6 +595,7 @@ animateCards("#placesResult .card");
 
 // 📊 Трекинг
 trackEvent("Поиск мест", { city, category });
+  });
 // ✅ Форматирование категории (иконка + текст)
 function formatCategory(code) {
   const map = {
