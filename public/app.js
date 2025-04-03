@@ -381,7 +381,8 @@ if (hotelCityInput) {
           `).join("") :
           `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
         );
-
+        // ✅ Вот это — добавь 👇
+        resultBlock.classList.add("visible");
         // ✨ Анимация карточек
         animateCards("#hotelsResult .card");
 
@@ -550,7 +551,7 @@ if (filtered.length === 0) {
   resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
   return;
 }
-
+resultBlock.classList.remove("visible"); // 👈 вот сюда
   resultBlock.innerHTML = filtered.map(p => `
    <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
       <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
@@ -560,8 +561,9 @@ if (filtered.length === 0) {
       <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded w-full">📍 Подробнее</button>
     </div>
   `).join("");
-
-  animateCards("#placesResult .card");
+  
+    resultBlock.classList.add("visible");
+    animateCards("#placesResult .card");
 
   // 📊 Трекинг
   trackEvent("Поиск мест", { city, category });
