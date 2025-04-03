@@ -502,35 +502,35 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       description: "Древняя крепость с видом на Лиссабон",
       city: "лиссабон",
       category: "culture",
-      image: "https://via.placeholder.com/300x180?text=Castle"
+      image: "https://placekitten.com/300/180"
     },
     {
       name: "Miradouro da Senhora do Monte",
       description: "Лучший панорамный вид на город",
       city: "лиссабон",
       category: "nature",
-      image: "https://via.placeholder.com/300x180?text=Viewpoint"
+      image: "https://placekitten.com/300/180"
     },
     {
       name: "Oceanário de Lisboa",
       description: "Современный океанариум",
       city: "лиссабон",
       category: "fun",
-      image: "https://via.placeholder.com/300x180?text=Oceanarium"
+      image: "https://placekitten.com/300/180"
     },
     {
       name: "Time Out Market",
       description: "Фудкорт и рынок в центре города",
       city: "лиссабон",
       category: "food",
-      image: "https://via.placeholder.com/300x180?text=Food+Market"
+      image: "https://placekitten.com/300/180"
     },
     {
       name: "Centro Colombo",
       description: "Крупный торговый центр",
       city: "лиссабон",
       category: "shopping",
-      image: "https://via.placeholder.com/300x180?text=Shopping+Mall"
+      image: "https://placekitten.com/300/180"
     }
   ];
 
