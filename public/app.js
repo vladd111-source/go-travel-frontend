@@ -790,10 +790,7 @@ function toggleFavoriteHotel(hotelData, btn) {
   }
 
   localStorage.setItem("favorites_places", JSON.stringify(favorites));
-
-
-      function toggleFavoriteFlight(...) { ... }
-function toggleFavoriteHotel(...) { ... }
+      
 
 function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
   try {
