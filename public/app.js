@@ -815,5 +815,4 @@ function toggleFavoritePlace(place, btn) {
 
   localStorage.setItem("favorites_places", JSON.stringify(favorites));
   trackEvent("Избранное место", { place, action: exists ? "remove" : "add" });
-}
 });
