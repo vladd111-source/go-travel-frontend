@@ -547,7 +547,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   }
 
   resultBlock.innerHTML = filtered.map(p => `
-    <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+   <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
       <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
       <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
       <p class="text-sm text-gray-600 mb-1">${p.description}</p>
