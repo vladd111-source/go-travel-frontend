@@ -105,6 +105,9 @@ window.showTab = function (id) {
 
   localStorage.setItem("activeTab", id);
   trackEvent("Переключение вкладки", id);
+  if (id === "favorites") {
+    switchFavTab("flights");
+  }
 };
 
 // ✅ Логирование аналитики
@@ -801,11 +804,6 @@ function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
     console.error("❌ Ошибка декодирования избранного места:", e);
   }
 }
-// ✅ Сохранение длительности сессии
-window.addEventListener("beforeunload", () => {
-  const duration = Math.round((Date.now() - appStart) / 1000);
-  logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
-
 //Вкладка Избранноеfunction switchFavTab(tab) {
   document.querySelectorAll('.fav-tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
   document.querySelector(`#favTab-${tab}`)?.classList.add('bg-blue-100');
@@ -855,4 +853,8 @@ function renderFavorites(tab) {
     `).join('');
   }
 }
+// ✅ Сохранение длительности сессии
+window.addEventListener("beforeunload", () => {
+  const duration = Math.round((Date.now() - appStart) / 1000);
+  logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
 });
