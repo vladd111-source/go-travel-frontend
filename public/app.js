@@ -371,16 +371,25 @@ if (hotelCityInput) {
  
 
         resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-          filtered.length ? filtered.map(h => `
-            <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
-              <strong>${h.name}</strong> (${h.city})<br>
-              Цена: $${h.price} / ночь<br>
-              Рейтинг: ${h.rating}<br>
-              <button class="btn mt-2 w-full" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
-            </div>
-          `).join("") :
-          `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-        );
+  filtered.length ? filtered.map(h => {
+    const hotelId = `${h.name}-${h.city}-${h.price}`;
+    const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+    const isFav = favHotels.some(fav => fav.name === h.name && fav.city === h.city);
+
+    return `
+      <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
+        <strong>${h.name}</strong> (${h.city})<br>
+        Цена: $${h.price} / ночь<br>
+        Рейтинг: ${h.rating}<br>
+        <div class="flex justify-between items-center mt-2">
+          <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
+          <button onclick='toggleFavoriteHotel(${JSON.stringify(h)}, this)' class="text-xl">${isFav ? "💙" : "🤍"}</button>
+        </div>
+      </div>
+    `;
+  }).join("") :
+  `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+);
         // ✅ Вот это — добавь 👇
         resultBlock.classList.add("visible");
         // ✨ Анимация карточек
@@ -740,6 +749,23 @@ function toggleFavoriteFlight(dealId, btn) {
 
   // ✅ Сохраняем в localStorage
   localStorage.setItem("favFlights", JSON.stringify(favorites));
+}
+    // ✅ Добавление/удаление отеля в избранное
+function toggleFavoriteHotel(hotelData, btn) {
+  let favorites = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+
+  const exists = favorites.some(h => h.name === hotelData.name && h.city === hotelData.city);
+  if (exists) {
+    favorites = favorites.filter(h => !(h.name === hotelData.name && h.city === hotelData.city));
+    btn.textContent = "🤍";
+    trackEvent("Удаление из избранного (отель)", hotelData);
+  } else {
+    favorites.push(hotelData);
+    btn.textContent = "💙";
+    trackEvent("Добавление в избранное (отель)", hotelData);
+  }
+
+  localStorage.setItem("favorites_hotels", JSON.stringify(favorites));
 }
 
   });
