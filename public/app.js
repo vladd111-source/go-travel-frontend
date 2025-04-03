@@ -584,15 +584,23 @@ const firstBatch = filtered.slice(0, 3);
 const remaining = filtered.slice(3);
 
 // Рендерим первые 3 карточки
-resultBlock.innerHTML = firstBatch.map(p => `
-  <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-    <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
-    <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-    <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-    <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
-    <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded w-full">📍 Подробнее</button>
-  </div>
-`).join("");
+resultBlock.innerHTML = firstBatch.map(p => {
+  const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
+
+  return `
+    <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+      <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
+      <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+      <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+      <div class="flex justify-between items-center mt-2">
+        <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
+        <button onclick='toggleFavoritePlace(${JSON.stringify(p)}, this)' class="text-xl">${isFav ? "💙" : "🤍"}</button>
+      </div>
+    </div>
+  `;
+}).join("");
 
 // Кнопка "Показать ещё"
 if (remaining.length > 0) {
@@ -766,6 +774,21 @@ function toggleFavoriteHotel(hotelData, btn) {
   }
 
   localStorage.setItem("favorites_hotels", JSON.stringify(favorites));
+}
+    function toggleFavoritePlace(placeObj, btn) {
+  let favorites = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  const index = favorites.findIndex(f => f.name === placeObj.name && f.city === placeObj.city);
+
+  if (index === -1) {
+    favorites.push(placeObj);
+    btn.textContent = "💙";
+  } else {
+    favorites.splice(index, 1);
+    btn.textContent = "🤍";
+  }
+
+  localStorage.setItem("favorites_places", JSON.stringify(favorites));
+  trackEvent("Избранное место", { name: placeObj.name, city: placeObj.city, action: index === -1 ? "add" : "remove" });
 }
 
   });
