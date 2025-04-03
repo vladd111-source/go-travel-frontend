@@ -443,18 +443,17 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
 // Рендеринг в избранное
       const hotDeals = document.getElementById("hotDeals");
 hotDeals.innerHTML = flights.map(deal => {
-  const dealId = `${deal.from}-${deal.to}-${deal.date}-${deal.price}`;
-  const favorites = JSON.parse(localStorage.getItem("favFlights") || "[]");
-  const isFavorite = favorites.includes(dealId);
+  const isFav = JSON.parse(localStorage.getItem("favorites_flights") || "[]")
+    .some(f => f.from === deal.from && f.to === deal.to && f.date === deal.date && f.price === deal.price);
 
   return `
-    <div class="card bg-white p-4 rounded-xl shadow mb-2 opacity-0 scale-95 transform transition-all duration-300">
+    <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
       <strong>${deal.from} → ${deal.to}</strong><br>
       Дата: ${deal.date}<br>
-      Цена: $${deal.price}<br>
+      Цена: $${deal.price}
       <div class="flex justify-between items-center mt-2">
-        <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotDeal('${deal.from}', '${deal.to}', '${deal.date}', ${deal.price})">Забронировать</button>
-        <button onclick="toggleFavoriteFlight('${dealId}', this)" class="text-xl">${isFavorite ? "💙" : "🤍"}</button>
+        <button class="btn w-full" onclick="bookHotel('${deal.from}', '${deal.to}', ${deal.price}, '${deal.date}')">Забронировать</button>
+        <button onclick='toggleFavoriteFlight(\`${encodeURIComponent(JSON.stringify(deal))}\`, this)' class="text-xl ml-3">${isFav ? "💙" : "🤍"}</button>
       </div>
     </div>
   `;
@@ -653,18 +652,57 @@ function animateCards(selector) {
   }, 50);
 }
 
+//Обработка вкладки избранное
+function switchFavTab(tab) {
+  document.querySelectorAll('.fav-tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+  document.querySelector(`#favTab-${tab}`)?.classList.add('bg-blue-100');
 
-//✅ Кэш поля "Места"
-    //const 
-     // placeCityInput = document.getElementById("placeCity");
-    //const 
-     // placeCategorySelect = document.getElementById("placeCategory");
+  document.querySelectorAll('.fav-content').forEach(div => div.classList.add('hidden'));
+  document.getElementById(`favContent-${tab}`)?.classList.remove('hidden');
+  
+  renderFavorites(tab);
+}
 
-   
+function renderFavorites(tab) {
+  const data = JSON.parse(localStorage.getItem(`favorites_${tab}`) || '[]');
+  const container = document.getElementById(`favContent-${tab}`);
 
+  if (!container) return;
 
+  if (data.length === 0) {
+    container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">Пока нет избранного.</p>`;
+    return;
+  }
 
+  if (tab === 'flights') {
+    container.innerHTML = data.map(f => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${f.from} → ${f.to}</strong><br>
+        Дата: ${f.date}<br>
+        Цена: $${f.price}
+      </div>
+    `).join('');
+  }
 
+  if (tab === 'hotels') {
+    container.innerHTML = data.map(h => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${h.name}</strong> (${h.city})<br>
+        Рейтинг: ${h.rating} | $${h.price}
+      </div>
+    `).join('');
+  }
+
+  if (tab === 'places') {
+    container.innerHTML = data.map(p => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${p.name}</strong><br>
+        ${p.description}<br>
+        Категория: ${p.category}
+      </div>
+    `).join('');
+  }
+}
   // Loader
   function showLoading() {
     document.getElementById("loadingSpinner")?.classList.remove("hidden");
@@ -683,7 +721,8 @@ function animateCards(selector) {
   window.addEventListener("beforeunload", () => {
     const duration = Math.round((Date.now() - appStart) / 1000);
     logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
-    //Функция для обработки лайков
+    
+  // ✅ Функция для обработки лайков на рейсы
 function toggleFavoriteFlight(dealId, btn) {
   let favorites = JSON.parse(localStorage.getItem("favFlights") || "[]");
   const index = favorites.indexOf(dealId);
@@ -696,8 +735,11 @@ function toggleFavoriteFlight(dealId, btn) {
     btn.textContent = "🤍";
   }
 
-  localStorage.setItem("favFlights", JSON.stringify(favorites));
+  // ✅ Логируем событие до сохранения
   trackEvent("Избранный рейс", { dealId, action: index === -1 ? "add" : "remove" });
+
+  // ✅ Сохраняем в localStorage
+  localStorage.setItem("favFlights", JSON.stringify(favorites));
 }
 
   });
