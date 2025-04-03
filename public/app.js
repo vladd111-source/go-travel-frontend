@@ -805,4 +805,54 @@ function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
 window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - appStart) / 1000);
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
+
+//Вкладка Избранноеfunction switchFavTab(tab) {
+  document.querySelectorAll('.fav-tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+  document.querySelector(`#favTab-${tab}`)?.classList.add('bg-blue-100');
+
+  document.querySelectorAll('.fav-content').forEach(div => div.classList.add('hidden'));
+  document.getElementById(`favContent-${tab}`)?.classList.remove('hidden');
+
+  renderFavorites(tab);
+}
+
+function renderFavorites(tab) {
+  const data = JSON.parse(localStorage.getItem(`favorites_${tab}`) || '[]');
+  const container = document.getElementById(`favContent-${tab}`);
+  if (!container) return;
+
+  if (data.length === 0) {
+    container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">Пока нет избранного.</p>`;
+    return;
+  }
+
+  if (tab === 'flights') {
+    container.innerHTML = data.map(f => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${f.from} → ${f.to}</strong><br>
+        Дата: ${f.date}<br>
+        Цена: $${f.price}
+      </div>
+    `).join('');
+  }
+
+  if (tab === 'hotels') {
+    container.innerHTML = data.map(h => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${h.name}</strong> (${h.city})<br>
+        Рейтинг: ${h.rating} | $${h.price}
+      </div>
+    `).join('');
+  }
+
+  if (tab === 'places') {
+    container.innerHTML = data.map(p => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${p.name}</strong><br>
+        ${p.description}<br>
+        Категория: ${formatCategory(p.category)}
+      </div>
+    `).join('');
+  }
+}
 });
