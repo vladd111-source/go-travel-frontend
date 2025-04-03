@@ -818,3 +818,4 @@ function toggleFavoritePlace(place, btn) {
 }
     }
   }
+});
