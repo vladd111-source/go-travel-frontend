@@ -295,28 +295,6 @@ setTimeout(() => {
   document.body.classList.remove("opacity-0");
 }, 100);
 
-    //✅ Кэш поля "Места"
-    //const 
-     // placeCityInput = document.getElementById("placeCity");
-    //const 
-     // placeCategorySelect = document.getElementById("placeCategory");
-
-    if (placeCityInput) {
-      const cachedCity = localStorage.getItem("placeCity");
-      if (cachedCity) placeCityInput.value = cachedCity;
-      placeCityInput.addEventListener("input", (e) => {
-        localStorage.setItem("placeCity", e.target.value.trim());
-      });
-    }
-
-    if (placeCategorySelect) {
-      const cachedCategory = localStorage.getItem("placeCategory");
-      if (cachedCategory) placeCategorySelect.value = cachedCategory;
-      placeCategorySelect.addEventListener("change", (e) => {
-        localStorage.setItem("placeCategory", e.target.value);
-      });
-    }
-
     //✅ Отправка события аналитики о загрузке
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
@@ -486,6 +464,22 @@ placeCityInput = document.getElementById("placeCity");
 const 
 placeCategorySelect = document.getElementById("placeCategory");
 const resultBlock = document.getElementById("placesResult");
+// ✅ Кэш поля "Места"
+ if (placeCityInput) {
+      const cachedCity = localStorage.getItem("placeCity");
+      if (cachedCity) placeCityInput.value = cachedCity;
+      placeCityInput.addEventListener("input", (e) => {
+        localStorage.setItem("placeCity", e.target.value.trim());
+      });
+    }
+
+    if (placeCategorySelect) {
+      const cachedCategory = localStorage.getItem("placeCategory");
+      if (cachedCategory) placeCategorySelect.value = cachedCategory;
+      placeCategorySelect.addEventListener("change", (e) => {
+        localStorage.setItem("placeCategory", e.target.value);
+      });
+    }
 
 // ✅ Автофокус на поле города
 placeCityInput.setAttribute("autofocus", "autofocus");
@@ -595,7 +589,13 @@ function animateCards(selector) {
 }
 
 
+//✅ Кэш поля "Места"
+    //const 
+     // placeCityInput = document.getElementById("placeCity");
+    //const 
+     // placeCategorySelect = document.getElementById("placeCategory");
 
+   
 
 
 
