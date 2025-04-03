@@ -297,9 +297,9 @@ setTimeout(() => {
 
     //✅ Кэш поля "Места"
     //const 
-      placeCityInput = document.getElementById("placeCity");
+     // placeCityInput = document.getElementById("placeCity");
     //const 
-      placeCategorySelect = document.getElementById("placeCategory");
+     // placeCategorySelect = document.getElementById("placeCategory");
 
     if (placeCityInput) {
       const cachedCity = localStorage.getItem("placeCity");
