@@ -571,21 +571,30 @@ if (remaining.length > 0) {
   moreBtn.textContent = "Показать ещё";
   moreBtn.className = "btn w-full mt-4 bg-blue-500 text-white text-sm rounded py-2 px-4";
 
-  moreBtn.addEventListener("click", () => {
-    const remainingCards = remaining.map(p => `
-      <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-        <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
-        <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-        <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-        <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
-        <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded w-full">📍 Подробнее</button>
-      </div>
-    `).join("");
+ moreBtn.addEventListener("click", () => {
+  const remainingCardsHTML = remaining.map(p => `
+    <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+      <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
+      <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+      <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+      <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded w-full">📍 Подробнее</button>
+    </div>
+  `).join("");
 
-    resultBlock.insertAdjacentHTML("beforeend", remainingCards);
-    animateCards("#placesResult .card");
-    moreBtn.remove();
-  });
+  // Добавляем карточки
+  resultBlock.insertAdjacentHTML("beforeend", remainingCardsHTML);
+  animateCards("#placesResult .card");
+
+  // 🔽 Плавная прокрутка к первой из новых карточек
+  setTimeout(() => {
+    const cards = resultBlock.querySelectorAll(".card");
+    const scrollTarget = cards[3]; // 0,1,2 — первые три, 3 — первая из оставшихся
+    scrollTarget?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
+
+  moreBtn.remove();
+});
 
   resultBlock.appendChild(moreBtn);
 }
