@@ -735,11 +735,11 @@ function renderFavorites(tab) {
     logEventToAnalytics("Ошибка JS", { msg, url, line, col, stack: error?.stack || null });
   };
 
-  // Время сессии
-  const appStart = Date.now();
-  window.addEventListener("beforeunload", () => {
-    const duration = Math.round((Date.now() - appStart) / 1000);
-    logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
+ // ✅ Сохранение длительности сессии
+window.addEventListener("beforeunload", () => {
+  const duration = Math.round((Date.now() - appStart) / 1000);
+  logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
+});
     
   // ✅ Функция для обработки лайков на рейсы
 function toggleFavoriteFlight(dealId, btn) {
@@ -774,33 +774,9 @@ function toggleFavoriteHotel(hotelData, btn) {
     btn.textContent = "💙";
     trackEvent("Добавление в избранное (отель)", hotelData);
   }
-
   localStorage.setItem("favorites_hotels", JSON.stringify(favorites));
-}
-    function toggleFavoritePlace(placeObj, btn) {
-  let favorites = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-  const index = favorites.findIndex(f => f.name === placeObj.name && f.city === placeObj.city);
-
-  if (index === -1) {
-    favorites.push(placeObj);
-    btn.textContent = "💙";
-  } else {
-    favorites.splice(index, 1);
-    btn.textContent = "🤍";
-  }
-
-  localStorage.setItem("favorites_places", JSON.stringify(favorites));
-      
-
-function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
-  try {
-    const placeObj = JSON.parse(decodeURIComponent(encodedStr));
-    toggleFavoritePlace(placeObj, btn);
-  } catch (e) {
-    console.error("❌ Ошибка декодирования избранного места:", e);
-  }
-}
-
+}    
+   //✅ Функция для лайка мест   
 function toggleFavoritePlace(place, btn) {
   let favorites = JSON.parse(localStorage.getItem("favorites_places") || "[]");
   const exists = favorites.some(f => f.name === place.name && f.city === place.city);
@@ -816,7 +792,16 @@ function toggleFavoritePlace(place, btn) {
   localStorage.setItem("favorites_places", JSON.stringify(favorites));
   trackEvent("Избранное место", { place, action: exists ? "remove" : "add" });
 }
-
+      // ✅ Функция для декодирования encoded JSON
+function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
+  try {
+    const placeObj = JSON.parse(decodeURIComponent(encodedStr));
+    toggleFavoritePlace(placeObj, btn);
+  } catch (e) {
+    console.error("❌ Ошибка декодирования избранного места:", e);
+  }
+}
+// ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - appStart) / 1000);
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
