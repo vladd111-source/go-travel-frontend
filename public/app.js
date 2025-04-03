@@ -368,6 +368,7 @@ if (hotelCityInput) {
         const t = translations[window._appLang];
         const resultBlock = document.getElementById("hotelsResult");
         resultBlock.classList.remove("visible");
+ 
 
         resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
           filtered.length ? filtered.map(h => `
@@ -534,17 +535,21 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     }
   ];
 
-  // ✅ Фильтрация
-  const filtered = dummyPlaces.filter(p =>
-    (!city || p.city.includes(city)) &&
-    (!category || p.category === category)
-  );
+// Очистка и скрытие старых результатов
+resultBlock.classList.remove("visible");
+resultBlock.innerHTML = "";
 
-  // ✅ Вывод результатов
-  if (filtered.length === 0) {
-    resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
-    return;
-  }
+// Фильтрация
+const filtered = dummyPlaces.filter(p =>
+  (!city || p.city.includes(city)) &&
+  (!category || p.category === category)
+);
+
+// Если ничего не найдено
+if (filtered.length === 0) {
+  resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
+  return;
+}
 
   resultBlock.innerHTML = filtered.map(p => `
    <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
