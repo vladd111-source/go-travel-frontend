@@ -168,6 +168,12 @@ input[type="range"].slider-thumb::-webkit-slider-thumb {
   font-weight: 600;
   color: #1e3a8a;
 }
+.btn-sm-tab {
+  @apply px-3 py-1 rounded bg-white shadow text-sm font-medium transition-all;
+}
+.btn-sm-tab.active {
+  @apply bg-blue-100 text-blue-700;
+}
 
 .label {
   font-size: 1rem;
