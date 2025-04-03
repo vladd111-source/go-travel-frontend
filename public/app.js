@@ -497,44 +497,44 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   localStorage.setItem("placeCity", city);
   localStorage.setItem("placeCategory", category);
 
-  // ✅ Моковые места
-  const dummyPlaces = [
-    {
-      name: "Castelo de São Jorge",
-      description: "Древняя крепость с видом на Лиссабон",
-      city: "лиссабон",
-      category: "culture",
-      image: "https://picsum.photos/300/180?random=1"
-    },
-    {
-      name: "Miradouro da Senhora do Monte",
-      description: "Лучший панорамный вид на город",
-      city: "лиссабон",
-      category: "nature",
-      image: "https://picsum.photos/300/180?random=2"
-    },
-    {
-      name: "Oceanário de Lisboa",
-      description: "Современный океанариум",
-      city: "лиссабон",
-      category: "fun",
-      image: "https://picsum.photos/300/180?random=3"
-    },
-    {
-      name: "Time Out Market",
-      description: "Фудкорт и рынок в центре города",
-      city: "лиссабон",
-      category: "food",
-      image: "https://picsum.photos/300/180?random=4"
-    },
-    {
-      name: "Centro Colombo",
-      description: "Крупный торговый центр",
-      city: "лиссабон",
-      category: "shopping",
-      image: "https://picsum.photos/300/180?random=5"
-    }
-  ];
+// ✅ Моковые места
+const dummyPlaces = [
+  {
+    name: "Castelo de São Jorge",
+    description: "Древняя крепость с видом на Лиссабон",
+    city: "лиссабон",
+    category: "culture",
+    image: "https://picsum.photos/300/180?random=1"
+  },
+  {
+    name: "Miradouro da Senhora do Monte",
+    description: "Лучший панорамный вид на город",
+    city: "лиссабон",
+    category: "nature",
+    image: "https://picsum.photos/300/180?random=2"
+  },
+  {
+    name: "Oceanário de Lisboa",
+    description: "Современный океанариум",
+    city: "лиссабон",
+    category: "fun",
+    image: "https://picsum.photos/300/180?random=3"
+  },
+  {
+    name: "Time Out Market",
+    description: "Фудкорт и рынок в центре города",
+    city: "лиссабон",
+    category: "food",
+    image: "https://picsum.photos/300/180?random=4"
+  },
+  {
+    name: "Centro Colombo",
+    description: "Крупный торговый центр",
+    city: "лиссабон",
+    category: "shopping",
+    image: "https://picsum.photos/300/180?random=5"
+  }
+];
 
 // Очистка и скрытие старых результатов
 resultBlock.classList.remove("visible");
@@ -551,10 +551,10 @@ if (filtered.length === 0) {
   return;
 }
 
-const firstBatch = filtered.slice(0, 5);
-const remaining = filtered.slice(5);
+const firstBatch = filtered.slice(0, 3);
+const remaining = filtered.slice(3);
 
-// Рендерим первые 5
+// Рендерим первые 3 карточки
 resultBlock.innerHTML = firstBatch.map(p => `
   <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
     <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
@@ -565,7 +565,7 @@ resultBlock.innerHTML = firstBatch.map(p => `
   </div>
 `).join("");
 
-// Добавляем кнопку "Показать ещё"
+// Кнопка "Показать ещё"
 if (remaining.length > 0) {
   const moreBtn = document.createElement("button");
   moreBtn.textContent = "Показать ещё";
@@ -593,9 +593,8 @@ if (remaining.length > 0) {
 resultBlock.classList.add("visible");
 animateCards("#placesResult .card");
 
-  // 📊 Трекинг
-  trackEvent("Поиск мест", { city, category });
-});
+// 📊 Трекинг
+trackEvent("Поиск мест", { city, category });
 // ✅ Форматирование категории (иконка + текст)
 function formatCategory(code) {
   const map = {
