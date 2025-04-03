@@ -509,28 +509,28 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       description: "Лучший панорамный вид на город",
       city: "лиссабон",
       category: "nature",
-      image: "https://placekitten.com/300/180"
+      image: "https://placekitten.com/300/181"
     },
     {
       name: "Oceanário de Lisboa",
       description: "Современный океанариум",
       city: "лиссабон",
       category: "fun",
-      image: "https://placekitten.com/300/180"
+      image: "https://placekitten.com/300/182"
     },
     {
       name: "Time Out Market",
       description: "Фудкорт и рынок в центре города",
       city: "лиссабон",
       category: "food",
-      image: "https://placekitten.com/300/180"
+      image: "https://placekitten.com/300/183"
     },
     {
       name: "Centro Colombo",
       description: "Крупный торговый центр",
       city: "лиссабон",
       category: "shopping",
-      image: "https://placekitten.com/300/180"
+      image: "https://placekitten.com/300/184"
     }
   ];
 
