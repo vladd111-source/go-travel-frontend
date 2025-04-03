@@ -804,7 +804,8 @@ function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
     console.error("❌ Ошибка декодирования избранного места:", e);
   }
 }
-//Вкладка Избранноеfunction switchFavTab(tab) {
+//Вкладка Избранное
+function switchFavTab(tab) {
   document.querySelectorAll('.fav-tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
   document.querySelector(`#favTab-${tab}`)?.classList.add('bg-blue-100');
 
