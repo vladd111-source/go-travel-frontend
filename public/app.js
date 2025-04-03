@@ -596,7 +596,9 @@ resultBlock.innerHTML = firstBatch.map(p => {
       <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
       <div class="flex justify-between items-center mt-2">
         <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
-        <button onclick='toggleFavoritePlace(${JSON.stringify(p)}, this)' class="text-xl">${isFav ? "💙" : "🤍"}</button>
+        <button onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" class="text-xl ml-2">
+          ${isFav ? "💙" : "🤍"}
+        </button>
       </div>
     </div>
   `;
@@ -788,7 +790,33 @@ function toggleFavoriteHotel(hotelData, btn) {
   }
 
   localStorage.setItem("favorites_places", JSON.stringify(favorites));
-  trackEvent("Избранное место", { name: placeObj.name, city: placeObj.city, action: index === -1 ? "add" : "remove" });
+
+
+      function toggleFavoriteFlight(...) { ... }
+function toggleFavoriteHotel(...) { ... }
+
+function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
+  try {
+    const placeObj = JSON.parse(decodeURIComponent(encodedStr));
+    toggleFavoritePlace(placeObj, btn);
+  } catch (e) {
+    console.error("❌ Ошибка декодирования избранного места:", e);
+  }
 }
 
-  });
+function toggleFavoritePlace(place, btn) {
+  let favorites = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  const exists = favorites.some(f => f.name === place.name && f.city === place.city);
+
+  if (exists) {
+    favorites = favorites.filter(f => !(f.name === place.name && f.city === place.city));
+    btn.textContent = "🤍";
+  } else {
+    favorites.push(place);
+    btn.textContent = "💙";
+  }
+
+  localStorage.setItem("favorites_places", JSON.stringify(favorites));
+  trackEvent("Избранное место", { place, action: exists ? "remove" : "add" });
+}
+      
