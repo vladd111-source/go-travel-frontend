@@ -175,7 +175,18 @@
     </form>
     <div id="placesResult" class="grid gap-4 transition-all duration-300"></div>
   </div>
-
+<!-- ❤️ Избранное -->
+<div id="favorites" class="tab hidden">
+  <div class="mb-4">
+    <div class="flex gap-2">
+      <button onclick="switchFavoritesTab('flights')" id="favTabFlights" class="btn-sm-tab active">✈️ Перелёты</button>
+      <button onclick="switchFavoritesTab('hotels')" id="favTabHotels" class="btn-sm-tab">🏨 Отели</button>
+      <button onclick="switchFavoritesTab('places')" id="favTabPlaces" class="btn-sm-tab">🌍 Места</button>
+    </div>
+  </div>
+  <div id="favoritesContent" class="grid gap-4 transition-all duration-300"></div>
+</div>
+  
   <!-- 🔄 Спиннер -->
   <div id="loadingSpinner" class="hidden text-center my-4 text-gray-500">
     <span class="loader inline-block w-6 h-6 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></span>
