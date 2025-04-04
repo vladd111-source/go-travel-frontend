@@ -955,3 +955,4 @@ function updatePlaceHearts() {
     }
   }); // <- закрыли forEach
 } // <- закрыли функцию
+});
