@@ -948,9 +948,8 @@ function updatePlaceHearts() {
       const place = JSON.parse(decodeURIComponent(btn.dataset.placeId));
       const isFav = favs.some(p => p.name === place.name && p.city === place.city);
       btn.textContent = isFav ? "💙" : "🤍";
-    });
-  
     } catch (e) {
       console.error("Ошибка обновления сердечка места:", e);
     }
   });
+}
