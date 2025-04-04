@@ -612,12 +612,13 @@ resultBlock.innerHTML = firstBatch.map(p => {
       <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
       <div class="flex justify-between items-center mt-2">
         <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
-        <button 
-          onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
-          class="text-xl ml-2"
-          data-place-id="${placeId}">
-          ${isFav ? "💙" : "🤍"}
-        </button>
+     <button 
+  onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
+  class="text-xl ml-2"
+  data-place-id="${encodeURIComponent(JSON.stringify(p))}"
+>
+  ${isFav ? "💙" : "🤍"}
+</button>
       </div>
     </div>
   `;
@@ -937,9 +938,13 @@ function updateHotelHearts() {
 function updatePlaceHearts() {
   const favs = JSON.parse(localStorage.getItem("favorites_places") || "[]");
   document.querySelectorAll('[data-place-id]').forEach(btn => {
-    const place = JSON.parse(decodeURIComponent(btn.dataset.placeId));
-    const isFav = favs.some(p => p.name === place.name && p.city === place.city);
-    btn.textContent = isFav ? "💙" : "🤍";
+    try {
+      const place = JSON.parse(decodeURIComponent(btn.dataset.placeId));
+      const isFav = favs.some(p => p.name === place.name && p.city === place.city);
+      btn.textContent = isFav ? "💙" : "🤍";
+    } catch (e) {
+      console.error("Ошибка обновления сердечка места:", e);
+    }
   });
 }
 
