@@ -818,18 +818,21 @@ function removeFavoriteFlight(index) {
   flights.splice(index, 1);
   localStorage.setItem("favorites_flights", JSON.stringify(flights));
   renderFavorites("flights");
+  updateFlightHearts();
 }
 function removeFavoriteHotel(index) {
   let hotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
   hotels.splice(index, 1);
   localStorage.setItem("favorites_hotels", JSON.stringify(hotels));
   renderFavorites("hotels");
+  updateFlightHearts();
 }
 function removeFavoritePlace(index) {
   let places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
   places.splice(index, 1);
   localStorage.setItem("favorites_places", JSON.stringify(places));
   renderFavorites("places");
+  updateFlightHearts();
 }
 // ✅ Модальное окно для показа деталей перелета/отеля/места
 function showPlaceDetails(index) {
