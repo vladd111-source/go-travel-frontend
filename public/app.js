@@ -500,8 +500,8 @@ animateCards("#hotDeals .card");
     })
     .finally(() => {
       hideLoading();
+      }
     });
-}
 
 // ✅ Поиск мест
 const 
