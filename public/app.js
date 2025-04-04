@@ -832,71 +832,56 @@ function removeFavoritePlace(index) {
   renderFavorites("places");
 }
 // ✅ Модальное окно для показа деталей перелета/отеля/места
-function showFlightDetails(index) {
-  const flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
-  const flight = flights[index];
-  if (!flight) return;
-
-  const modal = document.createElement("div");
-  modal.id = "flightModal";
-  modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
-  modal.innerHTML = `
-    <div class="bg-white rounded-xl p-6 max-w-sm w-full relative shadow-lg">
-      <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-500 text-xl">✖</button>
-      <h2 class="text-xl font-bold mb-2">${flight.from} → ${flight.to}</h2>
-      <p class="text-sm text-gray-500">Дата: ${flight.date}</p>
-      <p class="text-sm text-gray-500">Цена: $${flight.price}</p>
-    </div>
-  `;
-  document.body.appendChild(modal);
-}
-function showFlightDetails(index) {
-  const flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
-  const flight = flights[index];
-  if (!flight) return;
-
-  const modal = document.createElement("div");
-  modal.id = "flightModal";
-  modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
-  modal.innerHTML = `
-    <div class="bg-white rounded-xl p-6 max-w-sm w-full relative shadow-lg">
-      <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-500 text-xl">✖</button>
-      <h2 class="text-xl font-bold mb-2">${flight.from} → ${flight.to}</h2>
-      <p class="text-sm text-gray-500">Дата: ${flight.date}</p>
-      <p class="text-sm text-gray-500">Цена: $${flight.price}</p>
-    </div>
-  `;
-  document.body.appendChild(modal);
-}
-const modal = document.createElement("div");
-modal.id = "modalOverlay";
-modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden";
-modal.innerHTML = `
-  <div id="modalContent" class="bg-white p-6 rounded-xl shadow-xl max-w-md w-full relative">
-    <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-500 hover:text-black">✖</button>
-    <h2 id="modalTitle" class="text-xl font-bold mb-2"></h2>
-    <p id="modalDescription" class="text-gray-700 mb-2"></p>
-    <p id="modalCategory" class="text-sm text-gray-500"></p>
-  </div>
-`;
-document.body.appendChild(modal);
-
 function showPlaceDetails(index) {
   const places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-  const p = places[index];
+  const place = places[index];
+  if (!place) return;
 
-  document.getElementById("modalTitle").textContent = p.name;
-  document.getElementById("modalDescription").textContent = p.description;
-  document.getElementById("modalCategory").textContent = `${formatCategory(p.category)} • ${capitalize(p.city)}`;
+  document.getElementById("modalContent").innerHTML = `
+    <h2 class="text-xl font-bold mb-2">${place.name}</h2>
+    <p class="text-sm text-gray-600 mb-1">${place.description}</p>
+    <p class="text-sm text-gray-500">${formatCategory(place.category)} • ${capitalize(place.city)}</p>
+  `;
+  openModal();
+}
 
-  document.getElementById("modalOverlay").classList.remove("hidden");
+function showHotelDetails(index) {
+  const hotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  const hotel = hotels[index];
+  if (!hotel) return;
+
+  document.getElementById("modalContent").innerHTML = `
+    <h2 class="text-xl font-bold mb-2">${hotel.name}</h2>
+    <p class="text-sm text-gray-500">Город: ${hotel.city}</p>
+    <p class="text-sm text-gray-500">Цена: $${hotel.price}</p>
+    <p class="text-sm text-gray-500">Рейтинг: ${hotel.rating}</p>
+  `;
+  openModal();
+}
+
+function showFlightDetails(index) {
+  const flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+  const flight = flights[index];
+  if (!flight) return;
+
+  document.getElementById("modalContent").innerHTML = `
+    <h2 class="text-xl font-bold mb-2">${flight.from} → ${flight.to}</h2>
+    <p class="text-sm text-gray-500">Дата: ${flight.date}</p>
+    <p class="text-sm text-gray-500">Цена: $${flight.price}</p>
+  `;
+  openModal();
+}
+
+function openModal() {
+  const modal = document.getElementById("detailsModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
 }
 
 function closeModal() {
- function closeModal() {
-  document.getElementById("flightModal")?.remove();
-  document.getElementById("hotelModal")?.remove();
-  document.getElementById("placeModal")?.remove();
+  const modal = document.getElementById("detailsModal");
+  modal.classList.remove("flex");
+  modal.classList.add("hidden");
 }
 // ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
