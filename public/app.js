@@ -109,7 +109,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
 if (activeBtn) {
   activeBtn.classList.remove('bg-white', 'text-black', 'shadow');
-  activeBtn.classList.add('bg-blue-100', 'text-blue-600', 'shadow-md');
+  activeBtn.classList.add('bg-blue-100', 'text-black-600', 'shadow-md');
 }
   // Сохраняем и логируем
   localStorage.setItem("activeTab", id);
