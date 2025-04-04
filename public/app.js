@@ -1006,31 +1006,6 @@ function updatePlaceHearts() {
     }
   });
 }
-
-// ✅ Вызов обновлений после удаления
-function removeFavoriteFlight(index) {
-  const favs = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
-  favs.splice(index, 1);
-  localStorage.setItem("favorites_flights", JSON.stringify(favs));
-  renderFavorites("flights");
-  updateFlightHearts();
-}
-
-function removeFavoriteHotel(index) {
-  const favs = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-  favs.splice(index, 1);
-  localStorage.setItem("favorites_hotels", JSON.stringify(favs));
-  renderFavorites("hotels");
-  updateHotelHearts();
-}
-
-function removeFavoritePlace(index) {
-  const favs = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-  favs.splice(index, 1);
-  localStorage.setItem("favorites_places", JSON.stringify(favs));
-  renderFavorites("places");
-  updatePlaceHearts();
-}
 // ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - appStart) / 1000);
