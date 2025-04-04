@@ -883,7 +883,7 @@ function closeModal() {
   modal.classList.remove("flex");
   modal.classList.add("hidden");
 }
-}
+});
 // ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - appStart) / 1000);
