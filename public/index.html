@@ -178,14 +178,15 @@
   </div>
 <!-- ❤️ Избранное -->
 <div id="favorites" class="tab hidden">
-  <div class="mb-4">
-    <div class="flex gap-2">
-      <button onclick="switchFavoritesTab('flights')" id="favTabFlights" class="btn-sm-tab active">✈️ Перелёты</button>
-      <button onclick="switchFavoritesTab('hotels')" id="favTabHotels" class="btn-sm-tab">🏨 Отели</button>
-      <button onclick="switchFavoritesTab('places')" id="favTabPlaces" class="btn-sm-tab">🌍 Места</button>
-    </div>
+  <div class="mb-4 flex gap-2 justify-center">
+    <button id="favTab-flights" class="fav-tab-btn btn px-3 py-1 bg-blue-100" onclick="switchFavTab('flights')">✈️ Перелёты</button>
+    <button id="favTab-hotels" class="fav-tab-btn btn px-3 py-1" onclick="switchFavTab('hotels')">🏨 Отели</button>
+    <button id="favTab-places" class="fav-tab-btn btn px-3 py-1" onclick="switchFavTab('places')">🌍 Места</button>
   </div>
-  <div id="favoritesContent" class="grid gap-4 transition-all duration-300"></div>
+
+  <div id="favContent-flights" class="fav-content"></div>
+  <div id="favContent-hotels" class="fav-content hidden"></div>
+  <div id="favContent-places" class="fav-content hidden"></div>
 </div>
   
   <!-- 🔄 Спиннер -->
