@@ -500,9 +500,8 @@ animateCards("#hotDeals .card");
     })
     .finally(() => {
       hideLoading();
-       });
     });
-
+  });
 // ✅ Поиск мест
 const 
 placeCityInput = document.getElementById("placeCity");
