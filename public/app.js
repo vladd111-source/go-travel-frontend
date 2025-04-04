@@ -954,6 +954,6 @@ function updatePlaceHearts() {
       console.error("Ошибка обновления сердечка места:", e);
     }
       });
-  });
+  }
 
                         
