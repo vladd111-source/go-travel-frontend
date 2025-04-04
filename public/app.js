@@ -105,8 +105,7 @@ if (activeBtn) {
   if (id === "favorites") {
     switchFavTab("flights");
   }
-};
-
+}
 //Вкладка Избранное
 function renderFavorites(tab) {
   const data = JSON.parse(localStorage.getItem(`favorites_${tab}`) || '[]');
