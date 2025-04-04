@@ -596,7 +596,7 @@ const remaining = filtered.slice(3);
 const filtered = dummyPlaces.filter(p =>
   (!city || p.city.includes(city)) &&
   (!category || p.category === category)
-);
+//);
 
 if (filtered.length === 0) {
   resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
