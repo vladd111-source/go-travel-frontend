@@ -781,34 +781,56 @@ function renderFavorites(tab) {
     return;
   }
 
-  if (tab === 'flights') {
-    container.innerHTML = data.map(f => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${f.from} → ${f.to}</strong><br>
-        Дата: ${f.date}<br>
-        Цена: $${f.price}
-      </div>
-    `).join('');
-  }
+  if (tab === "flights") {
+  container.innerHTML = data.map((f, index) => `
+    <div class="card bg-white p-4 rounded-xl shadow mb-2">
+      <strong>${f.from} → ${f.to}</strong><br>
+      Дата: ${f.date}<br>
+      Цена: $${f.price}
+      <button class="btn mt-2 text-sm bg-red-100 text-red-600" onclick="removeFavoriteFlight(${index})">🗑 Удалить</button>
+    </div>
+  `).join('');
+}
 
-  if (tab === 'hotels') {
-    container.innerHTML = data.map(h => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${h.name}</strong> (${h.city})<br>
-        Рейтинг: ${h.rating} | $${h.price}
-      </div>
-    `).join('');
+  if (tab === "hotels") {
+  container.innerHTML = data.map((h, index) => `
+    <div class="card bg-white p-4 rounded-xl shadow mb-2">
+      <strong>${h.name}</strong> (${h.city})<br>
+      Рейтинг: ${h.rating} | $${h.price}
+      <button class="btn mt-2 text-sm bg-red-100 text-red-600" onclick="removeFavoriteHotel(${index})">🗑 Удалить</button>
+    </div>
+  `).join('');
+}
+  if (tab === "places") {
+  container.innerHTML = data.map((p, index) => `
+    <div class="card bg-white p-4 rounded-xl shadow mb-2">
+      <strong>${p.name}</strong><br>
+      ${p.description}<br>
+      Категория: ${formatCategory(p.category)}
+      <button class="btn mt-2 text-sm bg-red-100 text-red-600" onclick="removeFavoritePlace(${index})">🗑 Удалить</button>
+    </div>
+  `).join('');
+}
   }
-
-  if (tab === 'places') {
-    container.innerHTML = data.map(p => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${p.name}</strong><br>
-        ${p.description}<br>
-        Категория: ${formatCategory(p.category)}
-      </div>
-    `).join('');
-  }
+}
+//Функция удаления из избранного
+function removeFavoriteFlight(index) {
+  let flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+  flights.splice(index, 1);
+  localStorage.setItem("favorites_flights", JSON.stringify(flights));
+  renderFavorites("flights");
+}
+function removeFavoriteHotel(index) {
+  let hotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  hotels.splice(index, 1);
+  localStorage.setItem("favorites_hotels", JSON.stringify(hotels));
+  renderFavorites("hotels");
+}
+function removeFavoritePlace(index) {
+  let places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  places.splice(index, 1);
+  localStorage.setItem("favorites_places", JSON.stringify(places));
+  renderFavorites("places");
 }
 // ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
