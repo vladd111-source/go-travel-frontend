@@ -883,6 +883,66 @@ function closeModal() {
   modal.classList.remove("flex");
   modal.classList.add("hidden");
 }
+//Удаление прожатых сердец из вкладок после удаления из избранного
+// ✅ Обновление сердечек рейсов
+function updateFlightHearts() {
+  const favs = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+  document.querySelectorAll('[data-flight-id]').forEach(btn => {
+    const deal = JSON.parse(decodeURIComponent(btn.dataset.flightId));
+    const isFav = favs.some(f =>
+      f.from === deal.from &&
+      f.to === deal.to &&
+      f.date === deal.date &&
+      f.price === deal.price
+    );
+    btn.textContent = isFav ? "💙" : "🤍";
+  });
+}
+
+// ✅ Обновление сердечек отелей
+function updateHotelHearts() {
+  const favs = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  document.querySelectorAll('[data-hotel-id]').forEach(btn => {
+    const hotel = JSON.parse(decodeURIComponent(btn.dataset.hotelId));
+    const isFav = favs.some(h => h.name === hotel.name && h.city === hotel.city);
+    btn.textContent = isFav ? "💙" : "🤍";
+  });
+}
+
+// ✅ Обновление сердечек мест
+function updatePlaceHearts() {
+  const favs = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  document.querySelectorAll('[data-place-id]').forEach(btn => {
+    const place = JSON.parse(decodeURIComponent(btn.dataset.placeId));
+    const isFav = favs.some(p => p.name === place.name && p.city === place.city);
+    btn.textContent = isFav ? "💙" : "🤍";
+  });
+}
+
+// ✅ Вызов обновлений после удаления
+function removeFavoriteFlight(index) {
+  const favs = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+  favs.splice(index, 1);
+  localStorage.setItem("favorites_flights", JSON.stringify(favs));
+  renderFavorites("flights");
+  updateFlightHearts();
+}
+
+function removeFavoriteHotel(index) {
+  const favs = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  favs.splice(index, 1);
+  localStorage.setItem("favorites_hotels", JSON.stringify(favs));
+  renderFavorites("hotels");
+  updateHotelHearts();
+}
+
+function removeFavoritePlace(index) {
+  const favs = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  favs.splice(index, 1);
+  localStorage.setItem("favorites_places", JSON.stringify(favs));
+  renderFavorites("places");
+  updatePlaceHearts();
+}
 // ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - appStart) / 1000);
