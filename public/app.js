@@ -1036,4 +1036,4 @@ window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - appStart) / 1000);
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
 });
-
+console.log("✅ Скрипт завершен");
