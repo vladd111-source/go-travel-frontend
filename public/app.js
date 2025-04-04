@@ -598,10 +598,7 @@ if (filtered.length === 0) {
   resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
   return;
 }
-
-const firstBatch = filtered.slice(0, 3);
-const remaining = filtered.slice(3);
-
+  
 // Рендерим первые 3 карточки
 resultBlock.innerHTML = firstBatch.map(p => {
   const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
