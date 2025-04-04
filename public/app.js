@@ -779,27 +779,35 @@ function renderFavorites(tab) {
       <strong>${f.from} → ${f.to}</strong><br>
       Дата: ${f.date}<br>
       Цена: $${f.price}
-      <button class="btn mt-2 text-sm bg-red-100 text-red-600" onclick="removeFavoriteFlight(${index})">🗑 Удалить</button>
+      <div class="flex justify-between items-center mt-2">
+        <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showFlightDetails(${index})">📄 Подробнее</button>
+        <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteFlight(${index})">🗑 Удалить</button>
+      </div>
     </div>
   `).join('');
 }
-
   if (tab === "hotels") {
   container.innerHTML = data.map((h, index) => `
     <div class="card bg-white p-4 rounded-xl shadow mb-2">
       <strong>${h.name}</strong> (${h.city})<br>
       Рейтинг: ${h.rating} | $${h.price}
-      <button class="btn mt-2 text-sm bg-red-100 text-red-600" onclick="removeFavoriteHotel(${index})">🗑 Удалить</button>
+      <div class="flex justify-between items-center mt-2">
+        <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showHotelDetails(${index})">📄 Подробнее</button>
+        <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteHotel(${index})">🗑 Удалить</button>
+      </div>
     </div>
   `).join('');
 }
-  if (tab === "places") {
+ if (tab === "places") {
   container.innerHTML = data.map((p, index) => `
     <div class="card bg-white p-4 rounded-xl shadow mb-2">
       <strong>${p.name}</strong><br>
       ${p.description}<br>
-      Категория: ${formatCategory(p.category)}
-      <button class="btn mt-2 text-sm bg-red-100 text-red-600" onclick="removeFavoritePlace(${index})">🗑 Удалить</button>
+      Категория: ${formatCategory(p.category)}<br>
+      <div class="flex justify-between items-center mt-2">
+        <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showPlaceDetails(${index})">📄 Подробнее</button>
+        <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoritePlace(${index})">🗑 Удалить</button>
+      </div>
     </div>
   `).join('');
 }
@@ -822,6 +830,73 @@ function removeFavoritePlace(index) {
   places.splice(index, 1);
   localStorage.setItem("favorites_places", JSON.stringify(places));
   renderFavorites("places");
+}
+// ✅ Модальное окно для показа деталей перелета/отеля/места
+function showFlightDetails(index) {
+  const flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+  const flight = flights[index];
+  if (!flight) return;
+
+  const modal = document.createElement("div");
+  modal.id = "flightModal";
+  modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+  modal.innerHTML = `
+    <div class="bg-white rounded-xl p-6 max-w-sm w-full relative shadow-lg">
+      <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-500 text-xl">✖</button>
+      <h2 class="text-xl font-bold mb-2">${flight.from} → ${flight.to}</h2>
+      <p class="text-sm text-gray-500">Дата: ${flight.date}</p>
+      <p class="text-sm text-gray-500">Цена: $${flight.price}</p>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+function showFlightDetails(index) {
+  const flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+  const flight = flights[index];
+  if (!flight) return;
+
+  const modal = document.createElement("div");
+  modal.id = "flightModal";
+  modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+  modal.innerHTML = `
+    <div class="bg-white rounded-xl p-6 max-w-sm w-full relative shadow-lg">
+      <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-500 text-xl">✖</button>
+      <h2 class="text-xl font-bold mb-2">${flight.from} → ${flight.to}</h2>
+      <p class="text-sm text-gray-500">Дата: ${flight.date}</p>
+      <p class="text-sm text-gray-500">Цена: $${flight.price}</p>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+const modal = document.createElement("div");
+modal.id = "modalOverlay";
+modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden";
+modal.innerHTML = `
+  <div id="modalContent" class="bg-white p-6 rounded-xl shadow-xl max-w-md w-full relative">
+    <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-500 hover:text-black">✖</button>
+    <h2 id="modalTitle" class="text-xl font-bold mb-2"></h2>
+    <p id="modalDescription" class="text-gray-700 mb-2"></p>
+    <p id="modalCategory" class="text-sm text-gray-500"></p>
+  </div>
+`;
+document.body.appendChild(modal);
+
+function showPlaceDetails(index) {
+  const places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  const p = places[index];
+
+  document.getElementById("modalTitle").textContent = p.name;
+  document.getElementById("modalDescription").textContent = p.description;
+  document.getElementById("modalCategory").textContent = `${formatCategory(p.category)} • ${capitalize(p.city)}`;
+
+  document.getElementById("modalOverlay").classList.remove("hidden");
+}
+
+function closeModal() {
+ function closeModal() {
+  document.getElementById("flightModal")?.remove();
+  document.getElementById("hotelModal")?.remove();
+  document.getElementById("placeModal")?.remove();
 }
 // ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
