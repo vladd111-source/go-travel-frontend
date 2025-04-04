@@ -398,6 +398,7 @@ if (hotelCityInput) {
   }).join("") :
   `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
 );
+        updateHotelHearts();
         // ✅ Вот это — добавь 👇
         resultBlock.classList.add("visible");
         // ✨ Анимация карточек
@@ -621,7 +622,7 @@ resultBlock.innerHTML = firstBatch.map(p => {
     </div>
   `;
 }).join("");
-
+updatePlaceHearts();
 // Кнопка "Показать ещё"
 if (remaining.length > 0) {
   const moreBtn = document.createElement("button");
