@@ -673,14 +673,6 @@ function animateCards(selector) {
     });
   }, 50);
 }
-
-
-
-
-
-
-
-
   // Loader
   function showLoading() {
     document.getElementById("loadingSpinner")?.classList.remove("hidden");
@@ -812,7 +804,6 @@ function renderFavorites(tab) {
   `).join('');
 }
   }
-}
 //Функция удаления из избранного
 function removeFavoriteFlight(index) {
   let flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
