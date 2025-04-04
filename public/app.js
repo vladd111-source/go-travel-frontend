@@ -997,5 +997,6 @@ function updatePlaceHearts() {
       btn.textContent = isFav ? "💙" : "🤍";
     } catch (e) {
       console.error("Ошибка обновления сердечка места:", e);
+      }
     });
 }
