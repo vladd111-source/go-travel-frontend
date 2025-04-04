@@ -639,21 +639,39 @@ if (remaining.length > 0) {
   const moreBtn = document.createElement("button");
   moreBtn.textContent = "Показать ещё";
   moreBtn.className = "btn w-full mt-4 bg-blue-500 text-white text-sm rounded py-2 px-4";
+//Скрытые карточки "Посмотреть еще"
+moreBtn.addEventListener("click", () => {
+  const remainingCards = remaining.map(p => {
+    const placeId = `${p.name}-${p.city}`;
+    const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+    const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
 
- moreBtn.addEventListener("click", () => {
-  const remainingCardsHTML = remaining.map(p => `
-    <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-      <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
-      <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-      <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-      <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
-      <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded w-full">📍 Подробнее</button>
-    </div>
-  `).join("");
+    return `
+      <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+        <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
+        <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+        <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+        <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+        <div class="flex justify-between items-center mt-2">
+          <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
+          <button 
+            onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
+            class="text-xl ml-2"
+            data-place-id="${placeId}">
+            ${isFav ? "💙" : "🤍"}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
 
-  // Добавляем карточки
-  resultBlock.insertAdjacentHTML("beforeend", remainingCardsHTML);
+  resultBlock.insertAdjacentHTML("beforeend", remainingCards);
   animateCards("#placesResult .card");
+  moreBtn.remove();
+
+  // ✅ Обновим сердечки на всякий случай
+  updatePlaceHearts();
+});
 
   // 🔽 Плавная прокрутка к первой из новых карточек
   setTimeout(() => {
