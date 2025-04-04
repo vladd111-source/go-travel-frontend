@@ -480,7 +480,8 @@ const dealId = `${deal.from}-${deal.to}-${deal.date}-${deal.price}`;
     </div>
   `;
 }).join("");
-
+      
+updatePlaceHearts();
 animateCards("#hotDeals .card");
       
       if (match) {
