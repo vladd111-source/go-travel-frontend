@@ -377,16 +377,21 @@ if (hotelCityInput) {
   filtered.length ? filtered.map(h => {
     const hotelId = `${h.name}-${h.city}-${h.price}`;
     const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-    const isFav = favHotels.some(fav => fav.name === h.name && fav.city === h.city);
+    const isFav = favHotels.some(fav => fav.name === h.name && fav.city === h.city && fav.price === h.price);
 
     return `
       <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
         <strong>${h.name}</strong> (${h.city})<br>
         Цена: $${h.price} / ночь<br>
-        Рейтинг: ${h.rating}<br>
+        Рейтинг: ${h.rating}
         <div class="flex justify-between items-center mt-2">
           <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
-          <button onclick='toggleFavoriteHotel(${JSON.stringify(h)}, this)' class="text-xl">${isFav ? "💙" : "🤍"}</button>
+          <button 
+            onclick='toggleFavoriteHotel(${JSON.stringify(h)}, this)' 
+            class="text-xl ml-2"
+            data-hotel-id="${hotelId}">
+            ${isFav ? "💙" : "🤍"}
+          </button>
         </div>
       </div>
     `;
@@ -457,7 +462,7 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
 hotDeals.innerHTML = flights.map(deal => {
   const isFav = JSON.parse(localStorage.getItem("favorites_flights") || "[]")
     .some(f => f.from === deal.from && f.to === deal.to && f.date === deal.date && f.price === deal.price);
-
+const dealId = `${deal.from}-${deal.to}-${deal.date}-${deal.price}`;
   return `
     <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
       <strong>${deal.from} → ${deal.to}</strong><br>
@@ -465,7 +470,12 @@ hotDeals.innerHTML = flights.map(deal => {
       Цена: $${deal.price}
       <div class="flex justify-between items-center mt-2">
         <button class="btn w-full" onclick="bookHotel('${deal.from}', '${deal.to}', ${deal.price}, '${deal.date}')">Забронировать</button>
-        <button onclick='toggleFavoriteFlight(\`${encodeURIComponent(JSON.stringify(deal))}\`, this)' class="text-xl ml-3">${isFav ? "💙" : "🤍"}</button>
+        <button onclick="toggleFavoriteFlight('${dealId}', this)" 
+  class="text-xl ml-3"
+  data-flight-id="${dealId}"
+>
+  ${isFav ? "💙" : "🤍"}
+</button>
       </div>
     </div>
   `;
@@ -590,6 +600,7 @@ const remaining = filtered.slice(3);
 resultBlock.innerHTML = firstBatch.map(p => {
   const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
   const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
+  const placeId = `${p.name}-${p.city}`;
 
   return `
     <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
@@ -599,7 +610,10 @@ resultBlock.innerHTML = firstBatch.map(p => {
       <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
       <div class="flex justify-between items-center mt-2">
         <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
-        <button onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" class="text-xl ml-2">
+        <button 
+          onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
+          class="text-xl ml-2"
+          data-place-id="${placeId}">
           ${isFav ? "💙" : "🤍"}
         </button>
       </div>
