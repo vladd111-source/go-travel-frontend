@@ -86,6 +86,20 @@ function applyTranslations(lang) {
     if (t[key]) el.placeholder = t[key];
   });
 }
+
+// ✅ Глобально доступная функция showTab с подсветкой
+window.showTab = function (id) {
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.remove('active');
+    tab.classList.add('hidden');
+  });
+
+  const selectedTab = document.getElementById(id);
+  if (selectedTab) {
+    selectedTab.classList.remove('hidden');
+    selectedTab.classList.add('active');
+  }
+
   // Сброс активного стиля у всех кнопок
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.classList.remove('bg-blue-100', 'text-blue-600', 'shadow-md');
@@ -105,191 +119,8 @@ if (activeBtn) {
   if (id === "favorites") {
     switchFavTab("flights");
   }
-}
-//Вкладка Избранное
-function renderFavorites(tab) {
-  const data = JSON.parse(localStorage.getItem(`favorites_${tab}`) || '[]');
-  const container = document.getElementById(`favContent-${tab}`);
-  if (!container) return;
+};
 
-  if (data.length === 0) {
-    container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">Пока нет избранного.</p>`;
-    return;
-  }
-  
-  function switchFavTab(tab) {
-  document.querySelectorAll('.fav-tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
-  document.querySelector(`#favTab-${tab}`)?.classList.add('bg-blue-100');
-
-  document.querySelectorAll('.fav-content').forEach(div => div.classList.add('hidden'));
-  document.getElementById(`favContent-${tab}`)?.classList.remove('hidden');
-
-  renderFavorites(tab);
-}
-
-  if (tab === "flights") {
-    container.innerHTML = data.map((f, index) => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${f.from} → ${f.to}</strong><br>
-        Дата: ${f.date}<br>
-        Цена: $${f.price}
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showFlightDetails(${index})">📄 Подробнее</button>
-          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteFlight(${index})">🗑 Удалить</button>
-        </div>
-      </div>
-    `).join('');
-    updateFlightHearts(); // 👈 обновляем сердечки
-  }
-
-  if (tab === "hotels") {
-    container.innerHTML = data.map((h, index) => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${h.name}</strong> (${h.city})<br>
-        Рейтинг: ${h.rating} | $${h.price}
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showHotelDetails(${index})">📄 Подробнее</button>
-          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteHotel(${index})">🗑 Удалить</button>
-        </div>
-      </div>
-    `).join('');
-    updateHotelHearts(); // 👈 обновляем сердечки
-  }
-
-  if (tab === "places") {
-    container.innerHTML = data.map((p, index) => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${p.name}</strong><br>
-        ${p.description}<br>
-        Категория: ${formatCategory(p.category)}<br>
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showPlaceDetails(${index})">📄 Подробнее</button>
-          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoritePlace(${index})">🗑 Удалить</button>
-        </div>
-      </div>
-    `).join('');
-    updatePlaceHearts(); // 👈 обновляем сердечки
-  }
-}
-//Функция удаления из избранного
-function removeFavoriteFlight(index) {
-  let flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
-  flights.splice(index, 1);
-  localStorage.setItem("favorites_flights", JSON.stringify(flights));
-  renderFavorites("flights");
-  updateFlightHearts();
-}
-function removeFavoriteHotel(index) {
-  let hotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-  hotels.splice(index, 1);
-  localStorage.setItem("favorites_hotels", JSON.stringify(hotels));
-  renderFavorites("hotels");
-  updateHotelHearts(); // исправлено
-}
-function removeFavoritePlace(index) {
-  let places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-  places.splice(index, 1);
-  localStorage.setItem("favorites_places", JSON.stringify(places));
-  renderFavorites("places");
-  updatePlaceHearts(); // исправлено
-}
-// ✅ Модальное окно для показа деталей перелета/отеля/места
-function showPlaceDetails(index) {
-  const places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-  const place = places[index];
-  if (!place) return;
-
-  document.getElementById("modalContent").innerHTML = `
-    <h2 class="text-xl font-bold mb-2">${place.name}</h2>
-    <p class="text-sm text-gray-600 mb-1">${place.description}</p>
-    <p class="text-sm text-gray-500">${formatCategory(place.category)} • ${capitalize(place.city)}</p>
-  `;
-  openModal();
-}
-
-function showHotelDetails(index) {
-  const hotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-  const hotel = hotels[index];
-  if (!hotel) return;
-
-  document.getElementById("modalContent").innerHTML = `
-    <h2 class="text-xl font-bold mb-2">${hotel.name}</h2>
-    <p class="text-sm text-gray-500">Город: ${hotel.city}</p>
-    <p class="text-sm text-gray-500">Цена: $${hotel.price}</p>
-    <p class="text-sm text-gray-500">Рейтинг: ${hotel.rating}</p>
-  `;
-  openModal();
-}
-
-function showFlightDetails(index) {
-  const flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
-  const flight = flights[index];
-  if (!flight) return;
-
-  document.getElementById("modalContent").innerHTML = `
-    <h2 class="text-xl font-bold mb-2">${flight.from} → ${flight.to}</h2>
-    <p class="text-sm text-gray-500">Дата: ${flight.date}</p>
-    <p class="text-sm text-gray-500">Цена: $${flight.price}</p>
-  `;
-  openModal();
-}
-
-function openModal() {
-  const modal = document.getElementById("detailsModal");
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
-}
-
-function closeModal() {
-  const modal = document.getElementById("detailsModal");
-  modal.classList.remove("flex");
-  modal.classList.add("hidden");
-}
-  
-// ✅ Обновление сердечек рейсов (по dealId)
-function updateFlightHearts() {
-  const favs = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
-  document.querySelectorAll('[data-flight-id]').forEach(btn => {
-    const dealId = btn.dataset.flightId;
-    const isFav = favs.includes(dealId);
-    btn.textContent = isFav ? "💙" : "🤍";
-  });
-}
-
-// ✅ Обновление сердечек отелей
-function updateHotelHearts() {
-  const favs = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-  document.querySelectorAll('[data-hotel-id]').forEach(btn => {
-    const hotel = JSON.parse(decodeURIComponent(btn.dataset.hotelId));
-    const isFav = favs.some(h => h.name === hotel.name && h.city === hotel.city);
-    btn.textContent = isFav ? "💙" : "🤍";
-  });
-}
-
-// ✅ Обновление сердечек мест
-function updatePlaceHearts() {
-  const favs = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-  document.querySelectorAll('[data-place-id]').forEach(btn => {
-    try {
-      const place = JSON.parse(decodeURIComponent(btn.dataset.placeId));
-      const isFav = favs.some(p => p.name === place.name && p.city === place.city);
-      btn.textContent = isFav ? "💙" : "🤍";
-    } catch (e) {
-      console.error("Ошибка обновления сердечка места:", e);
-    }
-  }); // <- закрыли forEach
-// ✅ Глобально доступная функция showTab с подсветкой
-window.showTab = function (id) {
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.classList.remove('active');
-    tab.classList.add('hidden');
-  });
-
-  const selectedTab = document.getElementById(id);
-  if (selectedTab) {
-    selectedTab.classList.remove('hidden');
-    selectedTab.classList.add('active');
-  }
 // ✅ Логирование аналитики
 function logEventToAnalytics(eventName, eventData = {}) {
   const userId = window._telegramId;
@@ -330,7 +161,7 @@ function trackEvent(name, data = "") {
     timestamp: new Date().toISOString(),
   });
 }
-  
+
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
   try {
@@ -950,4 +781,177 @@ function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
   } catch (e) {
     console.error("❌ Ошибка декодирования избранного места:", e);
   }
-});
+}
+//Вкладка Избранное
+function switchFavTab(tab) {
+  document.querySelectorAll('.fav-tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
+  document.querySelector(`#favTab-${tab}`)?.classList.add('bg-blue-100');
+
+  document.querySelectorAll('.fav-content').forEach(div => div.classList.add('hidden'));
+  document.getElementById(`favContent-${tab}`)?.classList.remove('hidden');
+
+  renderFavorites(tab);
+}
+
+function renderFavorites(tab) {
+  const data = JSON.parse(localStorage.getItem(`favorites_${tab}`) || '[]');
+  const container = document.getElementById(`favContent-${tab}`);
+  if (!container) return;
+
+  if (data.length === 0) {
+    container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">Пока нет избранного.</p>`;
+    return;
+  }
+
+  if (tab === "flights") {
+    container.innerHTML = data.map((f, index) => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${f.from} → ${f.to}</strong><br>
+        Дата: ${f.date}<br>
+        Цена: $${f.price}
+        <div class="flex justify-between items-center mt-2">
+          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showFlightDetails(${index})">📄 Подробнее</button>
+          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteFlight(${index})">🗑 Удалить</button>
+        </div>
+      </div>
+    `).join('');
+    updateFlightHearts(); // 👈 обновляем сердечки
+  }
+
+  if (tab === "hotels") {
+    container.innerHTML = data.map((h, index) => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${h.name}</strong> (${h.city})<br>
+        Рейтинг: ${h.rating} | $${h.price}
+        <div class="flex justify-between items-center mt-2">
+          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showHotelDetails(${index})">📄 Подробнее</button>
+          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteHotel(${index})">🗑 Удалить</button>
+        </div>
+      </div>
+    `).join('');
+    updateHotelHearts(); // 👈 обновляем сердечки
+  }
+
+  if (tab === "places") {
+    container.innerHTML = data.map((p, index) => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${p.name}</strong><br>
+        ${p.description}<br>
+        Категория: ${formatCategory(p.category)}<br>
+        <div class="flex justify-between items-center mt-2">
+          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showPlaceDetails(${index})">📄 Подробнее</button>
+          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoritePlace(${index})">🗑 Удалить</button>
+        </div>
+      </div>
+    `).join('');
+    updatePlaceHearts(); // 👈 обновляем сердечки
+  }
+}
+//Функция удаления из избранного
+function removeFavoriteFlight(index) {
+  let flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+  flights.splice(index, 1);
+  localStorage.setItem("favorites_flights", JSON.stringify(flights));
+  renderFavorites("flights");
+  updateFlightHearts();
+}
+function removeFavoriteHotel(index) {
+  let hotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  hotels.splice(index, 1);
+  localStorage.setItem("favorites_hotels", JSON.stringify(hotels));
+  renderFavorites("hotels");
+  updateHotelHearts(); // исправлено
+}
+function removeFavoritePlace(index) {
+  let places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  places.splice(index, 1);
+  localStorage.setItem("favorites_places", JSON.stringify(places));
+  renderFavorites("places");
+  updatePlaceHearts(); // исправлено
+}
+// ✅ Модальное окно для показа деталей перелета/отеля/места
+function showPlaceDetails(index) {
+  const places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  const place = places[index];
+  if (!place) return;
+
+  document.getElementById("modalContent").innerHTML = `
+    <h2 class="text-xl font-bold mb-2">${place.name}</h2>
+    <p class="text-sm text-gray-600 mb-1">${place.description}</p>
+    <p class="text-sm text-gray-500">${formatCategory(place.category)} • ${capitalize(place.city)}</p>
+  `;
+  openModal();
+}
+
+function showHotelDetails(index) {
+  const hotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  const hotel = hotels[index];
+  if (!hotel) return;
+
+  document.getElementById("modalContent").innerHTML = `
+    <h2 class="text-xl font-bold mb-2">${hotel.name}</h2>
+    <p class="text-sm text-gray-500">Город: ${hotel.city}</p>
+    <p class="text-sm text-gray-500">Цена: $${hotel.price}</p>
+    <p class="text-sm text-gray-500">Рейтинг: ${hotel.rating}</p>
+  `;
+  openModal();
+}
+
+function showFlightDetails(index) {
+  const flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+  const flight = flights[index];
+  if (!flight) return;
+
+  document.getElementById("modalContent").innerHTML = `
+    <h2 class="text-xl font-bold mb-2">${flight.from} → ${flight.to}</h2>
+    <p class="text-sm text-gray-500">Дата: ${flight.date}</p>
+    <p class="text-sm text-gray-500">Цена: $${flight.price}</p>
+  `;
+  openModal();
+}
+
+function openModal() {
+  const modal = document.getElementById("detailsModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeModal() {
+  const modal = document.getElementById("detailsModal");
+  modal.classList.remove("flex");
+  modal.classList.add("hidden");
+}
+  
+// ✅ Обновление сердечек рейсов (по dealId)
+function updateFlightHearts() {
+  const favs = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+  document.querySelectorAll('[data-flight-id]').forEach(btn => {
+    const dealId = btn.dataset.flightId;
+    const isFav = favs.includes(dealId);
+    btn.textContent = isFav ? "💙" : "🤍";
+  });
+}
+
+// ✅ Обновление сердечек отелей
+function updateHotelHearts() {
+  const favs = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  document.querySelectorAll('[data-hotel-id]').forEach(btn => {
+    const hotel = JSON.parse(decodeURIComponent(btn.dataset.hotelId));
+    const isFav = favs.some(h => h.name === hotel.name && h.city === hotel.city);
+    btn.textContent = isFav ? "💙" : "🤍";
+  });
+}
+
+// ✅ Обновление сердечек мест
+function updatePlaceHearts() {
+  const favs = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  document.querySelectorAll('[data-place-id]').forEach(btn => {
+    try {
+      const place = JSON.parse(decodeURIComponent(btn.dataset.placeId));
+      const isFav = favs.some(p => p.name === place.name && p.city === place.city);
+      btn.textContent = isFav ? "💙" : "🤍";
+    } catch (e) {
+      console.error("Ошибка обновления сердечка места:", e);
+    }
+      });
+  });
