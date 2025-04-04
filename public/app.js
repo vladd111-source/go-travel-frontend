@@ -86,7 +86,7 @@ function applyTranslations(lang) {
   });
 }
 
-// ✅ Глобально доступная функция showTab
+// ✅ Глобально доступная функция showTab с подсветкой
 window.showTab = function (id) {
   document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.remove('active');
@@ -99,12 +99,21 @@ window.showTab = function (id) {
     selectedTab.classList.add('active');
   }
 
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
-  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
-  activeBtn?.classList.add('bg-blue-100');
+  // Сброс активного стиля у всех кнопок
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('bg-blue-100', 'text-blue-600');
+  });
 
+  // Подсветка активной
+  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add('bg-blue-100', 'text-blue-600');
+  }
+
+  // Сохраняем и логируем
   localStorage.setItem("activeTab", id);
   trackEvent("Переключение вкладки", id);
+
   if (id === "favorites") {
     switchFavTab("flights");
   }
