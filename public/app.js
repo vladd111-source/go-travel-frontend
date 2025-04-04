@@ -860,14 +860,14 @@ function removeFavoriteHotel(index) {
   hotels.splice(index, 1);
   localStorage.setItem("favorites_hotels", JSON.stringify(hotels));
   renderFavorites("hotels");
-  updateFlightHearts();
+  updateHotelHearts(); // исправлено
 }
 function removeFavoritePlace(index) {
   let places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
   places.splice(index, 1);
   localStorage.setItem("favorites_places", JSON.stringify(places));
   renderFavorites("places");
-  updateFlightHearts();
+  updatePlaceHearts(); // исправлено
 }
 // ✅ Модальное окно для показа деталей перелета/отеля/места
 function showPlaceDetails(index) {
