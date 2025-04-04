@@ -942,7 +942,6 @@ function updateHotelHearts() {
   });
 }
 
-// ✅ Обновление сердечек мест
 function updatePlaceHearts() {
   const favs = JSON.parse(localStorage.getItem("favorites_places") || "[]");
   document.querySelectorAll('[data-place-id]').forEach(btn => {
@@ -953,5 +952,5 @@ function updatePlaceHearts() {
     } catch (e) {
       console.error("Ошибка обновления сердечка места:", e);
     }
-      });
-  });
+  }); // ← закрываем forEach
+} // ← закрываем функцию
