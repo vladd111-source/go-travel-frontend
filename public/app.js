@@ -311,7 +311,7 @@ setTimeout(() => {
     //✅ Отправка события аналитики о загрузке
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toISOString()
 });
 
 // ✅ Поиск отелей
