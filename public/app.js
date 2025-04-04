@@ -953,5 +953,5 @@ function updatePlaceHearts() {
     } catch (e) {
       console.error("Ошибка обновления сердечка места:", e);
     }
-      });
+  }
   });
