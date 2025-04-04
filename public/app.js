@@ -953,4 +953,3 @@ function updatePlaceHearts() {
     }
   });
 }
-  });
