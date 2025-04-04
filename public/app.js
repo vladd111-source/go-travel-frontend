@@ -588,6 +588,10 @@ const dummyPlaces = [
 resultBlock.classList.remove("visible");
 resultBlock.innerHTML = "";
 
+  // Показываем первую часть карточек (3), остальное — по кнопке "Показать ещё"
+const firstBatch = filtered.slice(0, 3);
+const remaining = filtered.slice(3);
+  
 // Фильтрация
 const filtered = dummyPlaces.filter(p =>
   (!city || p.city.includes(city)) &&
@@ -630,10 +634,6 @@ if (remaining.length > 0) {
   const moreBtn = document.createElement("button");
   moreBtn.textContent = "Показать ещё";
   moreBtn.className = "btn w-full mt-4 bg-blue-500 text-white text-sm rounded py-2 px-4";
-  
-// Показываем первую часть карточек (3), остальное — по кнопке "Показать ещё"
-const firstBatch = filtered.slice(0, 3);
-const remaining = filtered.slice(3);
 
 resultBlock.innerHTML = firstBatch.map(p => {
   const placeId = `${p.name}-${p.city}`;
@@ -958,7 +958,7 @@ function closeModal() {
   modal.classList.remove("flex");
   modal.classList.add("hidden");
 }
-//Удаление прожатых сердец из вкладок после удаления из избранного
+  
 // ✅ Обновление сердечек рейсов
 function updateFlightHearts() {
   const favs = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
