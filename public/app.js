@@ -100,16 +100,17 @@ window.showTab = function (id) {
   }
 
   // Сброс активного стиля у всех кнопок
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.remove('bg-blue-100', 'text-blue-600');
-  });
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.classList.remove('bg-blue-100', 'text-blue-600', 'shadow-md');
+  btn.classList.add('bg-white', 'text-black', 'shadow');
+});
 
-  // Подсветка активной
-  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
-  if (activeBtn) {
-    activeBtn.classList.add('bg-blue-100', 'text-blue-600');
-  }
-
+// Подсветка активной кнопки
+const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+if (activeBtn) {
+  activeBtn.classList.remove('bg-white', 'text-black', 'shadow');
+  activeBtn.classList.add('bg-blue-100', 'text-blue-600', 'shadow-md');
+}
   // Сохраняем и логируем
   localStorage.setItem("activeTab", id);
   trackEvent("Переключение вкладки", id);
