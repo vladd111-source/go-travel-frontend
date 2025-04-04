@@ -339,12 +339,6 @@ if (priceRange) {
   window.addEventListener("resize", updatePriceTooltip);
   window.addEventListener("load", updatePriceTooltip);
 }
-  // ✅ Обновление при изменении
-  priceRange.addEventListener("input", updatePriceTooltip);
-
-  // ✅ Обновление при изменении размера окна
-  window.addEventListener("resize", updatePriceTooltip);
-
 if (hotelCityInput) {
   // ✅ Восстановление кэша города
   const cachedCity = localStorage.getItem("lastHotelCity");
