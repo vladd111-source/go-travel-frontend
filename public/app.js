@@ -308,12 +308,6 @@ setTimeout(() => {
   document.body.classList.remove("opacity-0");
 }, 100);
 
-    //✅ Отправка события аналитики о загрузке
-    trackEvent("Загрузка приложения", {
-      lang: window._appLang,
-      timestamp: new Date().toISOString()
-});
-
 // ✅ Поиск отелей
 const hotelCityInput = document.getElementById("hotelCity");
 
