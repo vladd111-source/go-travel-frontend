@@ -2,6 +2,7 @@
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const appStart = Date.now();
 
 // ✅ Генерация session_id
 const sessionId = localStorage.getItem("session_id") ||
@@ -927,17 +928,12 @@ function closeModal() {
   modal.classList.add("hidden");
 }
   
-// ✅ Обновление сердечек рейсов
+// ✅ Обновление сердечек рейсов (по dealId)
 function updateFlightHearts() {
   const favs = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
   document.querySelectorAll('[data-flight-id]').forEach(btn => {
-    const deal = JSON.parse(decodeURIComponent(btn.dataset.flightId));
-    const isFav = favs.some(f =>
-      f.from === deal.from &&
-      f.to === deal.to &&
-      f.date === deal.date &&
-      f.price === deal.price
-    );
+    const dealId = btn.dataset.flightId;
+    const isFav = favs.includes(dealId);
     btn.textContent = isFav ? "💙" : "🤍";
   });
 }
