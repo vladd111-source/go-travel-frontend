@@ -276,6 +276,20 @@ hr {
   display: none !important;
 }
 
+/* ===== Кастомная кнопка удаления ===== */
+.btn-delete {
+  background-color: #e11d48; /* rose-600 */
+  color: white;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+.btn-delete:hover {
+  background-color: #be123c; /* rose-700 */
+}
+
+/* ===== Медиазапрос для мобилок ===== */
 @media (max-width: 400px) {
   .text-sm {
     font-size: 0.75rem !important;
@@ -307,16 +321,4 @@ hr {
     padding: 1rem;
     box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
   }
-  /* ===== Кастомная кнопка удаления ===== */
-.btn-delete {
-  background-color: #e11d48; /* rose-600 */
-  color: white;
-  font-size: 0.875rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.75rem;
-  transition: all 0.2s ease;
-}
-.btn-delete:hover {
-  background-color: #be123c; /* rose-700 */
-}
 }
