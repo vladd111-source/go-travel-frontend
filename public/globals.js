@@ -152,16 +152,33 @@ window.showTab = function(id) {
 
 // ✅ Переключение таба внутри "Избранного"
 window.switchFavTab = function(subTab) {
-  const contents = document.querySelectorAll(".fav-tab-content");
+  if (!subTab) return;
+
+  // Скрываем все блоки
+  const contents = document.querySelectorAll(".fav-tab-content, .fav-content");
   contents.forEach(c => c.classList.add("hidden"));
 
+  // Показываем нужный
   const activeContent = document.getElementById(`favContent-${subTab}`);
   if (activeContent) {
     activeContent.classList.remove("hidden");
-    window.renderFavorites(subTab);
+    if (typeof window.renderFavorites === "function") {
+      window.renderFavorites(subTab);
+    } else {
+      console.warn("⚠️ renderFavorites не определена");
+    }
+  } else {
+    console.warn(`⚠️ Контейнер favContent-${subTab} не найден`);
   }
 
+  // Обновляем состояние в localStorage
   localStorage.setItem("activeFavTab", subTab);
+
+  // Обновляем активную кнопку (если есть кнопки табов)
+  const tabButtons = document.querySelectorAll(".fav-tab-btn");
+  tabButtons.forEach(btn => btn.classList.remove("bg-blue-100"));
+  const activeBtn = document.getElementById(`favTab-${subTab}`);
+  if (activeBtn) activeBtn.classList.add("bg-blue-100");
 };
 
 
