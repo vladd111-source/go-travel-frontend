@@ -56,18 +56,33 @@ const translations = {
 };
 
 function applyTranslations(lang) {
-  const t = translations[lang];
+  const fallback = translations["ru"];
+  const t = translations[lang] || fallback;
+
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.getAttribute("data-i18n");
-    if (t[key]) el.textContent = t[key];
+    if (t[key]) {
+      el.textContent = t[key];
+    } else if (fallback[key]) {
+      el.textContent = fallback[key];
+      console.warn(`⚠️ Нет перевода для "${key}" в "${lang}", использован RU`);
+    } else {
+      console.warn(`❌ Нет перевода для ключа: "${key}"`);
+    }
   });
+
   document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
     const key = el.getAttribute("data-i18n-placeholder");
-    if (t[key]) el.placeholder = t[key];
+    if (t[key]) {
+      el.placeholder = t[key];
+    } else if (fallback[key]) {
+      el.placeholder = fallback[key];
+      console.warn(`⚠️ Нет placeholder перевода для "${key}" в "${lang}", использован RU`);
+    } else {
+      console.warn(`❌ Нет placeholder перевода для ключа: "${key}"`);
+    }
   });
 }
-
-
 window.trackEvent = function(name, data = "") {
   const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
   console.log(message);
@@ -284,12 +299,7 @@ window.renderFavorites = function(type) {
   const container = document.getElementById(`favContent-${type}`);
   if (!container) return;
 
-  // 💥 Удаляем старые "Пока нет избранного", если вдруг остались
-  container.querySelectorAll("p.text-gray-500").forEach(el => el.remove());
-
   const data = JSON.parse(localStorage.getItem(key) || '[]');
-
-  container.innerHTML = ''; // очищаем всё
 
   if (data.length === 0) {
     container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">${t.noFavorites || 'Пока нет избранного.'}</p>`;
@@ -410,12 +420,10 @@ window.toggleFavoritePlaceFromEncoded = function(encoded, btn) {
   }
 };
 
+// ✅ Удаление с анимацией
 window.removeFavoriteItem = function(type, index, btn = null) {
   const key = `favorites_${type}`;
   let data = JSON.parse(localStorage.getItem(key) || "[]");
-
-  const container = document.getElementById(`favContent-${type}`);
-  if (container) container.innerHTML = ""; // 💥 Очищаем перед новым рендером
 
   if (btn) {
     const card = btn.closest('.card');
