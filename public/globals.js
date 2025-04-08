@@ -132,19 +132,27 @@ window.showTab = function(id) {
   }
 };
 
+
+
+
 // ✅ Переключение таба внутри "Избранного"
 window.switchFavTab = function(subTab) {
-  const contents = document.querySelectorAll(".fav-tab-content");
-  contents.forEach(c => c.classList.add("hidden"));
+  // Обновляем стили кнопок
+  const buttons = document.querySelectorAll(".fav-tab-btn");
+  buttons.forEach(btn => {
+    btn.classList.remove("bg-blue-100", "text-blue-600");
+    btn.classList.add("bg-white", "text-gray-700");
+  });
 
-  const activeContent = document.getElementById(`favContent-${subTab}`);
-  if (activeContent) {
-    activeContent.classList.remove("hidden");
-    window.renderFavorites(subTab);
+  const activeBtn = document.querySelector(.fav-tab-btn[onclick*="${subTab}"]);
+  if (activeBtn) {
+    activeBtn.classList.add("bg-blue-100", "text-blue-600");
+    activeBtn.classList.remove("bg-white", "text-gray-700");
   }
 
-  localStorage.setItem("activeFavTab", subTab);
-};
+
+
+  
   // Скрываем все блоки
   const contents = document.querySelectorAll(".fav-content");
   contents.forEach(c => {
