@@ -576,7 +576,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     }
   ];
 
-
   // Очистка и скрытие старых результатов
   resultBlock.classList.remove("visible");
   resultBlock.innerHTML = "";
@@ -621,8 +620,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   `;
   }).join("");
   updatePlaceHearts();
-//});
-  
   // Если есть ещё карточки — добавляем кнопку
   if (remaining.length > 0) {
     const moreBtn = document.createElement("button");
@@ -674,6 +671,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
 
   resultBlock.classList.add("visible");
   animateCards("#placesResult .card");
+
   // 📊 Трекинг
   trackEvent("Поиск мест", { city, category });
 
@@ -715,7 +713,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   window.onerror = function (msg, url, line, col, error) {
     logEventToAnalytics("Ошибка JS", { msg, url, line, col, stack: error?.stack || null });
   };
-});
 
   // ✅ Сохранение длительности сессии
   window.addEventListener("beforeunload", () => {
@@ -742,6 +739,9 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     // ✅ Сохраняем в localStorage
     localStorage.setItem("favFlights", JSON.stringify(favorites));
   }
+  
+});
+
   // ✅ Добавление/удаление отеля в избранное
   function toggleFavoriteHotel(hotelData, btn) {
     let favorites = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
