@@ -871,8 +871,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     updatePlaceHearts(); // исправлено
   }
   
-});
-
   // ✅ Модальное окно для показа деталей перелета/отеля/места
   function showPlaceDetails(index) {
     const places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
@@ -925,6 +923,8 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     modal.classList.remove("flex");
     modal.classList.add("hidden");
   }
+  
+});
 
   // ✅ Обновление сердечек рейсов (по dealId)
   function updateFlightHearts() {
