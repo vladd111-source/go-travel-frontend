@@ -275,10 +275,12 @@ window.renderFavorites = function(type) {
   const container = document.getElementById(`favContent-${type}`);
   if (!container) return;
 
+  // 💥 Удаляем старые "Пока нет избранного", если вдруг остались
+  container.querySelectorAll("p.text-gray-500").forEach(el => el.remove());
+
   const data = JSON.parse(localStorage.getItem(key) || '[]');
 
-  // 💥 Очищаем контейнер, чтобы не дублировалось
-  container.innerHTML = '';
+  container.innerHTML = ''; // очищаем всё
 
   if (data.length === 0) {
     container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">${t.noFavorites || 'Пока нет избранного.'}</p>`;
