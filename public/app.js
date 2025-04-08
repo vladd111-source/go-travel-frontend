@@ -729,250 +729,164 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
   });
 
-  // ✅ Функция для обработки лайков на рейсы
-  function toggleFavoriteFlight(dealId, btn) {
-    let favorites = JSON.parse(localStorage.getItem("favFlights") || "[]");
-    const index = favorites.indexOf(dealId);
+  // ✅ Глобальные функции для избранного и модалок
 
-    if (index === -1) {
-      favorites.push(dealId);
-      btn.textContent = "💙";
-    } else {
-      favorites.splice(index, 1);
-      btn.textContent = "🤍";
-    }
-  
-    // ✅ Логируем событие до сохранения
-    trackEvent("Избранный рейс", { dealId, action: index === -1 ? "add" : "remove" });
-  
-    // ✅ Сохраняем в localStorage
-    localStorage.setItem("favFlights", JSON.stringify(favorites));
-  }
-  // ✅ Добавление/удаление отеля в избранное
-  function toggleFavoriteHotel(hotelData, btn) {
-    let favorites = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+// 👉 Обработка лайков
+window.toggleFavoriteFlight = function(dealId, btn) {
+  let favorites = JSON.parse(localStorage.getItem("favFlights") || "[]");
+  const index = favorites.indexOf(dealId);
 
-    const exists = favorites.some(h => h.name === hotelData.name && h.city === hotelData.city);
-    if (exists) {
-      favorites = favorites.filter(h => !(h.name === hotelData.name && h.city === hotelData.city));
-      btn.textContent = "🤍";
-      trackEvent("Удаление из избранного (отель)", hotelData);
-    } else {
-      favorites.push(hotelData);
-      btn.textContent = "💙";
-      trackEvent("Добавление в избранное (отель)", hotelData);
-    }
-    localStorage.setItem("favorites_hotels", JSON.stringify(favorites));
+  if (index === -1) {
+    favorites.push(dealId);
+    btn.textContent = "💙";
+  } else {
+    favorites.splice(index, 1);
+    btn.textContent = "🤍";
   }
 
-  //✅ Функция для лайка мест   
-  function toggleFavoritePlace(place, btn) {
-    let favorites = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-    const exists = favorites.some(f => f.name === place.name && f.city === place.city);
+  trackEvent("Избранный рейс", { dealId, action: index === -1 ? "add" : "remove" });
+  localStorage.setItem("favFlights", JSON.stringify(favorites));
+};
 
-    if (exists) {
-      favorites = favorites.filter(f => !(f.name === place.name && f.city === place.city));
-      btn.textContent = "🤍";
-    } else {
-      favorites.push(place);
-      btn.textContent = "💙";
-    }
+window.toggleFavoriteHotel = function(hotelData, btn) {
+  let favorites = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  const exists = favorites.some(h => h.name === hotelData.name && h.city === hotelData.city);
 
-    localStorage.setItem("favorites_places", JSON.stringify(favorites));
-    trackEvent("Избранное место", { place, action: exists ? "remove" : "add" });
+  if (exists) {
+    favorites = favorites.filter(h => !(h.name === hotelData.name && h.city === hotelData.city));
+    btn.textContent = "🤍";
+    trackEvent("Удаление из избранного (отель)", hotelData);
+  } else {
+    favorites.push(hotelData);
+    btn.textContent = "💙";
+    trackEvent("Добавление в избранное (отель)", hotelData);
   }
 
-  // ✅ Функция для декодирования encoded JSON
-  function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
+  localStorage.setItem("favorites_hotels", JSON.stringify(favorites));
+};
+
+window.toggleFavoritePlace = function(place, btn) {
+  let favorites = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  const exists = favorites.some(f => f.name === place.name && f.city === place.city);
+
+  if (exists) {
+    favorites = favorites.filter(f => !(f.name === place.name && f.city === place.city));
+    btn.textContent = "🤍";
+  } else {
+    favorites.push(place);
+    btn.textContent = "💙";
+  }
+
+  localStorage.setItem("favorites_places", JSON.stringify(favorites));
+  trackEvent("Избранное место", { place, action: exists ? "remove" : "add" });
+};
+
+window.toggleFavoritePlaceFromEncoded = function(encodedStr, btn) {
+  try {
+    const placeObj = JSON.parse(decodeURIComponent(encodedStr));
+    window.toggleFavoritePlace(placeObj, btn);
+  } catch (e) {
+    console.error("❌ Ошибка декодирования избранного места:", e);
+  }
+};
+
+// ✅ Открытие/закрытие модалки
+window.openModal = function() {
+  const modal = document.getElementById("detailsModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+};
+
+window.closeModal = function() {
+  const modal = document.getElementById("detailsModal");
+  modal.classList.remove("flex");
+  modal.classList.add("hidden");
+};
+
+// ✅ Обновление сердечек (универсально)
+window.updateHearts = function(type) {
+  const config = {
+    flights: {
+      storageKey: "favorites_flights",
+      dataAttr: "data-flight-id",
+      parseItem: btn => btn.getAttribute("data-flight-id"),
+      isFav: (favs, item) => favs.includes(item),
+    },
+    hotels: {
+      storageKey: "favorites_hotels",
+      dataAttr: "data-hotel-id",
+      parseItem: btn => JSON.parse(decodeURIComponent(btn.getAttribute("data-hotel-id"))),
+      isFav: (favs, item) => favs.some(h => h.name === item.name && h.city === item.city),
+    },
+    places: {
+      storageKey: "favorites_places",
+      dataAttr: "data-place-id",
+      parseItem: btn => JSON.parse(decodeURIComponent(btn.getAttribute("data-place-id"))),
+      isFav: (favs, item) => favs.some(p => p.name === item.name && p.city === item.city),
+    }
+  };
+
+  const { storageKey, dataAttr, parseItem, isFav } = config[type] || {};
+  if (!storageKey || !dataAttr) return;
+
+  const favs = JSON.parse(localStorage.getItem(storageKey) || "[]");
+
+  document.querySelectorAll(`[${dataAttr}]`).forEach(btn => {
     try {
-      const placeObj = JSON.parse(decodeURIComponent(encodedStr));
-      toggleFavoritePlace(placeObj, btn);
+      const item = parseItem(btn);
+      btn.textContent = isFav(favs, item) ? "💙" : "🤍";
     } catch (e) {
-      console.error("❌ Ошибка декодирования избранного места:", e);
+      console.error(`Ошибка обновления сердечка [${type}]:`, e);
     }
-  }
+  });
+};
 
-  //Вкладка Избранное
-  window.switchFavTab = function(tab) {
-    document.querySelectorAll('.fav-tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
-    document.querySelector(`#favTab-${tab}`)?.classList.add('bg-blue-100');
-
-    document.querySelectorAll('.fav-content').forEach(div => div.classList.add('hidden'));
-    document.getElementById(`favContent-${tab}`)?.classList.remove('hidden');
-
-    renderFavorites(tab);
-  }
-
-  function renderFavorites(tab) {
-    const data = JSON.parse(localStorage.getItem(`favorites_${tab}`) || '[]');
-    const container = document.getElementById(`favContent-${tab}`);
-    if (!container) return;
-
-    if (data.length === 0) {
-      container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">Пока нет избранного.</p>`;
-      return;
+// ✅ Показ модалки с деталями
+window.showDetails = function(type, index) {
+  const dataMap = {
+    flights: {
+      storage: "favorites_flights",
+      template: (f) => `
+        <h2 class="text-xl font-bold mb-2">${f.from} → ${f.to}</h2>
+        <p class="text-sm text-gray-500">Дата: ${f.date}</p>
+        <p class="text-sm text-gray-500">Цена: $${f.price}</p>
+      `
+    },
+    hotels: {
+      storage: "favorites_hotels",
+      template: (h) => `
+        <h2 class="text-xl font-bold mb-2">${h.name}</h2>
+        <p class="text-sm text-gray-500">Город: ${h.city}</p>
+        <p class="text-sm text-gray-500">Цена: $${h.price}</p>
+        <p class="text-sm text-gray-500">Рейтинг: ${h.rating}</p>
+      `
+    },
+    places: {
+      storage: "favorites_places",
+      template: (p) => `
+        <h2 class="text-xl font-bold mb-2">${p.name}</h2>
+        <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+        <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+      `
     }
+  };
 
-    if (tab === "flights") {
-      container.innerHTML = data.map((f, index) => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${f.from} → ${f.to}</strong><br>
-        Дата: ${f.date}<br>
-        Цена: $${f.price}
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showFlightDetails(${index})">📄 Подробнее</button>
-          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteFlight(${index})">🗑 Удалить</button>
-        </div>
-      </div>
-    `).join('');
-      updateFlightHearts(); // 👈 обновляем сердечки
-    }
+  const config = dataMap[type];
+  if (!config) return;
 
-    if (tab === "hotels") {
-      container.innerHTML = data.map((h, index) => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${h.name}</strong> (${h.city})<br>
-        Рейтинг: ${h.rating} | $${h.price}
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showHotelDetails(${index})">📄 Подробнее</button>
-          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteHotel(${index})">🗑 Удалить</button>
-        </div>
-      </div>
-    `).join('');
-      updateHotelHearts(); // 👈 обновляем сердечки
-    }
+  const data = JSON.parse(localStorage.getItem(config.storage) || "[]");
+  const item = data[index];
+  if (!item) return;
 
-    if (tab === "places") {
-      container.innerHTML = data.map((p, index) => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${p.name}</strong><br>
-        ${p.description}<br>
-        Категория: ${formatCategory(p.category)}<br>
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showPlaceDetails(${index})">📄 Подробнее</button>
-          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoritePlace(${index})">🗑 Удалить</button>
-        </div>
-      </div>
-    `).join('');
-      updatePlaceHearts(); // 👈 обновляем сердечки
-    }
-  }
- 
-  //Функция удаления из избранного
-  window.removeFavoritePlace = function(index) {
-    let flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
-    flights.splice(index, 1);
-    localStorage.setItem("favorites_flights", JSON.stringify(flights));
-    renderFavorites("flights");
-    updateFlightHearts();
-  }
-  window.removeFavoritePlace = function(index) {
-    let hotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-    hotels.splice(index, 1);
-    localStorage.setItem("favorites_hotels", JSON.stringify(hotels));
-    renderFavorites("hotels");
-    updateHotelHearts(); // исправлено
-  }
-  window.removeFavoritePlace = function(index) {
-    let places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-    places.splice(index, 1);
-    localStorage.setItem("favorites_places", JSON.stringify(places));
-    renderFavorites("places");
-    updatePlaceHearts(); // исправлено
-  }
+  document.getElementById("modalContent").innerHTML = config.template(item);
+  openModal();
+};
 
-  // ✅ Модальное окно для показа деталей перелета/отеля/места
-  function showPlaceDetails(index) {
-    const places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-    const place = places[index];
-    if (!place) return;
-
-    document.getElementById("modalContent").innerHTML = `
-    <h2 class="text-xl font-bold mb-2">${place.name}</h2>
-    <p class="text-sm text-gray-600 mb-1">${place.description}</p>
-    <p class="text-sm text-gray-500">${formatCategory(place.category)} • ${capitalize(place.city)}</p>
-  `;
-    openModal();
-  }
-
-  function showHotelDetails(index) {
-    const hotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-    const hotel = hotels[index];
-    if (!hotel) return;
-
-    document.getElementById("modalContent").innerHTML = `
-    <h2 class="text-xl font-bold mb-2">${hotel.name}</h2>
-    <p class="text-sm text-gray-500">Город: ${hotel.city}</p>
-    <p class="text-sm text-gray-500">Цена: $${hotel.price}</p>
-    <p class="text-sm text-gray-500">Рейтинг: ${hotel.rating}</p>
-  `;
-    openModal();
-  }
-
-  function showFlightDetails(index) {
-    const flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
-    const flight = flights[index];
-    if (!flight) return;
-
-    document.getElementById("modalContent").innerHTML = `
-    <h2 class="text-xl font-bold mb-2">${flight.from} → ${flight.to}</h2>
-    <p class="text-sm text-gray-500">Дата: ${flight.date}</p>
-    <p class="text-sm text-gray-500">Цена: $${flight.price}</p>
-  `;
-    openModal();
-  }
-
-  function openModal() {
-    const modal = document.getElementById("detailsModal");
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-  }
-
-  function closeModal() {
-    const modal = document.getElementById("detailsModal");
-    modal.classList.remove("flex");
-    modal.classList.add("hidden");
-  }
-
-  // ✅ Обновление сердечек рейсов (по dealId)
-  function updateFlightHearts() {
-    const favs = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
-    document.querySelectorAll('[data-flight-id]').forEach(btn => {
-      const dealId = btn.dataset.flightId;
-      const isFav = favs.includes(dealId);
-      btn.textContent = isFav ? "💙" : "🤍";
-    });
-  }
-
-  // ✅ Обновление сердечек отелей
-  function updateHotelHearts() {
-    const favs = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-    document.querySelectorAll('[data-hotel-id]').forEach(btn => {
-      const hotel = JSON.parse(decodeURIComponent(btn.dataset.hotelId));
-      const isFav = favs.some(h => h.name === hotel.name && h.city === hotel.city);
-      btn.textContent = isFav ? "💙" : "🤍";
-    });
-  }
-
-  function updatePlaceHearts() {
-    const favs = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-    document.querySelectorAll('[data-place-id]').forEach(btn => {
-      try {
-        const place = JSON.parse(decodeURIComponent(btn.dataset.placeId));
-        const isFav = favs.some(p => p.name === place.name && p.city === place.city);
-        btn.textContent = isFav ? "💙" : "🤍";
-      } catch (e) {
-        console.error("Ошибка обновления сердечка места:", e);
-      }
-    });
-  }
-  // Автофокус на первый input вкладки
-function focusFirstInputIn(tabId) {
+// ✅ Автофокус по вкладке
+window.focusFirstInputIn = function(tabId) {
   const el = document.getElementById(tabId);
   if (!el) return;
   const input = el.querySelector("input");
   if (input) input.focus();
-}
-
-// 👇 Не забываем закрыть обработчик формы, если он был выше
+};
 });
