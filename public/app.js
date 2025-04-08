@@ -736,8 +736,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       favorites.splice(index, 1);
       btn.textContent = "🤍";
     }
-    
-  });
   
     // ✅ Логируем событие до сохранения
     trackEvent("Избранный рейс", { dealId, action: index === -1 ? "add" : "remove" });
@@ -745,6 +743,9 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     // ✅ Сохраняем в localStorage
     localStorage.setItem("favFlights", JSON.stringify(favorites));
   }
+  
+   });
+
   // ✅ Добавление/удаление отеля в избранное
   function toggleFavoriteHotel(hotelData, btn) {
     let favorites = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
