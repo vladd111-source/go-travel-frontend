@@ -755,7 +755,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     }
     localStorage.setItem("favorites_hotels", JSON.stringify(favorites));
   }
-  });
+  
   //✅ Функция для лайка мест   
   function toggleFavoritePlace(place, btn) {
     let favorites = JSON.parse(localStorage.getItem("favorites_places") || "[]");
@@ -772,6 +772,9 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     localStorage.setItem("favorites_places", JSON.stringify(favorites));
     trackEvent("Избранное место", { place, action: exists ? "remove" : "add" });
   }
+  
+});
+
   // ✅ Функция для декодирования encoded JSON
   function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
     try {
