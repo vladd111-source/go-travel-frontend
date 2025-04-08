@@ -793,7 +793,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   }
 
   //Вкладка Избранное
-  function switchFavTab(tab) {
+  window.switchFavTab = function(tab) {
     document.querySelectorAll('.fav-tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
     document.querySelector(`#favTab-${tab}`)?.classList.add('bg-blue-100');
 
