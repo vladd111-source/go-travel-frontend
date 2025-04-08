@@ -134,7 +134,7 @@ select.input {
 /* ===== Tooltip для цены ===== */
 #priceTooltip {
   position: absolute;
-  top: -1rem; /* подняли выше */
+  top: 0rem; /* подняли выше */
   transform: translateX(-50%);
   white-space: nowrap;
   font-weight: 600;
