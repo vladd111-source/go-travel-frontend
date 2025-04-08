@@ -479,4 +479,4 @@ window.focusFirstInputIn = function(tabId) {
   if (!el) return;
   const input = el.querySelector("input");
   if (input) input.focus();
-};
+}; // ← вот этой строки не хватало
