@@ -181,11 +181,13 @@
   </div>
 <!-- ❤️ Избранное -->
 <div id="favorites" class="tab hidden">
-  <div class="mb-4 flex gap-2 justify-center">
-    <button id="favTab-flights" class="fav-tab-btn btn px-3 py-1 bg-blue-100" onclick="switchFavTab('flights')">✈️ Билеты</button>
-    <button id="favTab-hotels" class="fav-tab-btn btn px-3 py-1" onclick="switchFavTab('hotels')">🏨 Отели</button>
-    <button id="favTab-places" class="fav-tab-btn btn px-3 py-1" onclick="switchFavTab('places')">🌍 Места</button>
-  </div>
+ <div class="mb-4 flex justify-center">
+  <select onchange="switchFavTab(this.value)" class="border px-4 py-2 rounded-xl text-sm shadow text-gray-700 bg-white">
+    <option value="flights">✈️ Перелёты</option>
+    <option value="hotels">🏨 Отели</option>
+    <option value="places">🌍 Места</option>
+  </select>
+</div>
 
   <div id="favContent-flights" class="fav-content"></div>
   <div id="favContent-hotels" class="fav-content hidden"></div>
