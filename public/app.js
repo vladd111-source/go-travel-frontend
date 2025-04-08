@@ -38,9 +38,13 @@ document.addEventListener("DOMContentLoaded", () => {
     showTab(lastTab);
 
     // ✅ Автофокус
-    setTimeout(() => {
-     window.focusFirstInputIn(lastTab); // ✅ работает
-    }, 200);
+setTimeout(() => {
+  if (typeof window.focusFirstInputIn === "function") {
+    window.focusFirstInputIn(lastTab); // ✅ безопасно вызовем
+  } else {
+    console.warn("⚠️ focusFirstInputIn пока не доступна");
+  }
+}, 200);
 
     // ✅ Плавное появление
     setTimeout(() => {
