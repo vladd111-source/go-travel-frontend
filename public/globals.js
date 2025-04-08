@@ -134,30 +134,36 @@ window.showTab = function(id) {
 
 // ✅ Переключение таба внутри "Избранного"
 window.switchFavTab = function(subTab) {
-  const buttons = document.querySelectorAll(".fav-subtab-btn");
+  // Обновляем стили кнопок
+  const buttons = document.querySelectorAll(".fav-tab-btn");
   buttons.forEach(btn => {
     btn.classList.remove("bg-blue-100", "text-blue-600");
     btn.classList.add("bg-white", "text-gray-700");
   });
 
-  const activeBtn = document.querySelector(`.fav-subtab-btn[data-tab="${subTab}"]`);
+  const activeBtn = document.querySelector(`.fav-tab-btn[onclick*="${subTab}"]`);
   if (activeBtn) {
     activeBtn.classList.add("bg-blue-100", "text-blue-600");
     activeBtn.classList.remove("bg-white", "text-gray-700");
   }
 
-  const contents = document.querySelectorAll(".fav-tab-content");
-  contents.forEach(c => c.classList.add("hidden"));
+  // Скрываем все блоки
+  const contents = document.querySelectorAll(".fav-content");
+  contents.forEach(c => {
+    c.classList.add("hidden");
+    c.innerHTML = ""; // 💥 Чистим контент при скрытии
+  });
 
+  // Показываем нужный
   const activeContent = document.getElementById(`favContent-${subTab}`);
   if (activeContent) {
     activeContent.classList.remove("hidden");
-    window.renderFavorites(subTab);
+    window.renderFavorites(subTab); // Рендерим актуальные данные
   }
 
+  // Запоминаем выбор
   localStorage.setItem("activeFavTab", subTab);
 };
-
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
