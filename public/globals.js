@@ -148,30 +148,44 @@ window.showTab = function(id) {
 };
 
 // ✅ Переключение таба внутри "Избранного"
-window.switchFavTab = function (subTab) {
-  if (!subTab) return;
+window.switchFavTab = function(subTab) {
+  const tabs = ["flights", "hotels", "places"];
+  const validTab = tabs.includes(subTab) ? subTab : "flights";
 
-  // 🔹 Скрываем все блоки контента и чистим
+  const getData = (type) => JSON.parse(localStorage.getItem(`favorites_${type}`) || "[]");
+
+  // 🧠 Если выбранный таб пустой, находим первый непустой
+  let selectedTab = validTab;
+  if (getData(validTab).length === 0) {
+    const firstNonEmpty = tabs.find(t => getData(t).length > 0);
+    if (firstNonEmpty) selectedTab = firstNonEmpty;
+  }
+
+  // 🔹 Скрываем все блоки
   document.querySelectorAll(".fav-content").forEach(c => {
     c.classList.add("hidden");
     c.innerHTML = "";
   });
 
   // 🔹 Показываем нужный блок
-  const activeContent = document.getElementById(`favContent-${subTab}`);
+  const activeContent = document.getElementById(`favContent-${selectedTab}`);
   if (activeContent) {
     activeContent.classList.remove("hidden");
-    window.renderFavorites?.(subTab);
+    window.renderFavorites?.(selectedTab);
   } else {
-    console.warn(`⚠️ Контейнер favContent-${subTab} не найден`);
+    console.warn(`⚠️ Контейнер favContent-${selectedTab} не найден`);
   }
 
-  // 🔹 Сохраняем активный таб в localStorage
-  localStorage.setItem("activeFavTab", subTab);
+  // 🔹 Обновляем select (если он есть)
+  const select = document.querySelector("#favorites select");
+  if (select) select.value = selectedTab;
 
-  // 🔹 Обновляем активную кнопку
+  // 🔹 Сохраняем выбор
+  localStorage.setItem("activeFavTab", selectedTab);
+
+  // 🔹 Обновляем активную кнопку (если есть)
   document.querySelectorAll(".fav-tab-btn").forEach(btn => btn.classList.remove("bg-blue-100"));
-  document.getElementById(`favTab-${subTab}`)?.classList.add("bg-blue-100");
+  document.getElementById(`favTab-${selectedTab}`)?.classList.add("bg-blue-100");
 };
 
 // ✅ Заглавная первая буква
