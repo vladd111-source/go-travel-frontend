@@ -772,8 +772,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     localStorage.setItem("favorites_places", JSON.stringify(favorites));
     trackEvent("Избранное место", { place, action: exists ? "remove" : "add" });
   }
-  
-});
 
   // ✅ Функция для декодирования encoded JSON
   function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
@@ -784,6 +782,9 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       console.error("❌ Ошибка декодирования избранного места:", e);
     }
   }
+  
+});
+
   //Вкладка Избранное
   function switchFavTab(tab) {
     document.querySelectorAll('.fav-tab-btn').forEach(btn => btn.classList.remove('bg-blue-100'));
