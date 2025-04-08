@@ -41,18 +41,21 @@ select.input {
   background-size: 1rem;
 }
 
-/* ===== Кнопка ===== */
+/* ===== Универсальная кнопка ===== */
 .btn {
-  background: linear-gradient(to right, #3b82f6, #6366f1);
-  color: white;
+  display: inline-block;
   font-weight: 600;
-  border-radius: 1rem;
+  font-size: 0.875rem;
   padding: 0.5rem 1rem;
+  border-radius: 1rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  width: 100%;
+  color: white;
   text-align: center;
+  width: 100%;
 }
+
+/* Эффекты наведения */
 .btn:hover {
   transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -60,6 +63,21 @@ select.input {
 .btn:active {
   transform: scale(0.97);
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+/* ===== Синие кнопки (Подробнее) ===== */
+.btn-blue {
+  background: linear-gradient(to right, #3b82f6, #6366f1);
+}
+.btn-blue:hover {
+  background: linear-gradient(to right, #2563eb, #4f46e5);
+}
+
+/* ===== Красные кнопки (Удалить) ===== */
+.btn-red {
+  background-color: #e11d48;
+}
+.btn-red:hover {
+  background-color: #be123c;
 }
 
 /* ===== Кнопка "Фильтры" как тумблер-кнопка */
