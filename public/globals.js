@@ -151,19 +151,23 @@ window.showTab = function(id) {
 
 
 // ✅ Переключение таба внутри "Избранного"
-window.switchFavTab = function(subTab) {
+window.switchFavTab = function (subTab) {
   if (!subTab) return;
 
-  // Скрываем все блоки
-  const contents = document.querySelectorAll(".fav-tab-content, .fav-content");
-  contents.forEach(c => c.classList.add("hidden"));
+  // 🔹 Скрываем все блоки контента и чистим
+  const contents = document.querySelectorAll(".fav-content");
+  contents.forEach(c => {
+    c.classList.add("hidden");
+    c.innerHTML = ""; // 💥 Чистим контент при скрытии
+  });
 
-  // Показываем нужный
+  // 🔹 Показываем нужный блок
   const activeContent = document.getElementById(`favContent-${subTab}`);
   if (activeContent) {
     activeContent.classList.remove("hidden");
+
     if (typeof window.renderFavorites === "function") {
-      window.renderFavorites(subTab);
+      window.renderFavorites(subTab); // 🔄 Отрисовка актуального контента
     } else {
       console.warn("⚠️ renderFavorites не определена");
     }
@@ -171,12 +175,13 @@ window.switchFavTab = function(subTab) {
     console.warn(`⚠️ Контейнер favContent-${subTab} не найден`);
   }
 
-  // Обновляем состояние в localStorage
+  // 🔹 Сохраняем активный таб в localStorage
   localStorage.setItem("activeFavTab", subTab);
 
-  // Обновляем активную кнопку (если есть кнопки табов)
+  // 🔹 Обновляем активную кнопку
   const tabButtons = document.querySelectorAll(".fav-tab-btn");
   tabButtons.forEach(btn => btn.classList.remove("bg-blue-100"));
+
   const activeBtn = document.getElementById(`favTab-${subTab}`);
   if (activeBtn) activeBtn.classList.add("bg-blue-100");
 };
