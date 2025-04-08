@@ -200,7 +200,24 @@ window.applyTranslations = applyTranslations;
 window.translations = translations;
 window.supabase = supabase;
 
-// ✅ Универсальные функции отображения карточек избранного с мультиязычной поддержкой и анимациями
+// ✅ Центрируем tooltip над ползунком
+window.updatePriceTooltip = function () {
+  const priceRange = document.getElementById("priceRange");
+  const priceTooltip = document.getElementById("priceTooltip");
+
+  if (!priceRange || !priceTooltip) return;
+
+  const value = parseInt(priceRange.value);
+  priceTooltip.textContent = `$${value}`;
+
+  const percent = (value - priceRange.min) / (priceRange.max - priceRange.min);
+  const sliderWidth = priceRange.offsetWidth;
+  const thumbWidth = 32;
+  const offset = percent * (sliderWidth - thumbWidth) + thumbWidth / 2;
+
+  priceTooltip.style.left = `${offset}px`;
+  priceTooltip.style.transform = `translateX(-50%)`;
+};
 
 // 👉 Форматирование деталей
 window.formatDetails = function(type, item) {
