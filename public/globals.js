@@ -293,7 +293,7 @@ return `
     <div class="text-sm text-gray-600 mb-2">${details}</div>
     <div class="flex justify-between sm:justify-start gap-2 mt-3 flex-wrap">
      <button 
-  class="btn"
+  class="btn btn-blue"
   onclick="showDetails('${type}', ${index})">
   📄 Подробнее
 </button>
