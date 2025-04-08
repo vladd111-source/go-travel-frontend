@@ -279,7 +279,7 @@ hr {
 
 /* ===== Кастомная кнопка удаления (удалена дублирующая запись) ===== */
 .btn-delete {
-  background-color: #e11d48; /* rose-600 */
+  background: #e11d48 !important; /* красный цвет */
   color: white;
   font-size: 0.875rem;
   font-weight: 600;
@@ -291,7 +291,7 @@ hr {
   text-align: center;
 }
 .btn-delete:hover {
-  background-color: #be123c; /* rose-700 */
+  background: #be123c !important; /* чуть темнее */
   transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
