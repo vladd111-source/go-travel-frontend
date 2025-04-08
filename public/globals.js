@@ -297,8 +297,8 @@ return `
         onclick="showDetails('${type}', ${index})">
         📄 Подробнее
       </button>
-      <button 
-  class="btn btn-delete"
+     <button 
+  class="btn-delete"
   onclick="removeFavoriteItem('${type}', ${index}, this)">
   🗑 Удалить
 </button>
