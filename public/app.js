@@ -640,3 +640,22 @@ window.onerror = function (msg, url, line, col, error) {
     stack: error?.stack || null
   });
 };
+// ✅ Фильтры при включении чекбокса
+document.addEventListener("DOMContentLoaded", () => {
+  const filtersToggle = document.getElementById("showFiltersCheckbox");
+  const hotelFilters = document.getElementById("hotelFilters");
+
+  if (!filtersToggle || !hotelFilters) {
+    console.warn("⛔ Не найден чекбокс или блок фильтров");
+    return;
+  }
+
+  filtersToggle.addEventListener("change", (e) => {
+    const show = e.target.checked;
+    hotelFilters.classList.toggle("hidden", !show);
+
+    if (show) {
+      updatePriceTooltip(); // Позиционируем цену над ползунком
+    }
+  });
+});
