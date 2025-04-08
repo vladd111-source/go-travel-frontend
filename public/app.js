@@ -69,7 +69,7 @@ const translations = {
     findSights: "Show Places",
     bookNow: "Book Now"
   }
-};
+}
 
 // ✅ Функция перевода элементов
 function applyTranslations(lang) {
@@ -116,7 +116,7 @@ window.showTab = function (id) {
   if (id === "favorites") {
     switchFavTab("flights");
   }
-};
+}
 
 // ✅ Логирование аналитики
 function logEventToAnalytics(eventName, eventData = {}) {
@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
         trackEvent("Смена языка", window._appLang);
       });
     }
-
+  
     // ✅ Восстановление активной вкладки
     let lastTab = localStorage.getItem("activeTab") || "flights";
 
@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     showTab(lastTab);
-
+  
     // ✅ Автофокус
     setTimeout(() => {
       const tabEl = document.getElementById(lastTab);
@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (firstInput) firstInput.focus();
       }
     }, 200);
-
+  
     // ✅ Плавное появление
     setTimeout(() => {
       document.body.classList.remove("opacity-0");
@@ -225,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (val > 10) ratingInput.value = 10;
         if (val < 0 || isNaN(val)) ratingInput.value = '';
       });
-
+    
       // Блокируем символы кроме цифр
       ratingInput.addEventListener("keydown", (e) => {
         const invalidKeys = ["e", "E", "+", "-", ".", ","];
@@ -245,6 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("❌ Ошибка при инициализации:", e);
   }
 });
+
 // ✅ Чекбокс "Туда и обратно"
 const roundTripCheckbox = document.getElementById("roundTrip");
 const returnDateWrapper = document.getElementById("returnDateWrapper");
@@ -259,8 +260,8 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     }
     returnDateInput.required = roundTripCheckbox.checked;
     if (!roundTripCheckbox.checked) returnDateInput.value = "";
-  };
-
+  }
+  
   // ✅ Восстанавливаем состояние при старте
   const saved = localStorage.getItem("roundTripChecked");
   if (saved === "1") {
@@ -287,7 +288,7 @@ if (hotelFiltersToggle && hotelFiltersSection) {
     if (isVisible) {
       setTimeout(updatePriceTooltip, 100);
     }
-  };
+  }
 
   hotelFiltersToggle.addEventListener("change", toggleVisibility);
   toggleVisibility(); // при загрузке
@@ -338,7 +339,7 @@ if (priceRange) {
   window.addEventListener("load", updatePriceTooltip);
 }
 if (hotelCityInput) {
-  
+
   // ✅ Восстановление кэша города
   const cachedCity = localStorage.getItem("lastHotelCity");
   if (cachedCity) hotelCityInput.value = cachedCity;
@@ -420,6 +421,7 @@ if (hotelCityInput) {
   });
 }
 
+
 // ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
 const toInput = document.getElementById("to");
@@ -456,7 +458,7 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
         f.from.toLowerCase() === from.toLowerCase() &&
         f.to.toLowerCase() === to.toLowerCase()
       );
-    
+  
       // Рендеринг в избранное
       const hotDeals = document.getElementById("hotDeals");
       hotDeals.innerHTML = flights.map(deal => {
@@ -480,10 +482,10 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
     </div>
   `;
       }).join("");
-
+  
       updatePlaceHearts();
       animateCards("#hotDeals .card");
-
+  
       if (match) {
         const msg = `✈️ Нашли рейс\n🛫 ${match.from} → 🛬 ${match.to}\n📅 ${match.date}\n💰 $${match.price}`;
         Telegram.WebApp.sendData?.(msg);
@@ -509,6 +511,7 @@ const
 const
   placeCategorySelect = document.getElementById("placeCategory");
 const resultBlock = document.getElementById("placesResult");
+
 // ✅ Кэш поля "Места"
 if (placeCityInput) {
   const cachedCity = localStorage.getItem("placeCity");
@@ -539,7 +542,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   // ✅ Кэшируем значения
   localStorage.setItem("placeCity", city);
   localStorage.setItem("placeCategory", category);
-  
+
   // ✅ Моковые места
   const dummyPlaces = [
     {
@@ -588,7 +591,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     (!city || p.city.includes(city)) &&
     (!category || p.category === category)
   );
-  
+
   // Показываем первую часть карточек (3), остальное — по кнопке "Показать ещё"
   const firstBatch = filtered.slice(0, 3);
   const remaining = filtered.slice(3);
@@ -624,12 +627,13 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   `;
   }).join("");
   updatePlaceHearts();
+
   // Если есть ещё карточки — добавляем кнопку
   if (remaining.length > 0) {
     const moreBtn = document.createElement("button");
     moreBtn.textContent = "Показать ещё";
     moreBtn.className = "btn w-full mt-4 bg-blue-500 text-white text-sm rounded py-2 px-4";
-
+  
     // Обработка клика
     moreBtn.addEventListener("click", () => {
       const remainingCards = remaining.map(p => {
@@ -655,18 +659,18 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
         </div>
       `;
       }).join("");
-
+    
       resultBlock.insertAdjacentHTML("beforeend", remainingCards);
       animateCards("#placesResult .card");
       updatePlaceHearts(); // обновим лайки
-
+    
       // Плавно прокручиваем к первой новой карточке
       setTimeout(() => {
         const cards = resultBlock.querySelectorAll(".card");
         const scrollTarget = cards[3]; // первая из новых
         scrollTarget?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
-
+    
       moreBtn.remove(); // убираем кнопку
     });
 
@@ -690,7 +694,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     };
     return map[code] || code;
   }
-  
+
   // ✅ Заглавная первая буква строки
   function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -705,6 +709,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       });
     }, 50);
   }
+
   // Loader
   function showLoading() {
     document.getElementById("loadingSpinner")?.classList.remove("hidden");
@@ -712,11 +717,11 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   function hideLoading() {
     document.getElementById("loadingSpinner")?.classList.add("hidden");
   }
-  
+
   // Обработка ошибок
   window.onerror = function (msg, url, line, col, error) {
     logEventToAnalytics("Ошибка JS", { msg, url, line, col, stack: error?.stack || null });
-  };
+  }
 
   // ✅ Сохранение длительности сессии
   window.addEventListener("beforeunload", () => {
@@ -739,7 +744,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   
     // ✅ Логируем событие до сохранения
     trackEvent("Избранный рейс", { dealId, action: index === -1 ? "add" : "remove" });
-
+  
     // ✅ Сохраняем в localStorage
     localStorage.setItem("favFlights", JSON.stringify(favorites));
   }
@@ -759,7 +764,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     }
     localStorage.setItem("favorites_hotels", JSON.stringify(favorites));
   }
-  
+
   //✅ Функция для лайка мест   
   function toggleFavoritePlace(place, btn) {
     let favorites = JSON.parse(localStorage.getItem("favorites_places") || "[]");
@@ -776,7 +781,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     localStorage.setItem("favorites_places", JSON.stringify(favorites));
     trackEvent("Избранное место", { place, action: exists ? "remove" : "add" });
   }
-  
+
   // ✅ Функция для декодирования encoded JSON
   function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
     try {
@@ -852,7 +857,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       updatePlaceHearts(); // 👈 обновляем сердечки
     }
   }
-  
+ 
   //Функция удаления из избранного
   function removeFavoriteFlight(index) {
     let flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
@@ -876,9 +881,8 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     updatePlaceHearts(); // исправлено
   }
   
+});
 
-  
-  
   // ✅ Модальное окно для показа деталей перелета/отеля/места
   function showPlaceDetails(index) {
     const places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
@@ -931,7 +935,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     modal.classList.remove("flex");
     modal.classList.add("hidden");
   }
-});
+
   // ✅ Обновление сердечек рейсов (по dealId)
   function updateFlightHearts() {
     const favs = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
