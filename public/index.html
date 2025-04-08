@@ -181,13 +181,15 @@
 <!-- ❤️ Избранное -->
 <div id="favorites" class="tab hidden">
 <div class="mb-4 flex justify-center">
-  <select onchange="switchFavTab(this.value)" class="border px-4 py-2 rounded-xl text-sm shadow text-gray-700 bg-white">
+  <select 
+    onchange="switchFavTab(this.value)" 
+    class="px-4 py-2 text-sm rounded-xl shadow bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:shadow-md">
     <option value="flights">✈️ Перелёты</option>
     <option value="hotels">🏨 Отели</option>
     <option value="places">🌍 Места</option>
   </select>
 </div>
-
+  
   <div id="favContent-flights" class="fav-content"></div>
   <div id="favContent-hotels" class="fav-content hidden"></div>
   <div id="favContent-places" class="fav-content hidden"></div>
