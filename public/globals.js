@@ -298,10 +298,10 @@ return `
         📄 Подробнее
       </button>
       <button 
-        class="btn btn-delete w-full sm:w-auto"
-        onclick="removeFavoriteItem('${type}', ${index}, this)">
-        🗑 Удалить
-      </button>
+  class="btn btn-delete"
+  onclick="removeFavoriteItem('${type}', ${index}, this)">
+  🗑 Удалить
+</button>
     </div>
   </div>
 `;
