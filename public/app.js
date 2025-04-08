@@ -923,8 +923,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     modal.classList.remove("flex");
     modal.classList.add("hidden");
   }
-  
-});
 
   // ✅ Обновление сердечек рейсов (по dealId)
   function updateFlightHearts() {
@@ -935,6 +933,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       btn.textContent = isFav ? "💙" : "🤍";
     });
   }
+});
 
   // ✅ Обновление сердечек отелей
   function updateHotelHearts() {
