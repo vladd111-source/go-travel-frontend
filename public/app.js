@@ -777,8 +777,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     trackEvent("Избранное место", { place, action: exists ? "remove" : "add" });
   }
   
-});
-
   // ✅ Функция для декодирования encoded JSON
   function toggleFavoritePlaceFromEncoded(encodedStr, btn) {
     try {
@@ -854,6 +852,8 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       updatePlaceHearts(); // 👈 обновляем сердечки
     }
   }
+  });
+
   //Функция удаления из избранного
   function removeFavoriteFlight(index) {
     let flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
