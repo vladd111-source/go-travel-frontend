@@ -306,7 +306,6 @@ return `
     </div>
   </div>
 `;
-}
   
 // ✅ Рендер всех карточек
 window.renderFavorites = function(type) {
