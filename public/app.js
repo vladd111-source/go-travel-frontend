@@ -859,21 +859,21 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   }
  
   //Функция удаления из избранного
-  function removeFavoriteFlight(index) {
+  window.removeFavoritePlace = function(index) {
     let flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
     flights.splice(index, 1);
     localStorage.setItem("favorites_flights", JSON.stringify(flights));
     renderFavorites("flights");
     updateFlightHearts();
   }
-  function removeFavoriteHotel(index) {
+  window.removeFavoritePlace = function(index) {
     let hotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
     hotels.splice(index, 1);
     localStorage.setItem("favorites_hotels", JSON.stringify(hotels));
     renderFavorites("hotels");
     updateHotelHearts(); // исправлено
   }
-  function removeFavoritePlace(index) {
+  window.removeFavoritePlace = function(index) {
     let places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
     places.splice(index, 1);
     localStorage.setItem("favorites_places", JSON.stringify(places));
