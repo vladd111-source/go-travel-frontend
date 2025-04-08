@@ -285,13 +285,6 @@ window.renderCard = function(type, item, index) {
     places: p => p.name
   };
 
-window.renderFavoriteItem = function(type, item, index) {
-  const titleMap = {
-    flights: f => `${f.from} → ${f.to}`,
-    hotels: h => h.name,
-    places: p => p.name
-  };
-
   const title = titleMap[type] ? titleMap[type](item) : '';
   const details = formatDetails(type, item);
 
