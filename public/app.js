@@ -539,7 +539,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   // ✅ Кэшируем значения
   localStorage.setItem("placeCity", city);
   localStorage.setItem("placeCategory", category);
-});
+  
   // ✅ Моковые места
   const dummyPlaces = [
     {
@@ -578,6 +578,8 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       image: "https://picsum.photos/300/180?random=5"
     }
   ];
+  
+});
 
   // Очистка и скрытие старых результатов
   resultBlock.classList.remove("visible");
