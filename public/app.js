@@ -782,8 +782,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       console.error("❌ Ошибка декодирования избранного места:", e);
     }
   }
-  
-});
 
   //Вкладка Избранное
   function switchFavTab(tab) {
@@ -850,6 +848,9 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       updatePlaceHearts(); // 👈 обновляем сердечки
     }
   }
+  
+});
+
   //Функция удаления из избранного
   function removeFavoriteFlight(index) {
     let flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
