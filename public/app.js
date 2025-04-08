@@ -589,8 +589,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     (!category || p.category === category)
   );
   
-});
-
   // Показываем первую часть карточек (3), остальное — по кнопке "Показать ещё"
   const firstBatch = filtered.slice(0, 3);
   const remaining = filtered.slice(3);
@@ -692,6 +690,8 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     };
     return map[code] || code;
   }
+  
+});
 
   // ✅ Заглавная первая буква строки
   function capitalize(str) {
