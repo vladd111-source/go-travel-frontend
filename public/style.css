@@ -66,12 +66,11 @@ select.input {
 }
 /* ===== Синие кнопки (Подробнее) ===== */
 .btn-blue {
-  background: linear-gradient(to right, #3b82f6, #6366f1);
+  background: linear-gradient(to right, #3b82f6, #6366f1) !important;
 }
 .btn-blue:hover {
-  background: linear-gradient(to right, #2563eb, #4f46e5);
+  background: linear-gradient(to right, #2563eb, #4f46e5) !important;
 }
-
 /* ===== Красные кнопки (Удалить) ===== */
 .btn-red {
   background-color: #e11d48;
