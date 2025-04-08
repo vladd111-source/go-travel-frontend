@@ -319,6 +319,19 @@ if (priceRange) {
 const hotelCityInput = document.getElementById("hotelCity");
 const ratingInput = document.getElementById("minRating");
 
+// ✅ Показ/скрытие фильтров по чекбоксу
+const filtersToggle = document.getElementById("showFiltersCheckbox");
+const hotelFilters = document.getElementById("hotelFilters");
+
+filtersToggle?.addEventListener("change", (e) => {
+  const show = e.target.checked;
+  hotelFilters.classList.toggle("hidden", !show);
+
+  if (show) {
+    updatePriceTooltip(); // 👈 тултип покажется правильно
+  }
+});
+
 if (hotelCityInput) {
   const cachedCity = localStorage.getItem("lastHotelCity");
   if (cachedCity) hotelCityInput.value = cachedCity;
@@ -383,7 +396,6 @@ if (hotelCityInput) {
       });
   });
 }
-
 
 // ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
