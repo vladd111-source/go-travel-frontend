@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // ✅ Установка языка и переключатель
+   // ✅ Установка языка и переключатель
     window._appLang = localStorage.getItem("lang") || "ru";
     applyTranslations(window._appLang);
 
@@ -38,13 +38,14 @@ document.addEventListener("DOMContentLoaded", () => {
     showTab(lastTab);
 
     // ✅ Автофокус
-setTimeout(() => {
-  if (typeof window.focusFirstInputIn === "function") {
-    window.focusFirstInputIn(lastTab); // ✅ безопасно вызовем
-  } else {
-    console.warn("⚠️ focusFirstInputIn пока не доступна");
-  }
-}, 200);
+    setTimeout(() => {
+      if (typeof window.focusFirstInputIn === "function") {
+        window.focusFirstInputIn(lastTab); // ✅ безопасно вызовем
+      } else {
+        console.warn("⚠️ focusFirstInputIn пока не доступна");
+      }
+    }, 200);
+
 
     // ✅ Плавное появление
     setTimeout(() => {
@@ -67,8 +68,8 @@ setTimeout(() => {
         }
       });
     }
-
-    // 📊 Отправка события
+    
+   // 📊 Отправка события
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
       timestamp: new Date().toISOString(),
