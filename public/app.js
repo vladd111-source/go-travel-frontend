@@ -691,8 +691,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     return map[code] || code;
   }
   
-});
-
   // ✅ Заглавная первая буква строки
   function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -714,7 +712,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   function hideLoading() {
     document.getElementById("loadingSpinner")?.classList.add("hidden");
   }
-
+  
   // Обработка ошибок
   window.onerror = function (msg, url, line, col, error) {
     logEventToAnalytics("Ошибка JS", { msg, url, line, col, stack: error?.stack || null });
@@ -738,7 +736,9 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       favorites.splice(index, 1);
       btn.textContent = "🤍";
     }
-
+    
+  });
+  
     // ✅ Логируем событие до сохранения
     trackEvent("Избранный рейс", { dealId, action: index === -1 ? "add" : "remove" });
 
