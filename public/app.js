@@ -1,38 +1,5 @@
-
-// ✅ Глобально доступная функция showTab с подсветкой
-window.showTab = function (id) {
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.classList.remove('active');
-    tab.classList.add('hidden');
-  });
-
-  const selectedTab = document.getElementById(id);
-  if (selectedTab) {
-    selectedTab.classList.remove('hidden');
-    selectedTab.classList.add('active');
-  }
-
-  // Сброс активного стиля у всех кнопок
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.remove('bg-blue-100', 'text-blue-600', 'shadow-md');
-    btn.classList.add('bg-white', 'text-black', 'shadow');
-  });
-
-  // Подсветка активной кнопки
-  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
-  if (activeBtn) {
-    activeBtn.classList.remove('bg-white', 'text-black', 'shadow');
-    activeBtn.classList.add('bg-blue-100', 'text-black-600', 'shadow-md');
-  }
-  // Сохраняем и логируем
-  localStorage.setItem("activeTab", id);
-  trackEvent("Переключение вкладки", id);
-
-  if (id === "favorites") {
-    switchFavTab("flights");
-  }
-}
-
+// ✅ DOMContentLoaded и инициализация приложения
+const appStart = Date.now();
 // ✅ Логирование аналитики
 function logEventToAnalytics(eventName, eventData = {}) {
   const userId = window._telegramId;
@@ -596,33 +563,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
 
   // 📊 Трекинг
   trackEvent("Поиск мест", { city, category });
-
-  // ✅ Форматирование категории (иконка + текст)
-  function formatCategory(code) {
-    const map = {
-      nature: "🏞 Природа",
-      culture: "🏰 Культура",
-      fun: "🎢 Развлечения",
-      shopping: "🛍 Шопинг",
-      food: "🍽 Еда"
-    };
-    return map[code] || code;
-  }
-
-  // ✅ Заглавная первая буква строки
-  function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-
-  // ✅ Анимация карточек (универсальная функция для любых блоков)
-  function animateCards(selector) {
-    setTimeout(() => {
-      document.querySelectorAll(selector).forEach(card => {
-        card.classList.remove("opacity-0", "scale-95");
-        card.classList.add("opacity-100", "scale-100");
-      });
-    }, 50);
-  }
 
   // Loader
   function showLoading() {
