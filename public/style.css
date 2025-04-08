@@ -53,6 +53,8 @@ select.input {
   color: white;
   text-align: center;
   width: 100%;
+  border: none;
+  cursor: pointer;
 }
 
 /* Эффекты наведения */
@@ -64,6 +66,7 @@ select.input {
   transform: scale(0.97);
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
+
 /* ===== Синие кнопки (Подробнее) ===== */
 .btn-blue {
   background: linear-gradient(to right, #3b82f6, #6366f1) !important;
@@ -71,14 +74,14 @@ select.input {
 .btn-blue:hover {
   background: linear-gradient(to right, #2563eb, #4f46e5) !important;
 }
+
 /* ===== Красные кнопки (Удалить) ===== */
 .btn-red {
-  background-color: #e11d48;
+  background-color: #e11d48 !important;
 }
 .btn-red:hover {
-  background-color: #be123c;
+  background-color: #be123c !important;
 }
-
 /* ===== Кнопка "Фильтры" как тумблер-кнопка */
 .toggle-btn {
   display: inline-flex;
