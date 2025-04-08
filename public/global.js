@@ -1,3 +1,61 @@
+// ✅ Универсальные функции отображения карточек избранного
+
+// 👉 Шаблоны карточек
+window.renderCard = function(type, item, index) {
+  const templates = {
+    flights: f => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${f.from} → ${f.to}</strong><br>
+        Дата: ${f.date}<br>
+        Цена: $${f.price}
+        <div class="flex justify-between items-center mt-2">
+          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showDetails('flights', ${index})">📄 Подробнее</button>
+          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteItem('flights', ${index})">🗑 Удалить</button>
+        </div>
+      </div>
+    `,
+    hotels: h => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${h.name}</strong> (${h.city})<br>
+        Рейтинг: ${h.rating} | $${h.price}
+        <div class="flex justify-between items-center mt-2">
+          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showDetails('hotels', ${index})">📄 Подробнее</button>
+          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteItem('hotels', ${index})">🗑 Удалить</button>
+        </div>
+      </div>
+    `,
+    places: p => `
+      <div class="card bg-white p-4 rounded-xl shadow mb-2">
+        <strong>${p.name}</strong><br>
+        ${p.description}<br>
+        Категория: ${formatCategory(p.category)}<br>
+        <div class="flex justify-between items-center mt-2">
+          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showDetails('places', ${index})">📄 Подробнее</button>
+          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteItem('places', ${index})">🗑 Удалить</button>
+        </div>
+      </div>
+    `
+  };
+
+  return templates[type] ? templates[type](item) : '';
+};
+
+// ✅ Рендер всех карточек
+window.renderFavorites = function(type) {
+  const key = `favorites_${type}`;
+  const container = document.getElementById(`favContent-${type}`);
+  if (!container) return;
+
+  const data = JSON.parse(localStorage.getItem(key) || '[]');
+
+  if (data.length === 0) {
+    container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">Пока нет избранного.</p>`;
+    return;
+  }
+
+  container.innerHTML = data.map((item, index) => renderCard(type, item, index)).join('');
+  updateHearts(type);
+};
 // ✅ Универсальное обновление сердечек
 window.updateHearts = function(type) {
   const config = {
