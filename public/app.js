@@ -420,7 +420,42 @@ if (hotelCityInput) {
       });
   });
 }
+window.updateHearts = function(type) {
+  const config = {
+    flights: {
+      storageKey: "favorites_flights",
+      dataAttr: "data-flight-id",
+      parseItem: btn => btn.getAttribute("data-flight-id"),
+      isFav: (favs, item) => favs.includes(item),
+    },
+    hotels: {
+      storageKey: "favorites_hotels",
+      dataAttr: "data-hotel-id",
+      parseItem: btn => JSON.parse(decodeURIComponent(btn.getAttribute("data-hotel-id"))),
+      isFav: (favs, item) => favs.some(h => h.name === item.name && h.city === item.city),
+    },
+    places: {
+      storageKey: "favorites_places",
+      dataAttr: "data-place-id",
+      parseItem: btn => JSON.parse(decodeURIComponent(btn.getAttribute("data-place-id"))),
+      isFav: (favs, item) => favs.some(p => p.name === item.name && p.city === item.city),
+    }
+  };
 
+  const { storageKey, dataAttr, parseItem, isFav } = config[type] || {};
+  if (!storageKey || !dataAttr) return;
+
+  const favs = JSON.parse(localStorage.getItem(storageKey) || "[]");
+
+  document.querySelectorAll(`[${dataAttr}]`).forEach(btn => {
+    try {
+      const item = parseItem(btn);
+      btn.textContent = isFav(favs, item) ? "💙" : "🤍";
+    } catch (e) {
+      console.error(`Ошибка обновления сердечка [${type}]:`, e);
+    }
+  });
+};
 
 // ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
