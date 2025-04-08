@@ -6,7 +6,7 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 // ✅ Переводы
 const translations = {
   ru: {
-    flights: "✈️ Авиабилеты",
+    flights: "✈️ Билеты",
     hotels: "🏨 Отели",
     sights: "🌍 Места",
     findFlights: "Найти рейсы",
