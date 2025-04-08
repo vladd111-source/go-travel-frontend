@@ -134,11 +134,11 @@ select.input {
 /* ===== Tooltip для цены ===== */
 #priceTooltip {
   position: absolute;
-  top: 0rem; /* подняли выше */
+  top: -0.5rem; /* подняли выше */
   transform: translateX(-50%);
   white-space: nowrap;
   font-weight: 600;
-  font-size: 1.2rem; /* увеличено на ~15% */
+  font-size: 1.1rem; /* увеличено на ~15% */
   background-color: #3b82f6;
   color: white;
   padding: 0.35rem 0.7rem; /* чуть увеличили отступы */
