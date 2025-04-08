@@ -292,13 +292,13 @@ return `
     <h3 class="text-lg font-semibold mb-1">${title}</h3>
     <div class="text-sm text-gray-600 mb-2">${details}</div>
     <div class="flex justify-between sm:justify-start gap-2 mt-3 flex-wrap">
-      <button 
-        class="btn w-full sm:w-auto"
-        onclick="showDetails('${type}', ${index})">
-        📄 Подробнее
-      </button>
      <button 
-  class="btn-delete"
+  class="btn"
+  onclick="showDetails('${type}', ${index})">
+  📄 Подробнее
+</button>
+     <button 
+  class="btn btn-delete"
   onclick="removeFavoriteItem('${type}', ${index}, this)">
   🗑 Удалить
 </button>
