@@ -277,6 +277,9 @@ window.renderFavorites = function(type) {
 
   const data = JSON.parse(localStorage.getItem(key) || '[]');
 
+  // 💥 Очищаем контейнер, чтобы не дублировалось
+  container.innerHTML = '';
+
   if (data.length === 0) {
     container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">${t.noFavorites || 'Пока нет избранного.'}</p>`;
     return;
