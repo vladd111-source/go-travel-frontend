@@ -282,6 +282,7 @@ hr {
 }
 
 #hotelFilters {
+  margin-top: 2rem;
   transition: all 0.3s ease;
   overflow: hidden;
 }
