@@ -483,7 +483,7 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
   `;
       }).join("");
   
-      updatePlaceHearts();
+     updateHearts("places");
       animateCards("#hotDeals .card");
   
       if (match) {
@@ -626,7 +626,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     </div>
   `;
   }).join("");
-  updatePlaceHearts();
+ updateHearts("places");
 
   // Если есть ещё карточки — добавляем кнопку
   if (remaining.length > 0) {
@@ -662,7 +662,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     
       resultBlock.insertAdjacentHTML("beforeend", remainingCards);
       animateCards("#placesResult .card");
-      updatePlaceHearts(); // обновим лайки
+     updateHearts("places"); // обновим лайки
     
       // Плавно прокручиваем к первой новой карточке
       setTimeout(() => {
