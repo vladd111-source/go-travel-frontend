@@ -848,9 +848,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       updatePlaceHearts(); // 👈 обновляем сердечки
     }
   }
-  
-});
-
   //Функция удаления из избранного
   function removeFavoriteFlight(index) {
     let flights = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
@@ -873,6 +870,9 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     renderFavorites("places");
     updatePlaceHearts(); // исправлено
   }
+  
+});
+
   // ✅ Модальное окно для показа деталей перелета/отеля/места
   function showPlaceDetails(index) {
     const places = JSON.parse(localStorage.getItem("favorites_places") || "[]");
