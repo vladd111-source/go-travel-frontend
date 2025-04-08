@@ -383,6 +383,21 @@ if (hotelCityInput) {
       });
   });
 }
+const hotelCityInput = document.getElementById("hotelCity");
+const ratingInput = document.getElementById("minRating");
+
+// 🔽 ВСТАВЬ СЮДА:
+const filtersToggle = document.getElementById("showFiltersCheckbox");
+const hotelFilters = document.getElementById("hotelFilters");
+
+filtersToggle?.addEventListener("change", (e) => {
+  const show = e.target.checked;
+  hotelFilters.classList.toggle("hidden", !show);
+
+  if (show) {
+    updatePriceTooltip(); // 👈 Важно: правильное позиционирование тултипа
+  }
+});
 
 // ✅ Поиск рейсов
 const fromInput = document.getElementById("from");
