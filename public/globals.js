@@ -147,30 +147,21 @@ window.showTab = function(id) {
   }
 };
 
-
-
-
 // ✅ Переключение таба внутри "Избранного"
 window.switchFavTab = function (subTab) {
   if (!subTab) return;
 
   // 🔹 Скрываем все блоки контента и чистим
-  const contents = document.querySelectorAll(".fav-content");
-  contents.forEach(c => {
+  document.querySelectorAll(".fav-content").forEach(c => {
     c.classList.add("hidden");
-    c.innerHTML = ""; // 💥 Чистим контент при скрытии
+    c.innerHTML = "";
   });
 
   // 🔹 Показываем нужный блок
   const activeContent = document.getElementById(`favContent-${subTab}`);
   if (activeContent) {
     activeContent.classList.remove("hidden");
-
-    if (typeof window.renderFavorites === "function") {
-      window.renderFavorites(subTab); // 🔄 Отрисовка актуального контента
-    } else {
-      console.warn("⚠️ renderFavorites не определена");
-    }
+    window.renderFavorites?.(subTab);
   } else {
     console.warn(`⚠️ Контейнер favContent-${subTab} не найден`);
   }
@@ -179,36 +170,16 @@ window.switchFavTab = function (subTab) {
   localStorage.setItem("activeFavTab", subTab);
 
   // 🔹 Обновляем активную кнопку
-  const tabButtons = document.querySelectorAll(".fav-tab-btn");
-  tabButtons.forEach(btn => btn.classList.remove("bg-blue-100"));
-
-  const activeBtn = document.getElementById(`favTab-${subTab}`);
-  if (activeBtn) activeBtn.classList.add("bg-blue-100");
+  document.querySelectorAll(".fav-tab-btn").forEach(btn => btn.classList.remove("bg-blue-100"));
+  document.getElementById(`favTab-${subTab}`)?.classList.add("bg-blue-100");
 };
 
-
-  
-  // Скрываем все блоки
-  const contents = document.querySelectorAll(".fav-content");
-  contents.forEach(c => {
-    c.classList.add("hidden");
-    c.innerHTML = ""; // 💥 Чистим контент при скрытии
-  });
-
-  // Показываем нужный
-  const activeContent = document.getElementById(`favContent-${subTab}`);
-  if (activeContent) {
-    activeContent.classList.remove("hidden");
-    window.renderFavorites(subTab); // Рендерим актуальные данные
-  }
-
-  // Запоминаем выбор
-  localStorage.setItem("activeFavTab", subTab);
-
+// ✅ Заглавная первая буква
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+// ✅ Человеческий вывод категории
 function formatCategory(code) {
   const map = {
     nature: "🏞 Природа",
@@ -220,6 +191,7 @@ function formatCategory(code) {
   return map[code] || code;
 }
 
+// ✅ Анимация карточек
 function animateCards(selector) {
   setTimeout(() => {
     document.querySelectorAll(selector).forEach(card => {
