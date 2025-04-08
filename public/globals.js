@@ -285,27 +285,29 @@ window.renderCard = function(type, item, index) {
     places: p => p.name
   };
 
-const title = titleMap[type] ? titleMap[type](item) : '';
-const details = formatDetails(type, item);
+window.renderFavoriteItem = function(type, item, index) {
+  const title = titleMap[type] ? titleMap[type](item) : '';
+  const details = formatDetails(type, item);
 
-return `
-  <div class="card bg-white border border-gray-200 p-4 rounded-xl shadow-md mb-4 transition-all duration-300">
-    <h3 class="text-lg font-semibold mb-1">${title}</h3>
-    <div class="text-sm text-gray-600 mb-2">${details}</div>
-    <div class="flex justify-between items-center gap-2 mt-3">
-      <button 
-        class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-xl transition-all"
-        onclick="showDetails('${type}', ${index})">
-        📄 Подробнее
-      </button>
-      <button 
-        class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-xl transition-all"
-        onclick="removeFavoriteItem('${type}', ${index}, this)">
-        🗑 Удалить
-      </button>
+  return `
+    <div class="card bg-white border border-gray-200 p-4 rounded-xl shadow-md mb-4 transition-all duration-300">
+      <h3 class="text-lg font-semibold mb-1">${title}</h3>
+      <div class="text-sm text-gray-600 mb-2">${details}</div>
+      <div class="flex justify-between items-center gap-2 mt-3">
+        <button 
+          class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-xl transition-all"
+          onclick="showDetails('${type}', ${index})">
+          📄 Подробнее
+        </button>
+        <button 
+          class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-xl transition-all"
+          onclick="removeFavoriteItem('${type}', ${index}, this)">
+          🗑 Удалить
+        </button>
+      </div>
     </div>
-  </div>
-`;
+  `;
+};
   
 // ✅ Рендер всех карточек
 window.renderFavorites = function(type) {
