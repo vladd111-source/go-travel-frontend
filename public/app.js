@@ -880,8 +880,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     renderFavorites("places");
     updatePlaceHearts(); // исправлено
   }
-  
-});
 
   // ✅ Модальное окно для показа деталей перелета/отеля/места
   function showPlaceDetails(index) {
@@ -968,3 +966,13 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       }
     });
   }
+  // Автофокус на первый input вкладки
+function focusFirstInputIn(tabId) {
+  const el = document.getElementById(tabId);
+  if (!el) return;
+  const input = el.querySelector("input");
+  if (input) input.focus();
+}
+
+// 👇 Не забываем закрыть обработчик формы, если он был выше
+});
