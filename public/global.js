@@ -1,43 +1,52 @@
-// ✅ Универсальные функции отображения карточек избранного
+// ✅ Универсальные функции отображения карточек избранного с мультиязычной поддержкой
 
-// 👉 Шаблоны карточек
-window.renderCard = function(type, item, index) {
-  const templates = {
+// 👉 Форматирование деталей
+window.formatDetails = function(type, item) {
+  const t = translations?.[window._appLang] || {};
+
+  const detailsMap = {
     flights: f => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${f.from} → ${f.to}</strong><br>
-        Дата: ${f.date}<br>
-        Цена: $${f.price}
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showDetails('flights', ${index})">📄 Подробнее</button>
-          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteItem('flights', ${index})">🗑 Удалить</button>
-        </div>
-      </div>
+      ${t.fromCity || 'Откуда'}: ${f.from}<br>
+      ${t.toCity || 'Куда'}: ${f.to}<br>
+      ${t.departure || 'Дата'}: ${f.date}<br>
+      ${t.priceTo || 'Цена'}: $${f.price}
     `,
     hotels: h => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${h.name}</strong> (${h.city})<br>
-        Рейтинг: ${h.rating} | $${h.price}
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showDetails('hotels', ${index})">📄 Подробнее</button>
-          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteItem('hotels', ${index})">🗑 Удалить</button>
-        </div>
-      </div>
+      ${t.city || 'Город'}: ${h.city}<br>
+      ${t.ratingMin || 'Рейтинг'}: ${h.rating}<br>
+      ${t.priceTo || 'Цена'}: $${h.price}
     `,
     places: p => `
-      <div class="card bg-white p-4 rounded-xl shadow mb-2">
-        <strong>${p.name}</strong><br>
-        ${p.description}<br>
-        Категория: ${formatCategory(p.category)}<br>
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showDetails('places', ${index})">📄 Подробнее</button>
-          <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteItem('places', ${index})">🗑 Удалить</button>
-        </div>
-      </div>
+      ${p.description}<br>
+      ${t.category || 'Категория'}: ${formatCategory(p.category)}<br>
+      ${t.city || 'Город'}: ${capitalize(p.city)}
     `
   };
 
-  return templates[type] ? templates[type](item) : '';
+  return detailsMap[type] ? detailsMap[type](item) : '';
+};
+
+// 👉 Шаблоны карточек
+window.renderCard = function(type, item, index) {
+  const titleMap = {
+    flights: f => `${f.from} → ${f.to}`,
+    hotels: h => h.name,
+    places: p => p.name
+  };
+
+  const title = titleMap[type] ? titleMap[type](item) : '';
+  const details = formatDetails(type, item);
+
+  return `
+    <div class="card bg-white p-4 rounded-xl shadow mb-2">
+      <strong>${title}</strong><br>
+      ${details}
+      <div class="flex justify-between items-center mt-2">
+        <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showDetails('${type}', ${index})">📄 Подробнее</button>
+        <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteItem('${type}', ${index})">🗑 Удалить</button>
+      </div>
+    </div>
+  `;
 };
 
 // ✅ Рендер всех карточек
@@ -56,7 +65,8 @@ window.renderFavorites = function(type) {
   container.innerHTML = data.map((item, index) => renderCard(type, item, index)).join('');
   updateHearts(type);
 };
-// ✅ Универсальное обновление сердечек
+
+// ✅ Обновление сердечек
 window.updateHearts = function(type) {
   const config = {
     flights: {
@@ -92,51 +102,6 @@ window.updateHearts = function(type) {
       console.error(`Ошибка обновления сердечка [${type}]:`, e);
     }
   });
-};
-
-// ✅ Универсальный рендеринг карточек избранного
-window.renderFavorites = function(type) {
-  const config = {
-    flights: {
-      storageKey: "favorites_flights",
-      getTitle: f => `${f.from} → ${f.to}`,
-      getDetails: f => `Дата: ${f.date}<br>Цена: $${f.price}`,
-    },
-    hotels: {
-      storageKey: "favorites_hotels",
-      getTitle: h => h.name,
-      getDetails: h => `(${h.city})<br>Рейтинг: ${h.rating} | $${h.price}`,
-    },
-    places: {
-      storageKey: "favorites_places",
-      getTitle: p => p.name,
-      getDetails: p => `${p.description}<br>Категория: ${formatCategory(p.category)}`,
-    },
-  };
-
-  const container = document.getElementById(`favContent-${type}`);
-  if (!container) return;
-
-  const { storageKey, getTitle, getDetails } = config[type] || {};
-  const data = JSON.parse(localStorage.getItem(storageKey) || "[]");
-
-  if (data.length === 0) {
-    container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">Пока нет избранного.</p>`;
-    return;
-  }
-
-  container.innerHTML = data.map((item, index) => `
-    <div class="card bg-white p-4 rounded-xl shadow mb-2">
-      <strong>${getTitle(item)}</strong><br>
-      ${getDetails(item)}
-      <div class="flex justify-between items-center mt-2">
-        <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showDetails('${type}', ${index})">📄 Подробнее</button>
-        <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteItem('${type}', ${index})">🗑 Удалить</button>
-      </div>
-    </div>
-  `).join("");
-
-  updateHearts(type);
 };
 
 // ✅ Показ модалки с деталями по типу
