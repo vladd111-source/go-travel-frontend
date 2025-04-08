@@ -1,3 +1,177 @@
+// ✅ Supabase init
+const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+// ✅ Переводы
+const translations = {
+  ru: {
+    flights: "✈️ Авиабилеты",
+    hotels: "🏨 Отели",
+    sights: "🌍 Места",
+    findFlights: "Найти рейсы",
+    roundTrip: "Туда и обратно",
+    departure: "Дата вылета",
+    return: "Дата возвращения",
+    hotelResults: "Результаты:",
+    noHotelsFound: "Ничего не найдено по заданным фильтрам.",
+    city: "Город",
+    fromCity: "Откуда",
+    toCity: "Куда",
+    guests: "Гостей",
+    checkIn: "Дата заезда",
+    checkOut: "Дата выезда",
+    priceFrom: "Цена от",
+    category: "Категория",
+    priceTo: "Цена",
+    ratingMin: "Рейтинг",
+    findHotel: "Найти отель",
+    findSights: "Показать места",
+    bookNow: "Забронировать"
+  },
+  en: {
+    flights: "✈️ Flights",
+    hotels: "🏨 Hotels",
+    sights: "🌍 Places",
+    findFlights: "Search Flights",
+    roundTrip: "Round Trip",
+    city: "City",
+    category: "Category",
+    departure: "Departure Date",
+    return: "Return Date",
+    hotelResults: "Results:",
+    noHotelsFound: "Nothing found for the selected filters.",
+    guests: "Guests",
+    fromCity: "From",
+    toCity: "To",
+    checkIn: "Check-in Date",
+    checkOut: "Check-out Date",
+    priceFrom: "Price from",
+    priceTo: "Price",
+    ratingMin: "Rating",
+    findHotel: "Find Hotel",
+    findSights: "Show Places",
+    bookNow: "Book Now"
+  }
+};
+
+function applyTranslations(lang) {
+  const t = translations[lang];
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (t[key]) el.textContent = t[key];
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    if (t[key]) el.placeholder = t[key];
+  });
+}
+
+window.trackEvent = function(name, data = "") {
+  const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
+  console.log(message);
+  if (window.Telegram?.WebApp?.sendData) {
+    Telegram.WebApp.sendData(message);
+  }
+  logEventToAnalytics(name, {
+    info: data,
+    lang: window._appLang,
+    activeTab: localStorage.getItem("activeTab") || "flights",
+    timestamp: new Date().toISOString(),
+  });
+};
+
+function logEventToAnalytics(eventName, eventData = {}) {
+  const userId = window._telegramId;
+  if (!userId) {
+    console.warn("⚠️ Нет Telegram ID — аналитика не записана");
+    return;
+  }
+  const sessionId = localStorage.getItem("session_id") || (window.crypto?.randomUUID?.() || Date.now().toString());
+  const payload = {
+    telegram_id: userId.toString(),
+    event: eventName,
+    event_data: eventData,
+    session_id: sessionId,
+    created_at: new Date().toISOString(),
+  };
+  supabase.from('analytics').insert([payload])
+    .then(({ error }) => {
+      if (error) {
+        console.error("❌ Supabase insert error:", error.message);
+      } else {
+        console.log("✅ Событие записано:", eventName);
+      }
+    });
+}
+
+window.showTab = function(id) {
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.remove('active');
+    tab.classList.add('hidden');
+  });
+  const selectedTab = document.getElementById(id);
+  if (selectedTab) {
+    selectedTab.classList.remove('hidden');
+    selectedTab.classList.add('active');
+  }
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('bg-blue-100', 'text-blue-600', 'shadow-md');
+    btn.classList.add('bg-white', 'text-black', 'shadow');
+  });
+  const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+  if (activeBtn) {
+    activeBtn.classList.remove('bg-white', 'text-black', 'shadow');
+    activeBtn.classList.add('bg-blue-100', 'text-black-600', 'shadow-md');
+  }
+  localStorage.setItem("activeTab", id);
+  window.trackEvent("Переключение вкладки", id);
+  if (id === "favorites") {
+    window.switchFavTab?.("flights");
+  }
+};
+
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function formatCategory(code) {
+  const map = {
+    nature: "🏞 Природа",
+    culture: "🏰 Культура",
+    fun: "🎢 Развлечения",
+    shopping: "🛍 Шопинг",
+    food: "🍽 Еда"
+  };
+  return map[code] || code;
+}
+
+function animateCards(selector) {
+  setTimeout(() => {
+    document.querySelectorAll(selector).forEach(card => {
+      card.classList.remove("opacity-0", "scale-95");
+      card.classList.add("opacity-100", "scale-100");
+    });
+  }, 50);
+}
+
+function showLoading() {
+  document.getElementById("loadingSpinner")?.classList.remove("hidden");
+}
+
+function hideLoading() {
+  document.getElementById("loadingSpinner")?.classList.add("hidden");
+}
+
+window.capitalize = capitalize;
+window.formatCategory = formatCategory;
+window.animateCards = animateCards;
+window.showLoading = showLoading;
+window.hideLoading = hideLoading;
+window.applyTranslations = applyTranslations;
+window.translations = translations;
+window.supabase = supabase;
+
 // ✅ Универсальные функции отображения карточек избранного с мультиязычной поддержкой и анимациями
 
 // 👉 Форматирование деталей
