@@ -116,25 +116,25 @@
 
     <div id="hotelFilters" class="hidden mt-2">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
         <!-- 💰 Ползунок с tooltip -->
-        <div class="col-span-2">
-          <label for="priceRange" class="label block mb-1" data-i18n="priceTo">Цена</label>
-          <div class="relative w-full">
-            <input
-              type="range"
-              id="priceRange"
-              min="0"
-              max="500"
-              step="10"
-              value="250"
-              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500 slider-thumb" />
-            <div id="priceTooltip"
-              class="absolute -top-8 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow transition-all pointer-events-none">
-              $250
-            </div>
-          </div>
-        </div>
-
+<div class="col-span-2 mt-4">
+  <label for="priceRange" class="label block mb-1" data-i18n="priceTo">Цена</label>
+  <div class="relative w-full" style="overflow: visible;">
+    <input
+      type="range"
+      id="priceRange"
+      min="0"
+      max="500"
+      step="10"
+      value="250"
+      class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500 slider-thumb" />
+    <div id="priceTooltip"
+      class="absolute -top-12 bg-blue-600 text-white text-sm px-2 py-1 rounded shadow transition-all pointer-events-none left-1/2 transform -translate-x-1/2 z-10">
+      $250
+    </div>
+  </div>
+</div>
         <!-- ⭐️ Рейтинг -->
         <div class="col-span-2">
           <label for="minRating" class="label" data-i18n="ratingMin">Рейтинг</label>
