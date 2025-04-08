@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ✅ Автофокус
     setTimeout(() => {
-      focusFirstInputIn(lastTab);
+     window.focusFirstInputIn(lastTab); // ✅ работает
     }, 200);
 
     // ✅ Плавное появление
