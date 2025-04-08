@@ -292,14 +292,14 @@ window.renderCard = function(type, item, index) {
     <div class="card bg-white border border-gray-200 p-4 rounded-xl shadow-md mb-4 transition-all duration-300">
       <h3 class="text-lg font-semibold mb-1">${title}</h3>
       <div class="text-sm text-gray-600 mb-2">${details}</div>
-      <div class="flex justify-between items-center gap-2 mt-3">
+      <div class="flex justify-between sm:justify-start gap-2 mt-3 flex-wrap">
         <button 
-          class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-xl transition-all"
+          class="btn w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-xl transition-all"
           onclick="showDetails('${type}', ${index})">
           📄 Подробнее
         </button>
         <button 
-          class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-xl transition-all"
+          class="btn w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-xl transition-all"
           onclick="removeFavoriteItem('${type}', ${index}, this)">
           🗑 Удалить
         </button>
