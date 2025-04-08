@@ -1,4 +1,4 @@
-// ✅ Универсальные функции отображения карточек избранного с мультиязычной поддержкой
+// ✅ Универсальные функции отображения карточек избранного с мультиязычной поддержкой и анимациями
 
 // 👉 Форматирование деталей
 window.formatDetails = function(type, item) {
@@ -38,12 +38,12 @@ window.renderCard = function(type, item, index) {
   const details = formatDetails(type, item);
 
   return `
-    <div class="card bg-white p-4 rounded-xl shadow mb-2">
+    <div class="card bg-white p-4 rounded-xl shadow mb-2 transition-all duration-300">
       <strong>${title}</strong><br>
       ${details}
       <div class="flex justify-between items-center mt-2">
         <button class="btn text-sm bg-blue-100 text-blue-600" onclick="showDetails('${type}', ${index})">📄 Подробнее</button>
-        <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteItem('${type}', ${index})">🗑 Удалить</button>
+        <button class="btn text-sm bg-red-100 text-red-600" onclick="removeFavoriteItem('${type}', ${index}, this)">🗑 Удалить</button>
       </div>
     </div>
   `;
@@ -51,6 +51,7 @@ window.renderCard = function(type, item, index) {
 
 // ✅ Рендер всех карточек
 window.renderFavorites = function(type) {
+  const t = translations?.[window._appLang] || {};
   const key = `favorites_${type}`;
   const container = document.getElementById(`favContent-${type}`);
   if (!container) return;
@@ -58,7 +59,7 @@ window.renderFavorites = function(type) {
   const data = JSON.parse(localStorage.getItem(key) || '[]');
 
   if (data.length === 0) {
-    container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">Пока нет избранного.</p>`;
+    container.innerHTML = `<p class="text-gray-500 text-sm text-center mt-4">${t.noFavorites || 'Пока нет избранного.'}</p>`;
     return;
   }
 
@@ -166,10 +167,24 @@ window.toggleFavoriteItem = function(type, item, btn) {
   trackEvent(`Избранное (${type})`, { item, action: exists ? "remove" : "add" });
 };
 
-// ✅ Удаление из избранного по типу
-window.removeFavoriteItem = function(type, index) {
+// ✅ Удаление с анимацией
+window.removeFavoriteItem = function(type, index, btn = null) {
   const key = `favorites_${type}`;
   let data = JSON.parse(localStorage.getItem(key) || "[]");
+
+  if (btn) {
+    const card = btn.closest('.card');
+    if (card) {
+      card.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => {
+        data.splice(index, 1);
+        localStorage.setItem(key, JSON.stringify(data));
+        renderFavorites(type);
+      }, 300);
+      return;
+    }
+  }
+
   data.splice(index, 1);
   localStorage.setItem(key, JSON.stringify(data));
   renderFavorites(type);
