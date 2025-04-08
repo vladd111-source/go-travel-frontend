@@ -67,6 +67,7 @@ function applyTranslations(lang) {
   });
 }
 
+
 window.trackEvent = function(name, data = "") {
   const message = `📈 Событие: ${name}` + (data ? `\n➡️ ${typeof data === "string" ? data : JSON.stringify(data)}` : "");
   console.log(message);
@@ -130,6 +131,33 @@ window.showTab = function(id) {
     window.switchFavTab?.("flights");
   }
 };
+
+// ✅ Переключение таба внутри "Избранного"
+window.switchFavTab = function(subTab) {
+  const buttons = document.querySelectorAll(".fav-subtab-btn");
+  buttons.forEach(btn => {
+    btn.classList.remove("bg-blue-100", "text-blue-600");
+    btn.classList.add("bg-white", "text-gray-700");
+  });
+
+  const activeBtn = document.querySelector(`.fav-subtab-btn[data-tab="${subTab}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add("bg-blue-100", "text-blue-600");
+    activeBtn.classList.remove("bg-white", "text-gray-700");
+  }
+
+  const contents = document.querySelectorAll(".fav-tab-content");
+  contents.forEach(c => c.classList.add("hidden"));
+
+  const activeContent = document.getElementById(`favContent-${subTab}`);
+  if (activeContent) {
+    activeContent.classList.remove("hidden");
+    window.renderFavorites(subTab);
+  }
+
+  localStorage.setItem("activeFavTab", subTab);
+};
+
 
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
