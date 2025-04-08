@@ -277,7 +277,6 @@ window.formatDetails = function(type, item) {
   return detailsMap[type] ? detailsMap[type](item) : '';
 };
 
-// 👉 Шаблоны карточек
 window.renderCard = function(type, item, index) {
   const titleMap = {
     flights: f => `${f.from} → ${f.to}`,
@@ -298,11 +297,11 @@ window.renderCard = function(type, item, index) {
           onclick="showDetails('${type}', ${index})">
           📄 Подробнее
         </button>
-       <button 
-  class="btn-delete"
-  onclick="removeFavoriteItem('${type}', ${index}, this)">
-  🗑 Удалить
-</button>
+        <button 
+          class="btn-delete w-full sm:w-auto"
+          onclick="removeFavoriteItem('${type}', ${index}, this)">
+          🗑 Удалить
+        </button>
       </div>
     </div>
   `;
