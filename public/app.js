@@ -532,8 +532,6 @@ placeCityInput.setAttribute("autofocus", "autofocus");
 // ✅ Обработчик формы
 document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   e.preventDefault();
-  
-});
 
   const city = placeCityInput.value.trim().toLowerCase();
   const category = placeCategorySelect.value;
@@ -541,7 +539,7 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   // ✅ Кэшируем значения
   localStorage.setItem("placeCity", city);
   localStorage.setItem("placeCategory", category);
-
+});
   // ✅ Моковые места
   const dummyPlaces = [
     {
