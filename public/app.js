@@ -743,9 +743,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     // ✅ Сохраняем в localStorage
     localStorage.setItem("favFlights", JSON.stringify(favorites));
   }
-  
-   });
-
   // ✅ Добавление/удаление отеля в избранное
   function toggleFavoriteHotel(hotelData, btn) {
     let favorites = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
@@ -763,6 +760,8 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     localStorage.setItem("favorites_hotels", JSON.stringify(favorites));
   }
   
+});
+
   //✅ Функция для лайка мест   
   function toggleFavoritePlace(place, btn) {
     let favorites = JSON.parse(localStorage.getItem("favorites_places") || "[]");
