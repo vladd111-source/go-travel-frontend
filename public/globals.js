@@ -396,10 +396,12 @@ window.toggleFavoritePlaceFromEncoded = function(encoded, btn) {
   }
 };
 
-// ✅ Удаление с анимацией
 window.removeFavoriteItem = function(type, index, btn = null) {
   const key = `favorites_${type}`;
   let data = JSON.parse(localStorage.getItem(key) || "[]");
+
+  const container = document.getElementById(`favContent-${type}`);
+  if (container) container.innerHTML = ""; // 💥 Очищаем перед новым рендером
 
   if (btn) {
     const card = btn.closest('.card');
