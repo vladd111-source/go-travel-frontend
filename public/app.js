@@ -274,6 +274,7 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     localStorage.setItem("roundTripChecked", roundTripCheckbox.checked ? "1" : "0");
   });
 }
+
 // ✅ Показ/скрытие фильтров + обновление tooltip
 const hotelFiltersToggle = document.getElementById("toggleFilters");
 const hotelFiltersSection = document.getElementById("hotelFilters");
@@ -337,6 +338,7 @@ if (priceRange) {
   window.addEventListener("load", updatePriceTooltip);
 }
 if (hotelCityInput) {
+  
   // ✅ Восстановление кэша города
   const cachedCity = localStorage.getItem("lastHotelCity");
   if (cachedCity) hotelCityInput.value = cachedCity;
@@ -454,6 +456,7 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
         f.from.toLowerCase() === from.toLowerCase() &&
         f.to.toLowerCase() === to.toLowerCase()
       );
+    
       // Рендеринг в избранное
       const hotDeals = document.getElementById("hotDeals");
       hotDeals.innerHTML = flights.map(deal => {
@@ -529,6 +532,8 @@ placeCityInput.setAttribute("autofocus", "autofocus");
 // ✅ Обработчик формы
 document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   e.preventDefault();
+  
+});
 
   const city = placeCityInput.value.trim().toLowerCase();
   const category = placeCategorySelect.value;
@@ -933,7 +938,6 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       btn.textContent = isFav ? "💙" : "🤍";
     });
   }
-});
 
   // ✅ Обновление сердечек отелей
   function updateHotelHearts() {
