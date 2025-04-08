@@ -299,7 +299,7 @@ window.renderCard = function(type, item, index) {
           📄 Подробнее
         </button>
         <button 
-          class="btn w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-xl transition-all"
+          class="btn w-full sm:w-auto bg-rose-500 hover:bg-rose-600 text-white text-sm px-4 py-2 rounded-xl transition-all"
           onclick="removeFavoriteItem('${type}', ${index}, this)">
           🗑 Удалить
         </button>
