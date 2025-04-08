@@ -578,17 +578,18 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       image: "https://picsum.photos/300/180?random=5"
     }
   ];
-  
-});
 
   // Очистка и скрытие старых результатов
   resultBlock.classList.remove("visible");
   resultBlock.innerHTML = "";
+
   // Фильтрация
   const filtered = dummyPlaces.filter(p =>
     (!city || p.city.includes(city)) &&
     (!category || p.category === category)
   );
+  
+});
 
   // Показываем первую часть карточек (3), остальное — по кнопке "Показать ещё"
   const firstBatch = filtered.slice(0, 3);
