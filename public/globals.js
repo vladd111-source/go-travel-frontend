@@ -386,6 +386,16 @@ window.toggleFavoriteItem = function(type, item, btn) {
   trackEvent(`Избранное (${type})`, { item, action: exists ? "remove" : "add" });
 };
 
+// ✅ Добавление/удаление из избранного по закодированной строке (для мест)
+window.toggleFavoritePlaceFromEncoded = function(encoded, btn) {
+  try {
+    const place = JSON.parse(decodeURIComponent(encoded));
+    window.toggleFavoriteItem("places", place, btn);
+  } catch (e) {
+    console.error("❌ Ошибка при декодировании места:", e);
+  }
+};
+
 // ✅ Удаление с анимацией
 window.removeFavoriteItem = function(type, index, btn = null) {
   const key = `favorites_${type}`;
