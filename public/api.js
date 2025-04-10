@@ -1,5 +1,6 @@
 export async function fetchLocation(query) {
-  const url = `https://skyscanner89.p.rapidapi.com/flights/locations?query=${encodeURIComponent(query)}`;
+  const url = `https://skyscanner89.p.rapidapi.com/airports/search?query=${encodeURIComponent(query)}`;
+  
   const options = {
     method: 'GET',
     headers: {
@@ -10,9 +11,15 @@ export async function fetchLocation(query) {
 
   try {
     const res = await fetch(url, options);
-    const json = await res.json();
-    const item = json[0];
-    return item ? { code: item.code, id: item.entityId } : null;
+    const data = await res.json();
+    const firstMatch = data?.[0];
+
+    if (!firstMatch) return null;
+
+    return {
+      code: firstMatch.iataCode,
+      id: firstMatch.entityId
+    };
   } catch (err) {
     console.error('Ошибка поиска города:', err);
     return null;
