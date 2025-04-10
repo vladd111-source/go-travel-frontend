@@ -285,6 +285,21 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
       hideLoading();
     });
 });
+document.getElementById('clearFlights').addEventListener('click', () => {
+  // Очистка полей
+  document.getElementById('from').value = '';
+  document.getElementById('to').value = '';
+  document.getElementById('departureDate').value = '';
+  document.getElementById('returnDate').value = '';
+  document.getElementById('roundTrip').checked = false;
+
+  // Скрыть поле возврата, если было видно
+  document.getElementById('returnDateWrapper').classList.add('hidden');
+
+  // Очистка результатов
+  document.getElementById('hotDeals').innerHTML = '';
+});
+
 
 // ✅ Поиск мест
 const placeCityInput = document.getElementById("placeCity");
