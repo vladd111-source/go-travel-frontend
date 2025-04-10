@@ -433,8 +433,30 @@ document.getElementById('search-form').addEventListener('submit', async (e) => {
   if (!from || !to) return alert('Города не найдены');
 
   const flights = await fetchFlights(from.code, from.id, to.code, to.id);
+  console.log('Рейсы:', flights); // 👉 лог до отрисовки
 
-  console.log('Рейсы:', flights); // 👉 пока просто лог
+  const container = document.getElementById('hotDeals');
+  container.innerHTML = ''; // очистка
+
+  if (!flights || !flights.length) {
+    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
+    return;
+  }
+
+  flights.forEach(flight => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    card.innerHTML = `
+      <h3 class="text-lg font-semibold mb-1">${flight.carrierName || 'Авиакомпания'}</h3>
+      <div class="text-sm text-gray-600 mb-1">🛫 ${flight.origin} → 🛬 ${flight.destination}</div>
+      <div class="text-sm text-gray-600 mb-1">⏱️ Вылет: ${flight.departureTime || '—'}</div>
+      <div class="text-sm text-gray-600 mb-1">💶 Цена: ${flight.price || '—'} ${flight.currency || ''}</div>
+      <a href="${flight.deepLink || '#'}" target="_blank" class="btn btn-blue mt-3">Забронировать</a>
+    `;
+
+    container.appendChild(card);
+  });
 });
 
 
