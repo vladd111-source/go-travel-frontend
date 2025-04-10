@@ -418,6 +418,26 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   trackEvent("Поиск мест", { city, category });
 });
 
+
+document.getElementById('search-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const fromCity = document.getElementById('from').value.trim();
+  const toCity = document.getElementById('to').value.trim();
+
+  if (!fromCity || !toCity) return alert('Введите оба города');
+
+  const from = await fetchLocation(fromCity);
+  const to = await fetchLocation(toCity);
+
+  if (!from || !to) return alert('Города не найдены');
+
+  const flights = await fetchFlights(from.code, from.id, to.code, to.id);
+
+  console.log('Рейсы:', flights); // 👉 пока просто лог
+});
+
+
 // ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - window.appStart) / 1000);
