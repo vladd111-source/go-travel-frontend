@@ -285,21 +285,32 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
       hideLoading();
     });
 });
+
 document.getElementById('clearFlights').addEventListener('click', () => {
-  // Очистка полей
+  // Очистка полей формы
   document.getElementById('from').value = '';
   document.getElementById('to').value = '';
   document.getElementById('departureDate').value = '';
   document.getElementById('returnDate').value = '';
   document.getElementById('roundTrip').checked = false;
 
-  // Скрыть поле возврата, если было видно
+  // Скрыть поле возврата
   document.getElementById('returnDateWrapper').classList.add('hidden');
 
   // Очистка результатов
   document.getElementById('hotDeals').innerHTML = '';
-});
 
+  // Очистка из localStorage
+  localStorage.removeItem("lastFrom");
+  localStorage.removeItem("lastTo");
+  localStorage.removeItem("lastDepartureDate");
+
+  // Вернуть автофокус на поле "Откуда"
+  document.getElementById('from').focus();
+
+  // Логирование события (если используется trackEvent)
+  trackEvent?.("Очистка формы рейсов", "Пользователь сбросил поля и кэш");
+});
 
 // ✅ Поиск мест
 const placeCityInput = document.getElementById("placeCity");
