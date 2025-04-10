@@ -58,8 +58,7 @@
 <button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('favorites')">❤️</button>
   </div>
 
-  <!-- ✈️ Авиабилеты -->
- <!-- ✈️ Перелёты -->
+<!-- ✈️ Перелёты -->
 <div id="flights" class="tab block">
   <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
     <input type="text" name="from" id="from" class="input" required data-i18n-placeholder="fromCity" />
@@ -80,6 +79,24 @@
       <input type="checkbox" id="roundTrip" />
       <span data-i18n="roundTrip"></span>
     </label>
+
+    <!-- Кнопки -->
+    <div class="flex flex-col sm:flex-row gap-2">
+      <button type="submit" class="btn btn-blue sm:w-auto" data-i18n="findFlights">Найти билеты</button>
+      <button type="button" id="clearFlights" class="btn btn-red sm:w-auto">Очистить</button>
+    </div>
+  </form>
+
+  <!-- Лоадер -->
+  <div id="flightsLoader" class="flex justify-center my-4 hidden">
+    <div class="loader"></div>
+  </div>
+
+  <!-- Результаты -->
+  <h2 class="text-lg font-semibold mt-6" data-i18n="hotelResults"></h2>
+  <div id="hotDeals" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2"></div>
+</div>
+  
 
     <!-- ✅ Кнопка Найти билеты -->
     <button type="submit" class="btn btn-blue w-full sm:w-auto" data-i18n="findFlights">
