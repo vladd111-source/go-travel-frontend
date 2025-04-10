@@ -1,6 +1,5 @@
-async function fetchLocation(cityName) {
-  const url = `https://skyscanner89.p.rapidapi.com/config/locations?search=${cityName}`;
-
+export async function fetchLocation(query) {
+  const url = `https://skyscanner89.p.rapidapi.com/flights/locations?query=${encodeURIComponent(query)}`;
   const options = {
     method: 'GET',
     headers: {
@@ -11,16 +10,17 @@ async function fetchLocation(cityName) {
 
   try {
     const res = await fetch(url, options);
-    const data = await res.json();
-    console.log(data); // 👈 глянь, что приходит, и выберем нужные поля
-    return data;
+    const json = await res.json();
+    const item = json[0];
+    return item ? { code: item.code, id: item.entityId } : null;
   } catch (err) {
     console.error('Ошибка поиска города:', err);
+    return null;
   }
 }
-export async function fetchLocation(cityName) {
-  const url = `https://skyscanner89.p.rapidapi.com/config/locations?search=${cityName}`;
 
+export async function fetchFlights(fromCode, fromId, toCode, toId) {
+  const url = `https://skyscanner89.p.rapidapi.com/flights/one-way/list?origin=${fromCode}&originId=${fromId}&destination=${toCode}&destinationId=${toId}`;
   const options = {
     method: 'GET',
     headers: {
@@ -31,10 +31,9 @@ export async function fetchLocation(cityName) {
 
   try {
     const res = await fetch(url, options);
-    const data = await res.json();
-    return data?.data?.[0]; // возвращаем первый результат
+    return await res.json();
   } catch (err) {
-    console.error('Ошибка поиска города:', err);
+    console.error('Ошибка загрузки рейсов:', err);
     return null;
   }
 }
