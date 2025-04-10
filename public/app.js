@@ -1,5 +1,5 @@
 // ✅ DOMContentLoaded и инициализация приложения
-import { fetchLocation, fetchFlights } from '../js/api.js';
+import { fetchLocation, fetchFlights } from './api.js';
 document.addEventListener("DOMContentLoaded", () => {
   try {
     // ✅ Telegram init
