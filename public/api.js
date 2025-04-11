@@ -20,16 +20,16 @@ export async function fetchLocation(query) {
     const res = await fetch(url);
     const data = await res.json();
 
-    // Фильтрация по точному совпадению названия города
-    const exactMatch = data.find(item =>
-      item.name.toLowerCase() === query.toLowerCase() &&
+    // 👇 Мягкое совпадение: ищем по вхождению строки
+    const match = data.find(item =>
+      item.name.toLowerCase().includes(query.toLowerCase()) &&
       item.iata
     );
 
-    if (!exactMatch) return null;
+    if (!match) return null;
 
     return {
-      code: exactMatch.iata
+      code: match.iata
     };
   } catch (err) {
     console.error('❌ Ошибка поиска города:', err);
