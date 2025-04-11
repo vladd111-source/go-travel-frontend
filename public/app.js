@@ -1,32 +1,23 @@
-// Получение IATA-кода и ID по названию города
+// Получение IATA-кода по названию города через TravelPayouts (Aviasales)
 export async function fetchLocation(cityName) {
-  const url = `https://skyscanner89.p.rapidapi.com/airports/search?query=${cityName}`;
-
-  const options = {
-    method: 'GET',
-    headers: {
-      'X-RapidAPI-Key': '61654e8ea8msh81fd1f2e412c216p164556jsne7c3bbe401bf',
-      'X-RapidAPI-Host': 'skyscanner89.p.rapidapi.com'
-    }
-  };
+  const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(cityName)}&locale=en&types[]=city`;
 
   try {
-    const res = await fetch(url, options);
+    const res = await fetch(url);
     const data = await res.json();
-    const firstMatch = data?.[0];
+
+    const firstMatch = data?.find(item => item.iata);
 
     if (!firstMatch) return null;
 
     return {
-      code: firstMatch.iataCode,
-      id: firstMatch.entityId
+      code: firstMatch.iata
     };
   } catch (err) {
-    console.error('Ошибка поиска города:', err);
+    console.error('Ошибка получения IATA-кода города:', err);
     return null;
   }
 }
-
 // Получение рейсов
 export async function fetchFlights(fromCode, fromId, toCode, toId) {
   const url = `https://skyscanner89.p.rapidapi.com/flights/one-way/list?origin=${fromCode}&originId=${fromId}&destination=${toCode}&destinationId=${toId}`;
@@ -508,7 +499,7 @@ document.getElementById('search-form').addEventListener('submit', async (e) => {
 
   if (!from || !to) return alert('Города не найдены');
 
-  const flights = await fetchFlights(from.code, from.id, to.code, to.id);
+  const flights = await fetchAviasalesFlights(from.code, to.code, departureDate);
   console.log('Рейсы:', flights); // 👉 лог до отрисовки
 
   const container = document.getElementById('hotDeals');
