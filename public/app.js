@@ -525,8 +525,10 @@ document.getElementById('search-form').addEventListener('submit', async (e) => {
   });
 });
 // ВНИЗУ app.js
-import { fetchLocation, fetchFlights } from './api.js';
+import { fetchLocation, fetchAviasalesFlights } from './api.js';
+// добавь прямо под этим:
 window.fetchLocation = fetchLocation;
+window.fetchAviasalesFlights = fetchAviasalesFlights;
 
 // ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
