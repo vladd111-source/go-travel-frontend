@@ -263,9 +263,6 @@ if (fromInput && toInput && departureInput) {
   fromInput.setAttribute("autofocus", "autofocus");
 }
 
-import { fetchLocation, fetchAviasalesFlights } from './api.js';
-import { renderFlights } from './render.js'; // если ты вынес renderFlights в отдельный файл
-
 // ✅ Обработка отправки формы
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -512,6 +509,8 @@ renderFlights(flights);
     container.appendChild(card);
   });
 });
+import { fetchLocation, fetchAviasalesFlights } from './api.js';
+import { renderFlights } from './render.js'; // если ты вынес renderFlights в отдельный файл
 // добавь прямо под этим:
 window.fetchLocation = fetchLocation;
 window.fetchAviasalesFlights = fetchAviasalesFlights;
