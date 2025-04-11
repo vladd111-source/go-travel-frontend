@@ -25,16 +25,24 @@ export async function fetchLocation(query) {
 
     console.log("📦 Ответ от API:", data);
 
-    const match = data.find(item =>
+    // 1. Ищем точное совпадение
+    let match = data.find(item =>
       normalize(item.name) === normalize(query) && item.iata
     );
+
+    // 2. Если не найдено — ищем по вхождению
+    if (!match) {
+      match = data.find(item =>
+        normalize(item.name).includes(normalize(query)) && item.iata
+      );
+    }
 
     if (!match) {
       console.warn("❌ Город не найден:", query);
       return null;
     }
 
-    console.log("✅ Найден город:", match.name, "—", match.iata);
+    console.log(`✅ Найден город: ${match.name} (${match.iata})`);
     return {
       code: match.iata
     };
