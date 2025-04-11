@@ -525,7 +525,9 @@ document.getElementById('search-form').addEventListener('submit', async (e) => {
     container.appendChild(card);
   });
 });
-
+// ВНИЗУ app.js
+import { fetchLocation } from './api.js';
+window.fetchLocation = fetchLocation;
 
 // ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
