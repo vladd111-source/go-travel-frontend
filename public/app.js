@@ -1,3 +1,8 @@
+import { fetchLocation, fetchAviasalesFlights } from './api.js';
+import { renderFlights } from './render.js'; // если ты вынес renderFlights в отдельный файл
+// добавь прямо под этим:
+window.fetchLocation = fetchLocation;
+window.fetchAviasalesFlights = fetchAviasalesFlights;
 // Получение IATA-кода по названию города через TravelPayouts (Aviasales)
 export async function fetchLocation(cityName) {
   const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(cityName)}&locale=en&types[]=city`;
@@ -509,11 +514,6 @@ renderFlights(flights);
     container.appendChild(card);
   });
 });
-import { fetchLocation, fetchAviasalesFlights } from './api.js';
-import { renderFlights } from './render.js'; // если ты вынес renderFlights в отдельный файл
-// добавь прямо под этим:
-window.fetchLocation = fetchLocation;
-window.fetchAviasalesFlights = fetchAviasalesFlights;
 
 function renderFlights(flights) {
   const container = document.getElementById("hotDeals");
