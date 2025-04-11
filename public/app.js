@@ -261,12 +261,17 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     const fromLoc = await fetchLocation(from);
     const toLoc = await fetchLocation(to);
 
-    if (!fromLoc || !toLoc) {
+    console.log("📍 fromLoc:", fromLoc);
+    console.log("📍 toLoc:", toLoc);
+
+    if (!fromLoc || !toLoc || !fromLoc.code || !toLoc.code) {
       alert("Города не найдены.");
       return;
     }
 
     const flights = await fetchAviasalesFlights(fromLoc.code, toLoc.code, departureDate);
+    console.log("✈️ Найдено рейсов:", flights);
+    
     renderFlights(flights);
 
     if (flights.length) {
