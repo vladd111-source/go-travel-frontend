@@ -263,67 +263,66 @@ if (fromInput && toInput && departureInput) {
   fromInput.setAttribute("autofocus", "autofocus");
 }
 
-document.getElementById("search-form")?.addEventListener("submit", (e) => {
+import { fetchLocation, fetchAviasalesFlights } from './api.js';
+import { renderFlights } from './render.js'; // если ты вынес renderFlights в отдельный файл
+
+// ✅ DOM элементы
+const fromInput = document.getElementById("from");
+const toInput = document.getElementById("to");
+const departureInput = document.getElementById("departureDate");
+
+// ✅ Подстановка из localStorage
+if (fromInput && toInput && departureInput) {
+  fromInput.value = localStorage.getItem("lastFrom") || "";
+  toInput.value = localStorage.getItem("lastTo") || "";
+  departureInput.value = localStorage.getItem("lastDepartureDate") || "";
+}
+
+// ✅ Обработка отправки формы
+document.getElementById("search-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const from = fromInput.value.trim();
   const to = toInput.value.trim();
   const departureDate = departureInput.value;
 
+  if (!from || !to || !departureDate) {
+    alert("Пожалуйста, заполните все поля.");
+    return;
+  }
+
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
 
-  showLoading();
+  showLoading(); // функция для показа лоадера
 
-  fetch("https://go-travel-backend.vercel.app/api/flights")
-    .then(res => res.json())
-    .then(flights => {
-      const match = flights.find(f =>
-        f.from.toLowerCase() === from.toLowerCase() &&
-        f.to.toLowerCase() === to.toLowerCase()
-      );
+  try {
+    const fromLoc = await fetchLocation(from);
+    const toLoc = await fetchLocation(to);
 
-      const hotDeals = document.getElementById("hotDeals");
-      hotDeals.innerHTML = flights.map(deal => {
-        const isFav = JSON.parse(localStorage.getItem("favorites_flights") || "[]")
-          .some(f => f.from === deal.from && f.to === deal.to && f.date === deal.date && f.price === deal.price);
-        const dealId = `${deal.from}-${deal.to}-${deal.date}-${deal.price}`;
-        return `
-          <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
-            <strong>${deal.from} → ${deal.to}</strong><br>
-            Дата: ${deal.date}<br>
-            Цена: $${deal.price}
-            <div class="flex justify-between items-center mt-2">
-              <button class="btn w-full" onclick="bookHotel('${deal.from}', '${deal.to}', ${deal.price}, '${deal.date}')">Забронировать</button>
-              <button onclick="toggleFavoriteFlight('${dealId}', this)" class="text-xl ml-3" data-flight-id="${dealId}">
-                ${isFav ? "💙" : "🤍"}
-              </button>
-            </div>
-          </div>
-        `;
-      }).join("");
+    if (!fromLoc || !toLoc) {
+      alert("Города не найдены.");
+      return;
+    }
 
-      updateHearts("places");
-      animateCards("#hotDeals .card");
+    const flights = await fetchAviasalesFlights(fromLoc.code, toLoc.code, departureDate);
+    renderFlights(flights); // отрисовка карточек
 
-      if (match) {
-        const msg = `✈️ Нашли рейс\n🛫 ${match.from} → 🛬 ${match.to}\n📅 ${match.date}\n💰 $${match.price}`;
-        Telegram.WebApp.sendData?.(msg);
-        trackEvent("Поиск рейса", msg);
-      } else {
-        Telegram.WebApp.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
-        trackEvent("Поиск рейса", `Не найдено: ${from} → ${to}, ${departureDate}`);
-      }
-    })
-    .catch(err => {
-      console.error("❌ Ошибка запроса рейсов:", err);
-      Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
-      trackEvent("Ошибка загрузки рейсов", err.message);
-    })
-    .finally(() => {
-      hideLoading();
-    });
+    if (flights.length) {
+      Telegram.WebApp.sendData?.(`✈️ Найдены рейсы: ${from} → ${to}`);
+      trackEvent("Поиск рейсов", `${from} → ${to}, ${departureDate}`);
+    } else {
+      Telegram.WebApp.sendData?.("😢 Рейсы не найдены.");
+      trackEvent("Поиск рейсов", `Не найдено: ${from} → ${to}, ${departureDate}`);
+    }
+  } catch (err) {
+    console.error("❌ Ошибка при поиске рейсов:", err);
+    Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
+    trackEvent("Ошибка загрузки рейсов", err.message);
+  } finally {
+    hideLoading(); // функция для скрытия лоадера
+  }
 });
 
 document.getElementById('clearFlights').addEventListener('click', () => {
@@ -498,7 +497,8 @@ document.getElementById('search-form').addEventListener('submit', async (e) => {
 
   if (!from || !to) return alert('Города не найдены');
 
-  const flights = await fetchAviasalesFlights(from.code, to.code, departureDate);
+ const flights = await fetchAviasalesFlights(from.code, to.code, departureDate);
+renderFlights(flights);
   console.log('Рейсы:', flights); // 👉 лог до отрисовки
 
   const container = document.getElementById('hotDeals');
