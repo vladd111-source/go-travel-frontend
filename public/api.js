@@ -12,10 +12,10 @@ export async function fetchAviasalesFlights(from, to, date) {
   }
 }
 
-// ✅ Поиск города по названию через Skyscanner API (если ты всё ещё используешь)
+// ✅ Поиск города по названию через Skyscanner API
 export async function fetchLocation(query) {
   const url = `https://skyscanner89.p.rapidapi.com/airports/search?query=${encodeURIComponent(query)}`;
-  
+
   const options = {
     method: 'GET',
     headers: {
@@ -44,6 +44,7 @@ export async function fetchLocation(query) {
 // ✅ Альтернатива — прямой поиск рейсов через Skyscanner
 export async function fetchFlights(fromCode, fromId, toCode, toId) {
   const url = `https://skyscanner89.p.rapidapi.com/flights/one-way/list?origin=${fromCode}&originId=${fromId}&destination=${toCode}&destinationId=${toId}`;
+
   const options = {
     method: 'GET',
     headers: {
