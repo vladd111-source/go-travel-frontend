@@ -12,19 +12,21 @@ export async function fetchAviasalesFlights(from, to, date) {
   }
 }
 
+// ✅ Устойчивый поиск города по названию через Aviasales (TravelPayouts) API
 export async function fetchLocation(query) {
   const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(query)}&locale=en&types[]=city`;
+
+  const normalize = (s) => s.trim().toLowerCase();
 
   try {
     console.log("🔍 Запрос города:", query);
     const res = await fetch(url);
     const data = await res.json();
 
-    console.log("📦 Ответ от API:", data); // лог полного ответа
+    console.log("📦 Ответ от API:", data);
 
     const match = data.find(item =>
-      item.name.toLowerCase().includes(query.toLowerCase()) &&
-      item.iata
+      normalize(item.name) === normalize(query) && item.iata
     );
 
     if (!match) {
