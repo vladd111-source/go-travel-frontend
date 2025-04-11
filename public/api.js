@@ -12,31 +12,22 @@ export async function fetchAviasalesFlights(from, to, date) {
   }
 }
 
-// ✅ Поиск города по названию через Skyscanner API
+// ✅ Поиск города по названию через Aviasales (TravelPayouts) API
 export async function fetchLocation(query) {
-  const url = `https://skyscanner89.p.rapidapi.com/airports/search?query=${encodeURIComponent(query)}`;
-
-  const options = {
-    method: 'GET',
-    headers: {
-      'X-RapidAPI-Key': '61654e8ea8msh81fd1f2e412c216p164556jsne7c3bbe401bf',
-      'X-RapidAPI-Host': 'skyscanner89.p.rapidapi.com'
-    }
-  };
+  const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(query)}&locale=en&types[]=city`;
 
   try {
-    const res = await fetch(url, options);
+    const res = await fetch(url);
     const data = await res.json();
-    const firstMatch = data?.[0];
+    const firstMatch = data?.find(item => item.iata);
 
     if (!firstMatch) return null;
 
     return {
-      code: firstMatch.iataCode,
-      id: firstMatch.entityId
+      code: firstMatch.iata
     };
   } catch (err) {
-    console.error('Ошибка поиска города:', err);
+    console.error('❌ Ошибка поиска города:', err);
     return null;
   }
 }
