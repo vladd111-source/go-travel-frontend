@@ -266,18 +266,6 @@ if (fromInput && toInput && departureInput) {
 import { fetchLocation, fetchAviasalesFlights } from './api.js';
 import { renderFlights } from './render.js'; // если ты вынес renderFlights в отдельный файл
 
-// ✅ DOM элементы
-const fromInput = document.getElementById("from");
-const toInput = document.getElementById("to");
-const departureInput = document.getElementById("departureDate");
-
-// ✅ Подстановка из localStorage
-if (fromInput && toInput && departureInput) {
-  fromInput.value = localStorage.getItem("lastFrom") || "";
-  toInput.value = localStorage.getItem("lastTo") || "";
-  departureInput.value = localStorage.getItem("lastDepartureDate") || "";
-}
-
 // ✅ Обработка отправки формы
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
