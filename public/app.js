@@ -512,8 +512,6 @@ renderFlights(flights);
     container.appendChild(card);
   });
 });
-// ВНИЗУ app.js
-import { fetchLocation, fetchAviasalesFlights } from './api.js';
 // добавь прямо под этим:
 window.fetchLocation = fetchLocation;
 window.fetchAviasalesFlights = fetchAviasalesFlights;
