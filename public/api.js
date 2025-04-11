@@ -1,13 +1,13 @@
-// ✅ Получение билетов через Aviasales API
+// ✅ Получение билетов через собственный backend (обход CORS)
 export async function fetchAviasalesFlights(from, to, date) {
-  const url = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${from}&destination=${to}&departure_at=${date}&currency=usd&token=067df6a5f1de28c8a898bc83744dfdcd`;
+  const url = `https://go-travel-backend.vercel.app/api/flights?from=${from}&to=${to}&date=${date}`;
 
   try {
     const res = await fetch(url);
     const data = await res.json();
-    return data.data || [];
+    return data || [];
   } catch (err) {
-    console.error("Ошибка загрузки рейсов от Aviasales:", err);
+    console.error("❌ Ошибка загрузки рейсов с backend:", err);
     return [];
   }
 }
