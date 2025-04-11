@@ -16,7 +16,8 @@ export async function fetchAviasalesFlights(from, to, date) {
 export async function fetchLocation(query) {
   const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(query)}&locale=en&types[]=city`;
 
-  const normalize = (s) => s.trim().toLowerCase();
+  const normalize = (s) => (s || "").trim().toLowerCase();
+  const normQuery = normalize(query);
 
   try {
     console.log("🔍 Запрос города:", query);
@@ -25,15 +26,19 @@ export async function fetchLocation(query) {
 
     console.log("📦 Ответ от API:", data);
 
-    // 1. Ищем точное совпадение
+    // 1. Ищем точное совпадение по name/code
     let match = data.find(item =>
-      normalize(item.name) === normalize(query) && item.iata
+      (normalize(item.name) === normQuery || normalize(item.code) === normQuery) &&
+      item.code
     );
 
-    // 2. Если не найдено — ищем по вхождению
+    // 2. Если не найдено — ищем по вхождению в name, city_name, code
     if (!match) {
       match = data.find(item =>
-        normalize(item.name).includes(normalize(query)) && item.iata
+        (normalize(item.name).includes(normQuery) ||
+         normalize(item.city_name)?.includes(normQuery) ||
+         normalize(item.code) === normQuery) &&
+        item.code
       );
     }
 
@@ -42,9 +47,9 @@ export async function fetchLocation(query) {
       return null;
     }
 
-    console.log(`✅ Найден город: ${match.name} (${match.iata})`);
+    console.log(`✅ Найден город: ${match.name || match.city_name} (${match.code})`);
     return {
-      code: match.iata
+      code: match.code
     };
   } catch (err) {
     console.error('❌ Ошибка поиска города:', err);
