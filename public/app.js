@@ -40,7 +40,6 @@ export async function fetchFlights(fromCode, fromId, toCode, toId) {
   }
 }
 // ✅ DOMContentLoaded и инициализация приложения
-import { fetchLocation, fetchFlights } from './api.js';
 document.addEventListener("DOMContentLoaded", () => {
   try {
     // ✅ Telegram init
@@ -526,7 +525,7 @@ document.getElementById('search-form').addEventListener('submit', async (e) => {
   });
 });
 // ВНИЗУ app.js
-import { fetchLocation } from './api.js';
+import { fetchLocation, fetchFlights } from './api.js';
 window.fetchLocation = fetchLocation;
 
 // ✅ Сохранение длительности сессии
