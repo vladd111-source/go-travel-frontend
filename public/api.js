@@ -19,12 +19,17 @@ export async function fetchLocation(query) {
   try {
     const res = await fetch(url);
     const data = await res.json();
-    const firstMatch = data?.find(item => item.iata);
 
-    if (!firstMatch) return null;
+    // Фильтрация по точному совпадению названия города
+    const exactMatch = data.find(item =>
+      item.name.toLowerCase() === query.toLowerCase() &&
+      item.iata
+    );
+
+    if (!exactMatch) return null;
 
     return {
-      code: firstMatch.iata
+      code: exactMatch.iata
     };
   } catch (err) {
     console.error('❌ Ошибка поиска города:', err);
