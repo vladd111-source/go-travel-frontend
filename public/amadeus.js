@@ -1,7 +1,20 @@
+// 🔤 Транслитерация с кириллицы на латиницу
+function transliterate(text) {
+  const map = {
+    А: "A", Б: "B", В: "V", Г: "G", Д: "D", Е: "E", Ё: "E", Ж: "Zh", З: "Z", И: "I", Й: "Y",
+    К: "K", Л: "L", М: "M", Н: "N", О: "O", П: "P", Р: "R", С: "S", Т: "T", У: "U", Ф: "F",
+    Х: "Kh", Ц: "Ts", Ч: "Ch", Ш: "Sh", Щ: "Shch", Ъ: "", Ы: "Y", Ь: "", Э: "E", Ю: "Yu", Я: "Ya",
+    а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z", и: "i", й: "y",
+    к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f",
+    х: "kh", ц: "ts", ч: "ch", ш: "sh", щ: "shch", ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya"
+  };
+  return text.split('').map(char => map[char] || char).join('');
+}
+
 // 🔐 Получение токена доступа от Amadeus
 export async function getAmadeusToken() {
-  const clientId = "10UMyGcxHVsK1sK8x1U8MCqgR7g1LuDo"; // 👉 замени на свой при необходимости
-  const clientSecret = "0bXLQrqxEAyFjdkx"; // 👉 замени на свой при необходимости
+  const clientId = "10UMyGcxHVsK1sK8x1U8MCqgR7g1LuDo"; // 👉 замени на свой
+  const clientSecret = "0bXLQrqxEAyFjdkx";              // 👉 замени на свой
 
   const response = await fetch("https://test.api.amadeus.com/v1/security/oauth2/token", {
     method: "POST",
@@ -22,12 +35,14 @@ export async function getAmadeusToken() {
 // 🌍 Поиск IATA-кода по названию города (на любом языке)
 export async function fetchCityIATA(cityName) {
   const token = await getAmadeusToken();
+  const translitCity = transliterate(cityName); // ⚠️ ключевая правка
+
   const response = await fetch(
-    `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(cityName)}&subType=CITY`,
+    `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(translitCity)}&subType=CITY`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Accept-Language": "ru" // ✅ Ключевая правка — поддержка русского языка
+        "Accept-Language": "ru"
       }
     }
   );
