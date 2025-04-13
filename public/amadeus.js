@@ -1,6 +1,7 @@
+// 🔐 Получение токена доступа от Amadeus
 export async function getAmadeusToken() {
-  const clientId = "10UMyGcxHVsK1sK8x1U8MCqgR7g1LuDo"; // замени на свой
-  const clientSecret = "0bXLQrqxEAyFjdkx"; // замени на свой
+  const clientId = "10UMyGcxHVsK1sK8x1U8MCqgR7g1LuDo"; // 👉 замени на свой при необходимости
+  const clientSecret = "0bXLQrqxEAyFjdkx"; // 👉 замени на свой при необходимости
 
   const response = await fetch("https://test.api.amadeus.com/v1/security/oauth2/token", {
     method: "POST",
@@ -18,18 +19,25 @@ export async function getAmadeusToken() {
   return data.access_token;
 }
 
-// ✅ Поиск IATA-кода по названию города (на любом языке)
+// 🌍 Поиск IATA-кода по названию города (на любом языке)
 export async function fetchCityIATA(cityName) {
   const token = await getAmadeusToken();
-  const response = await fetch(`https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(cityName)}&subType=CITY`, {
-    headers: {
-      Authorization: `Bearer ${token}`
+  const response = await fetch(
+    `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(cityName)}&subType=CITY`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     }
-  });
+  );
 
   const data = await response.json();
   const first = data?.data?.[0];
-  if (!first) return null;
+
+  if (!first) {
+    console.warn("⚠️ Город не найден в Amadeus:", cityName);
+    return null;
+  }
 
   return {
     code: first.iataCode,
@@ -37,10 +45,11 @@ export async function fetchCityIATA(cityName) {
   };
 }
 
-// ✅ Поиск рейсов через Amadeus API
+// ✈️ Поиск рейсов через Amadeus API
 export async function fetchAmadeusFlights(from, to, date) {
   const token = await getAmadeusToken();
-  const response = await fetch(`https://test.api.amadeus.com/v2/shopping/flight-offers`, {
+
+  const response = await fetch("https://test.api.amadeus.com/v2/shopping/flight-offers", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -58,7 +67,10 @@ export async function fetchAmadeusFlights(from, to, date) {
 
   const data = await response.json();
 
-  if (!data?.data) return [];
+  if (!data?.data?.length) {
+    console.warn("⚠️ Рейсы не найдены в Amadeus");
+    return [];
+  }
 
   return data.data.map(offer => ({
     from,
