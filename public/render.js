@@ -25,7 +25,7 @@ export function renderFlights(flights) {
 
   flights.forEach(flight => {
     const card = document.createElement("div");
-    card.className = "card";
+    card.className = "card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300";
 
     const departureDate = flight.departure_at?.split("T")[0] || "—";
     const link = generateAviasalesLink(flight);
