@@ -26,7 +26,8 @@ export async function fetchCityIATA(cityName) {
     `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(cityName)}&subType=CITY`,
     {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        "Accept-Language": "ru" // ✅ Ключевая правка — поддержка русского языка
       }
     }
   );
