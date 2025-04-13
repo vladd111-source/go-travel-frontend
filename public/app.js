@@ -239,8 +239,6 @@ if (fromInput && toInput && departureInput) {
   fromInput.setAttribute("autofocus", "autofocus");
 }
 
-import { getAmadeusToken, fetchCityIATA, fetchAmadeusFlights } from "./amadeus.js"; // убедись в пути
-
 // ─── Обработка формы поиска рейсов ──────────────────────────────
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
