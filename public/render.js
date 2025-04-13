@@ -1,12 +1,12 @@
 // render.js
 
 /**
- * Генерирует ссылку на бронирование в Aviasales
- * @param {Object} flight - Объект рейса с origin, destination и departure_at
- * @returns {string} - URL для перехода к бронированию
+ * Генерирует deeplink для бронирования на Aviasales.
+ * @param {Object} flight - Объект рейса
+ * @returns {string} - Ссылка на Aviasales
  */
-function generateAviasalesLink(flight) {
-  const datePart = flight.departure_at?.split("T")[0]?.replace(/-/g, "") || "";
+export function generateAviasalesLink(flight) {
+  const datePart = flight.departure_at.split("T")[0].replace(/-/g, "");
   return `https://www.aviasales.com/search/${flight.origin}${datePart}${flight.destination}1`;
 }
 
@@ -36,6 +36,62 @@ export function renderFlights(flights) {
       <div class="text-sm text-gray-600 mb-1">📅 ${departureDate}</div>
       <div class="text-sm text-gray-600 mb-1">💰 $${flight.price}</div>
       <a href="${link}" target="_blank" class="btn btn-blue mt-3">Перейти к бронированию</a>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+/**
+ * Отрисовывает список отелей.
+ * @param {Array} hotels - Массив отелей
+ */
+export function renderHotels(hotels) {
+  const container = document.getElementById("hotelsResult");
+  container.innerHTML = "";
+
+  if (!hotels || !hotels.length) {
+    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены</div>`;
+    return;
+  }
+
+  hotels.forEach(hotel => {
+    const card = document.createElement("div");
+    card.className = "card bg-white p-4 rounded-xl shadow mb-4";
+
+    card.innerHTML = `
+      <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
+      <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
+      <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price}</p>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+/**
+ * Отрисовывает список достопримечательностей.
+ * @param {Array} places - Массив мест
+ */
+export function renderPlaces(places) {
+  const container = document.getElementById("placesResult");
+  container.innerHTML = "";
+
+  if (!places || !places.length) {
+    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Ничего не найдено</div>`;
+    return;
+  }
+
+  places.forEach(place => {
+    const card = document.createElement("div");
+    card.className = "card bg-white p-4 rounded-xl shadow mb-4";
+
+    card.innerHTML = `
+      <h3 class="text-lg font-semibold mb-1">${place.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">📍 ${place.city}</p>
+      <p class="text-sm text-gray-600 mb-1">🗂️ Категория: ${place.category}</p>
+      <p class="text-sm text-gray-600 mb-1">📝 ${place.description}</p>
     `;
 
     container.appendChild(card);
