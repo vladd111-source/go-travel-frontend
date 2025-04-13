@@ -11,6 +11,16 @@ function transliterate(text) {
   return text.split('').map(char => map[char] || char).join('');
 }
 
+// 🧠 Ручной маппинг для нестандартных названий
+const manualMap = {
+  "Прага": "Prague",
+  "Варшава": "Warsaw",
+  "Киев": "Kyiv",
+  "Мюнхен": "Munich",
+  "Копенгаген": "Copenhagen",
+  "Неаполь": "Naples"
+};
+
 // 🔐 Получение токена доступа от Amadeus
 export async function getAmadeusToken() {
   const clientId = "10UMyGcxHVsK1sK8x1U8MCqgR7g1LuDo"; // 👉 замени на свой
@@ -35,7 +45,9 @@ export async function getAmadeusToken() {
 // 🌍 Поиск IATA-кода по названию города (на любом языке)
 export async function fetchCityIATA(cityName) {
   const token = await getAmadeusToken();
-  const translitCity = transliterate(cityName); // ⚠️ ключевая правка
+
+  const mapped = manualMap[cityName] || cityName;
+  const translitCity = transliterate(mapped);
 
   const response = await fetch(
     `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(translitCity)}&subType=CITY`,
