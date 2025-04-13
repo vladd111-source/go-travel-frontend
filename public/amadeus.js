@@ -17,3 +17,54 @@ export async function getAmadeusToken() {
   const data = await response.json();
   return data.access_token;
 }
+
+// ✅ Поиск IATA-кода по названию города (на любом языке)
+export async function fetchCityIATA(cityName) {
+  const token = await getAmadeusToken();
+  const response = await fetch(`https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(cityName)}&subType=CITY`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const data = await response.json();
+  const first = data?.data?.[0];
+  if (!first) return null;
+
+  return {
+    code: first.iataCode,
+    name: first.name
+  };
+}
+
+// ✅ Поиск рейсов через Amadeus API
+export async function fetchAmadeusFlights(from, to, date) {
+  const token = await getAmadeusToken();
+  const response = await fetch(`https://test.api.amadeus.com/v2/shopping/flight-offers`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      currencyCode: "USD",
+      originLocationCode: from,
+      destinationLocationCode: to,
+      departureDate: date,
+      adults: 1,
+      max: 5
+    })
+  });
+
+  const data = await response.json();
+
+  if (!data?.data) return [];
+
+  return data.data.map(offer => ({
+    from,
+    to,
+    date,
+    airline: offer.validatingAirlineCodes?.[0] || "—",
+    price: offer.price?.total || "—"
+  }));
+}
