@@ -238,6 +238,8 @@ if (fromInput && toInput && departureInput) {
   fromInput.setAttribute("autofocus", "autofocus");
 }
 
+import { getAmadeusToken, fetchCityIATA, fetchAmadeusFlights } from "./amadeus.js"; // убедись в пути
+
 // ─── Обработка формы поиска рейсов ──────────────────────────────
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -263,30 +265,30 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   showLoading();
 
   try {
-    // ─── Получаем IATA-коды городов ─────────────────────────────
-    const fromLoc = await fetchLocation(from);
-    const toLoc = await fetchLocation(to);
+    // 🔐 Получаем access token для Amadeus
+    const token = await getAmadeusToken();
 
-    console.log("📍 fromLoc:", fromLoc);
-    console.log("📍 toLoc:", toLoc);
+    // 🔍 Ищем IATA-коды по названиям городов
+    const fromCode = await fetchCityIATA(from, token);
+    const toCode = await fetchCityIATA(to, token);
 
-    if (!fromLoc?.code || !toLoc?.code) {
+    console.log("📍 IATA:", fromCode, toCode);
+
+    if (!fromCode || !toCode) {
       alert("Города не найдены.");
       return;
     }
 
-    // ─── Запрос рейсов туда ─────────────────────────────────────
-    const departureFlights = await fetchAviasalesFlights(fromLoc.code, toLoc.code, departureDate);
+    // ✈️ Запрашиваем рейсы туда
+    const departureFlights = await fetchAmadeusFlights(fromCode, toCode, departureDate, token);
     console.log("🛫 Найдено рейсов туда:", departureFlights);
 
-    // ─── Если выбрано туда-обратно, запрашиваем обратные рейсы ─
     let returnFlights = [];
     if (isRoundTrip) {
-      returnFlights = await fetchAviasalesFlights(toLoc.code, fromLoc.code, returnDate);
+      returnFlights = await fetchAmadeusFlights(toCode, fromCode, returnDate, token);
       console.log("🛬 Найдено рейсов обратно:", returnFlights);
     }
 
-    // ─── Отрисовка результатов ─────────────────────────────────
     const container = document.getElementById("hotDeals");
     container.innerHTML = "";
 
@@ -306,7 +308,6 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
       renderFlights(returnFlights);
     }
 
-    // ─── Проверка результатов ──────────────────────────────────
     if (!departureFlights?.length && (!isRoundTrip || !returnFlights?.length)) {
       container.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
       Telegram.WebApp.sendData?.("😢 Рейсы не найдены.");
@@ -314,7 +315,6 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
       Telegram.WebApp.sendData?.(`✈️ Найдены рейсы: ${from} → ${to}${isRoundTrip ? " и обратно" : ""}`);
     }
 
-    // ─── Отправка события в аналитику ───────────────────────────
     trackEvent("Поиск рейсов", {
       from,
       to,
@@ -347,6 +347,7 @@ document.getElementById('clearFlights')?.addEventListener('click', () => {
   localStorage.removeItem("lastFrom");
   localStorage.removeItem("lastTo");
   localStorage.removeItem("lastDepartureDate");
+  localStorage.removeItem("lastReturnDate");
 
   fromInput.focus();
 
