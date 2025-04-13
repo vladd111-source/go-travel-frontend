@@ -1,6 +1,16 @@
 // render.js
 
 /**
+ * Генерирует ссылку на бронирование в Aviasales
+ * @param {Object} flight - Объект рейса с origin, destination и departure_at
+ * @returns {string} - URL для перехода к бронированию
+ */
+function generateAviasalesLink(flight) {
+  const datePart = flight.departure_at?.split("T")[0]?.replace(/-/g, "") || "";
+  return `https://www.aviasales.com/search/${flight.origin}${datePart}${flight.destination}1`;
+}
+
+/**
  * Отрисовывает список рейсов на странице.
  * @param {Array} flights - Массив рейсов от Aviasales API
  */
@@ -18,7 +28,7 @@ export function renderFlights(flights) {
     card.className = "card";
 
     const departureDate = flight.departure_at?.split("T")[0] || "—";
-    const link = `https://www.aviasales.com/search/${flight.origin}${departureDate.replace(/-/g, '')}${flight.destination}1`;
+    const link = generateAviasalesLink(flight);
 
     card.innerHTML = `
       <h3 class="text-lg font-semibold mb-1">${flight.airline || "Авиакомпания"}</h3>
