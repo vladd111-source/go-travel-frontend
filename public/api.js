@@ -5,7 +5,17 @@ export async function fetchAviasalesFlights(from, to, date) {
   try {
     const res = await fetch(url);
     const data = await res.json();
-    return data || [];
+
+    console.log("📦 Ответ от backend:", data);
+
+    // Если пришёл объект — преобразуем в массив
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && typeof data === "object") {
+      return Object.values(data);
+    } else {
+      return [];
+    }
   } catch (err) {
     console.error("❌ Ошибка загрузки рейсов с backend:", err);
     return [];
