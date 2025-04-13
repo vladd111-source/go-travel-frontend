@@ -245,42 +245,85 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   const from = fromInput.value.trim();
   const to = toInput.value.trim();
   const departureDate = departureInput.value;
+  const isRoundTrip = document.getElementById("roundTrip").checked;
+  const returnDate = document.getElementById("returnDate")?.value;
 
-  if (!from || !to || !departureDate) {
+  // ─── Проверка на заполнение обязательных полей ────────────────
+  if (!from || !to || !departureDate || (isRoundTrip && !returnDate)) {
     alert("Пожалуйста, заполните все поля.");
     return;
   }
 
+  // ─── Сохраняем значения в localStorage ────────────────────────
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
+  if (isRoundTrip) localStorage.setItem("lastReturnDate", returnDate);
 
   showLoading();
 
   try {
+    // ─── Получаем IATA-коды городов ─────────────────────────────
     const fromLoc = await fetchLocation(from);
     const toLoc = await fetchLocation(to);
 
     console.log("📍 fromLoc:", fromLoc);
     console.log("📍 toLoc:", toLoc);
 
-    if (!fromLoc || !toLoc || !fromLoc.code || !toLoc.code) {
+    if (!fromLoc?.code || !toLoc?.code) {
       alert("Города не найдены.");
       return;
     }
 
-    const flights = await fetchAviasalesFlights(fromLoc.code, toLoc.code, departureDate);
-    console.log("✈️ Найдено рейсов:", flights);
-    
-    renderFlights(flights);
+    // ─── Запрос рейсов туда ─────────────────────────────────────
+    const departureFlights = await fetchAviasalesFlights(fromLoc.code, toLoc.code, departureDate);
+    console.log("🛫 Найдено рейсов туда:", departureFlights);
 
-    if (flights.length) {
-      Telegram.WebApp.sendData?.(`✈️ Найдены рейсы: ${from} → ${to}`);
-      trackEvent("Поиск рейсов", `${from} → ${to}, ${departureDate}`);
-    } else {
-      Telegram.WebApp.sendData?.("😢 Рейсы не найдены.");
-      trackEvent("Поиск рейсов", `Не найдено: ${from} → ${to}, ${departureDate}`);
+    // ─── Если выбрано туда-обратно, запрашиваем обратные рейсы ─
+    let returnFlights = [];
+    if (isRoundTrip) {
+      returnFlights = await fetchAviasalesFlights(toLoc.code, fromLoc.code, returnDate);
+      console.log("🛬 Найдено рейсов обратно:", returnFlights);
     }
+
+    // ─── Отрисовка результатов ─────────────────────────────────
+    const container = document.getElementById("hotDeals");
+    container.innerHTML = "";
+
+    if (departureFlights?.length) {
+      const title = document.createElement("h3");
+      title.textContent = "Рейсы туда:";
+      title.className = "text-lg font-semibold mb-2 mt-4";
+      container.appendChild(title);
+      renderFlights(departureFlights);
+    }
+
+    if (isRoundTrip && returnFlights?.length) {
+      const titleBack = document.createElement("h3");
+      titleBack.textContent = "Рейсы обратно:";
+      titleBack.className = "text-lg font-semibold mb-2 mt-4";
+      container.appendChild(titleBack);
+      renderFlights(returnFlights);
+    }
+
+    // ─── Проверка результатов ──────────────────────────────────
+    if (!departureFlights?.length && (!isRoundTrip || !returnFlights?.length)) {
+      container.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
+      Telegram.WebApp.sendData?.("😢 Рейсы не найдены.");
+    } else {
+      Telegram.WebApp.sendData?.(`✈️ Найдены рейсы: ${from} → ${to}${isRoundTrip ? " и обратно" : ""}`);
+    }
+
+    // ─── Отправка события в аналитику ───────────────────────────
+    trackEvent("Поиск рейсов", {
+      from,
+      to,
+      departureDate,
+      returnDate: isRoundTrip ? returnDate : null,
+      isRoundTrip,
+      count: (departureFlights.length || 0) + (returnFlights.length || 0)
+    });
+
   } catch (err) {
     console.error("❌ Ошибка при поиске рейсов:", err);
     Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
