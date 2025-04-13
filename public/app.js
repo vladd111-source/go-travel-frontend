@@ -1,3 +1,4 @@
+import { getAmadeusToken, fetchCityIATA, fetchAmadeusFlights } from './amadeus.js';
 import { fetchLocation, fetchAviasalesFlights } from './api.js';
 import { renderFlights } from './render.js';
 
