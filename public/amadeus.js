@@ -42,38 +42,41 @@ export async function getAmadeusToken() {
   return data.access_token;
 }
 
-// 🌍 Поиск IATA-кода по названию города (через аэропорты)
+// 🌍 Поиск IATA-кода по названию города
 export async function fetchCityIATA(cityName) {
   const token = await getAmadeusToken();
-
   const mapped = manualMap[cityName] || cityName;
   const translitCity = transliterate(mapped);
 
-  const response = await fetch(
-    `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(translitCity)}&subType=AIRPORT`,
-    {
+  const url = `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(translitCity)}&subType=AIRPORT`;
+
+  try {
+    const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Accept-Language": "ru"
       }
+    });
+
+    const data = await response.json();
+    const airport = data?.data?.find(loc => loc.iataCode && loc.subType === "AIRPORT");
+
+    if (!airport) {
+      console.warn("⚠️ Город не найден в Amadeus:", cityName);
+      return null;
     }
-  );
 
-  const data = await response.json();
-  const airport = data?.data?.find(loc => loc.iataCode && loc.subType === "AIRPORT");
-
-  if (!airport) {
-    console.warn("⚠️ Город не найден в Amadeus:", cityName);
+    return {
+      code: airport.iataCode,
+      name: airport.name
+    };
+  } catch (err) {
+    console.error("❌ Ошибка получения IATA:", err);
     return null;
   }
-
-  return {
-    code: airport.iataCode,
-    name: airport.name
-  };
 }
 
-// ✈️ Поиск рейсов через Amadeus API
+// ✈️ Поиск рейсов через Amadeus API с fallback'ом на ошибки
 export async function fetchAmadeusFlights(from, to, date) {
   const token = await getAmadeusToken();
 
@@ -105,25 +108,25 @@ export async function fetchAmadeusFlights(from, to, date) {
 
     const text = await response.text();
 
-    try {
-      const data = JSON.parse(text);
-
-      if (!data?.data?.length) {
-        console.warn("⚠️ Рейсы не найдены в Amadeus:", data);
-        return [];
-      }
-
-      return data.data.map(offer => ({
-        from,
-        to,
-        date,
-        airline: offer.validatingAirlineCodes?.[0] || "—",
-        price: offer.price?.total || "—"
-      }));
-    } catch (jsonError) {
-      console.error("❌ Ошибка парсинга JSON от Amadeus:", text);
+    if (!response.ok) {
+      console.warn(`⚠️ Ошибка Amadeus API ${response.status}:`, text);
       return [];
     }
+
+    const data = JSON.parse(text);
+
+    if (!data?.data?.length) {
+      console.warn("⚠️ Рейсы не найдены в Amadeus:", data);
+      return [];
+    }
+
+    return data.data.map(offer => ({
+      from,
+      to,
+      date,
+      airline: offer.validatingAirlineCodes?.[0] || "—",
+      price: offer.price?.total || "—"
+    }));
   } catch (err) {
     console.error("❌ Ошибка запроса к Amadeus:", err);
     return [];
