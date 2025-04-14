@@ -278,50 +278,63 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
       return;
     }
 
-    // ✈️ Запрашиваем рейсы туда
-    const departureFlights = await fetchAmadeusFlights(fromCode, toCode, departureDate, token);
-    console.log("🛫 Найдено рейсов туда:", departureFlights);
+// ✈️ Запрашиваем рейсы туда
+let departureFlights = await fetchAmadeusFlights(fromCode, toCode, departureDate, token);
+console.log("🛫 Найдено рейсов туда (Amadeus):", departureFlights);
 
-    let returnFlights = [];
-    if (isRoundTrip) {
-      returnFlights = await fetchAmadeusFlights(toCode, fromCode, returnDate, token);
-      console.log("🛬 Найдено рейсов обратно:", returnFlights);
-    }
+// 🔁 Fallback на Aviasales, если нет результатов
+if (!departureFlights.length) {
+  console.warn("🔁 Fallback: запрашиваем рейсы из Aviasales");
+  departureFlights = await fetchAviasalesFlights(fromCode, toCode, departureDate);
+  console.log("🛫 Найдено рейсов туда (Aviasales):", departureFlights);
+}
 
-    const container = document.getElementById("hotDeals");
-    container.innerHTML = "";
+let returnFlights = [];
+if (isRoundTrip) {
+  returnFlights = await fetchAmadeusFlights(toCode, fromCode, returnDate, token);
+  console.log("🛬 Найдено рейсов обратно (Amadeus):", returnFlights);
 
-    if (departureFlights?.length) {
-      const title = document.createElement("h3");
-      title.textContent = "Рейсы туда:";
-      title.className = "text-lg font-semibold mb-2 mt-4";
-      container.appendChild(title);
-      renderFlights(departureFlights);
-    }
+  if (!returnFlights.length) {
+    console.warn("🔁 Fallback: запрашиваем обратные рейсы из Aviasales");
+    returnFlights = await fetchAviasalesFlights(toCode, fromCode, returnDate);
+    console.log("🛬 Найдено рейсов обратно (Aviasales):", returnFlights);
+  }
+}
 
-    if (isRoundTrip && returnFlights?.length) {
-      const titleBack = document.createElement("h3");
-      titleBack.textContent = "Рейсы обратно:";
-      titleBack.className = "text-lg font-semibold mb-2 mt-4";
-      container.appendChild(titleBack);
-      renderFlights(returnFlights);
-    }
+const container = document.getElementById("hotDeals");
+container.innerHTML = "";
 
-    if (!departureFlights?.length && (!isRoundTrip || !returnFlights?.length)) {
-      container.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
-      Telegram.WebApp.sendData?.("😢 Рейсы не найдены.");
-    } else {
-      Telegram.WebApp.sendData?.(`✈️ Найдены рейсы: ${from} → ${to}${isRoundTrip ? " и обратно" : ""}`);
-    }
+if (departureFlights?.length) {
+  const title = document.createElement("h3");
+  title.textContent = "Рейсы туда:";
+  title.className = "text-lg font-semibold mb-2 mt-4";
+  container.appendChild(title);
+  renderFlights(departureFlights);
+}
 
-    trackEvent("Поиск рейсов", {
-      from,
-      to,
-      departureDate,
-      returnDate: isRoundTrip ? returnDate : null,
-      isRoundTrip,
-      count: (departureFlights.length || 0) + (returnFlights.length || 0)
-    });
+if (isRoundTrip && returnFlights?.length) {
+  const titleBack = document.createElement("h3");
+  titleBack.textContent = "Рейсы обратно:";
+  titleBack.className = "text-lg font-semibold mb-2 mt-4";
+  container.appendChild(titleBack);
+  renderFlights(returnFlights);
+}
+
+if (!departureFlights?.length && (!isRoundTrip || !returnFlights?.length)) {
+  container.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
+  Telegram.WebApp.sendData?.("😢 Рейсы не найдены.");
+} else {
+  Telegram.WebApp.sendData?.(`✈️ Найдены рейсы: ${from} → ${to}${isRoundTrip ? " и обратно" : ""}`);
+}
+
+trackEvent("Поиск рейсов", {
+  from,
+  to,
+  departureDate,
+  returnDate: isRoundTrip ? returnDate : null,
+  isRoundTrip,
+  count: (departureFlights.length || 0) + (returnFlights.length || 0)
+});
 
   } catch (err) {
     console.error("❌ Ошибка при поиске рейсов:", err);
