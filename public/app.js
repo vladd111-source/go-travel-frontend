@@ -282,16 +282,16 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
 let departureFlights = await fetchAmadeusFlights(fromCode, toCode, departureDate, token);
 console.log("🛫 Найдено рейсов туда (Amadeus):", departureFlights);
 
-// 🔁 Fallback на Aviasales, если нет результатов или пустой массив
+// 🔁 Fallback на Aviasales, если Amadeus ничего не вернул
 if (!Array.isArray(departureFlights) || !departureFlights.length) {
   console.warn("🔁 Fallback: запрашиваем рейсы из Aviasales");
-  const fallbackFlights = await fetchAviasalesFlights(fromCode, toCode, departureDate);
+  const fallback = await fetchAviasalesFlights(fromCode, toCode, departureDate);
 
-  if (Array.isArray(fallbackFlights) && fallbackFlights[0]?.departure_at) {
-    departureFlights = fallbackFlights;
+  if (Array.isArray(fallback) && fallback[0]?.departure_at) {
+    departureFlights = fallback;
     console.log("🛫 Найдено рейсов туда (Aviasales):", departureFlights);
   } else {
-    console.warn("❌ Ошибка: некорректный ответ от Aviasales:", fallbackFlights);
+    console.error("❌ Ошибка: некорректный ответ от Aviasales:", fallback);
     departureFlights = [];
   }
 }
