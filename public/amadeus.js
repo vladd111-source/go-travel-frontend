@@ -97,7 +97,8 @@ export async function fetchAmadeusFlights(from, to, date) {
         id: "1",
         travelerType: "ADULT"
       }
-    ]
+    ],
+    sources: ["GDS"] // ✅ ОБЯЗАТЕЛЬНО!
   };
 
   try {
