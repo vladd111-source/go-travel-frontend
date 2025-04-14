@@ -11,7 +11,7 @@ function transliterate(text) {
   return text.split('').map(char => map[char] || char).join('');
 }
 
-// 🧠 Ручной маппинг
+// 🧠 Ручной маппинг для нестандартных названий
 const manualMap = {
   "Прага": "Prague",
   "Варшава": "Warsaw",
@@ -28,9 +28,7 @@ export async function getAmadeusToken() {
 
   const response = await fetch("https://test.api.amadeus.com/v1/security/oauth2/token", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       grant_type: "client_credentials",
       client_id: clientId,
@@ -42,23 +40,23 @@ export async function getAmadeusToken() {
   return data.access_token;
 }
 
-// 🌍 Поиск IATA-кода по названию города
+// 🌍 Поиск IATA-кода по названию города (через аэропорты)
 export async function fetchCityIATA(cityName) {
   const token = await getAmadeusToken();
   const mapped = manualMap[cityName] || cityName;
-  const translitCity = transliterate(mapped);
+  const translit = transliterate(mapped);
 
-  const url = `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(translitCity)}&subType=AIRPORT`;
+  const url = `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(translit)}&subType=AIRPORT`;
 
   try {
-    const response = await fetch(url, {
+    const res = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Accept-Language": "ru"
       }
     });
 
-    const data = await response.json();
+    const data = await res.json();
     const airport = data?.data?.find(loc => loc.iataCode && loc.subType === "AIRPORT");
 
     if (!airport) {
@@ -67,7 +65,7 @@ export async function fetchCityIATA(cityName) {
     }
 
     return {
-      code: airport.iataCode,
+      code: airport.iataCode.replace(/"/g, "").toUpperCase(),
       name: airport.name
     };
   } catch (err) {
@@ -76,7 +74,7 @@ export async function fetchCityIATA(cityName) {
   }
 }
 
-// ✈️ Поиск рейсов через Amadeus API с fallback'ом на ошибки
+// ✈️ Поиск рейсов через Amadeus API
 export async function fetchAmadeusFlights(from, to, date) {
   const token = await getAmadeusToken();
 
@@ -85,10 +83,13 @@ export async function fetchAmadeusFlights(from, to, date) {
     return [];
   }
 
+  const cleanFrom = from.replace(/"/g, "").toUpperCase();
+  const cleanTo = to.replace(/"/g, "").toUpperCase();
+
   const payload = {
     currencyCode: "USD",
-    originLocationCode: from,
-    destinationLocationCode: to,
+    originLocationCode: cleanFrom,
+    destinationLocationCode: cleanTo,
     departureDate: date,
     adults: 1,
     max: 5
@@ -121,8 +122,8 @@ export async function fetchAmadeusFlights(from, to, date) {
     }
 
     return data.data.map(offer => ({
-      from,
-      to,
+      from: cleanFrom,
+      to: cleanTo,
       date,
       airline: offer.validatingAirlineCodes?.[0] || "—",
       price: offer.price?.total || "—"
