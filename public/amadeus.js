@@ -11,7 +11,7 @@ function transliterate(text) {
   return text.split('').map(char => map[char] || char).join('');
 }
 
-// 🧠 Ручной маппинг для нестандартных названий
+// 🧠 Ручной маппинг
 const manualMap = {
   "Прага": "Prague",
   "Варшава": "Warsaw",
@@ -42,7 +42,7 @@ export async function getAmadeusToken() {
   return data.access_token;
 }
 
-// 🌍 Поиск IATA-кода по названию города
+// 🌍 Поиск IATA-кода по названию города (через аэропорты)
 export async function fetchCityIATA(cityName) {
   const token = await getAmadeusToken();
 
@@ -50,7 +50,7 @@ export async function fetchCityIATA(cityName) {
   const translitCity = transliterate(mapped);
 
   const response = await fetch(
-    `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(translitCity)}&subType=CITY`,
+    `https://test.api.amadeus.com/v1/reference-data/locations?keyword=${encodeURIComponent(translitCity)}&subType=AIRPORT`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -60,16 +60,16 @@ export async function fetchCityIATA(cityName) {
   );
 
   const data = await response.json();
-  const first = data?.data?.[0];
+  const airport = data?.data?.find(loc => loc.iataCode && loc.subType === "AIRPORT");
 
-  if (!first) {
+  if (!airport) {
     console.warn("⚠️ Город не найден в Amadeus:", cityName);
     return null;
   }
 
   return {
-    code: first.iataCode,
-    name: first.name
+    code: airport.iataCode,
+    name: airport.name
   };
 }
 
