@@ -279,13 +279,13 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     }
 
 // ✈️ Запрашиваем рейсы туда
-let departureFlights = await fetchAmadeusFlights(fromCode, toCode, departureDate, token);
+let departureFlights = await fetchAmadeusFlights(fromCode.code, toCode.code, departureDate, token);
 console.log("🛫 Найдено рейсов туда (Amadeus):", departureFlights);
 
 // 🔁 Fallback на Aviasales, если Amadeus ничего не вернул
 if (!Array.isArray(departureFlights) || !departureFlights.length) {
   console.warn("🔁 Fallback: запрашиваем рейсы из Aviasales");
-  const fallback = await fetchAviasalesFlights(fromCode, toCode, departureDate);
+  const fallback = await fetchAviasalesFlights(fromCode.code, toCode.code, departureDate);
 
   if (Array.isArray(fallback) && fallback[0]?.departure_at) {
     departureFlights = fallback;
@@ -298,12 +298,12 @@ if (!Array.isArray(departureFlights) || !departureFlights.length) {
 
 let returnFlights = [];
 if (isRoundTrip) {
-  returnFlights = await fetchAmadeusFlights(toCode, fromCode, returnDate, token);
+  returnFlights = await fetchAmadeusFlights(toCode.code, fromCode.code, returnDate, token);
   console.log("🛬 Найдено рейсов обратно (Amadeus):", returnFlights);
 
   if (!Array.isArray(returnFlights) || !returnFlights.length) {
     console.warn("🔁 Fallback: запрашиваем обратные рейсы из Aviasales");
-    const fallbackReturn = await fetchAviasalesFlights(toCode, fromCode, returnDate);
+    const fallbackReturn = await fetchAviasalesFlights(toCode.code, fromCode.code, returnDate);
 
     if (Array.isArray(fallbackReturn) && fallbackReturn[0]?.departure_at) {
       returnFlights = fallbackReturn;
@@ -313,15 +313,8 @@ if (isRoundTrip) {
       returnFlights = [];
     }
   }
-
-
-  
 }
 
-
-
-
-    
 const container = document.getElementById("hotDeals");
 container.innerHTML = "";
 
