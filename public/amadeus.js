@@ -92,8 +92,8 @@ export async function fetchAmadeusFlights(from, to, date) {
     originLocationCode: cleanFrom,
     destinationLocationCode: cleanTo,
     departureDate: cleanDate,
-    adults: 1,
-    max: 5
+    adults: 1
+    // ❌ НЕ добавляем `max`: это недопустимый параметр
   };
 
   try {
