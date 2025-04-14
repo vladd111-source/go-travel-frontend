@@ -65,7 +65,7 @@ export async function fetchCityIATA(cityName) {
     }
 
     return {
-      code: airport.iataCode.replace(/"/g, "").toUpperCase(),
+      code: airport.iataCode.toUpperCase().trim(),
       name: airport.name
     };
   } catch (err) {
@@ -78,19 +78,20 @@ export async function fetchCityIATA(cityName) {
 export async function fetchAmadeusFlights(from, to, date) {
   const token = await getAmadeusToken();
 
-  if (!from || !to || !date) {
+  const cleanFrom = from?.toUpperCase().trim();
+  const cleanTo = to?.toUpperCase().trim();
+  const cleanDate = typeof date === "string" && date.match(/^\d{4}-\d{2}-\d{2}$/) ? date : null;
+
+  if (!cleanFrom || !cleanTo || !cleanDate) {
     console.warn("❌ Недостаточно данных для запроса рейсов", { from, to, date });
     return [];
   }
-
-  const cleanFrom = from.replace(/"/g, "").toUpperCase();
-  const cleanTo = to.replace(/"/g, "").toUpperCase();
 
   const payload = {
     currencyCode: "USD",
     originLocationCode: cleanFrom,
     destinationLocationCode: cleanTo,
-    departureDate: date,
+    departureDate: cleanDate,
     adults: 1,
     max: 5
   };
@@ -124,7 +125,7 @@ export async function fetchAmadeusFlights(from, to, date) {
     return data.data.map(offer => ({
       from: cleanFrom,
       to: cleanTo,
-      date,
+      date: cleanDate,
       airline: offer.validatingAirlineCodes?.[0] || "—",
       price: offer.price?.total || "—"
     }));
