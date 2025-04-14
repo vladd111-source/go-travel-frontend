@@ -8,16 +8,17 @@ export async function fetchAviasalesFlights(from, to, date) {
 
     console.log("📦 Ответ от backend:", data);
 
-    // Если пришёл объект — преобразуем в массив
+    // ✅ Обработка разных форматов: массив или объект
     if (Array.isArray(data)) {
       return data;
     } else if (data && typeof data === "object") {
       return Object.values(data);
     } else {
+      console.warn("⚠️ Неподдерживаемый формат ответа:", data);
       return [];
     }
   } catch (err) {
-    console.error("❌ Ошибка загрузки рейсов с backend:", err);
+    console.error("❌ Ошибка загрузки рейсов с backend:", err.message || err);
     return [];
   }
 }
