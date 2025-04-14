@@ -282,11 +282,18 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
 let departureFlights = await fetchAmadeusFlights(fromCode, toCode, departureDate, token);
 console.log("🛫 Найдено рейсов туда (Amadeus):", departureFlights);
 
-// 🔁 Fallback на Aviasales, если нет результатов
-if (!departureFlights.length) {
+// 🔁 Fallback на Aviasales, если нет результатов или пустой массив
+if (!Array.isArray(departureFlights) || !departureFlights.length) {
   console.warn("🔁 Fallback: запрашиваем рейсы из Aviasales");
-  departureFlights = await fetchAviasalesFlights(fromCode, toCode, departureDate);
-  console.log("🛫 Найдено рейсов туда (Aviasales):", departureFlights);
+  const fallbackFlights = await fetchAviasalesFlights(fromCode, toCode, departureDate);
+
+  if (Array.isArray(fallbackFlights) && fallbackFlights[0]?.departure_at) {
+    departureFlights = fallbackFlights;
+    console.log("🛫 Найдено рейсов туда (Aviasales):", departureFlights);
+  } else {
+    console.warn("❌ Ошибка: некорректный ответ от Aviasales:", fallbackFlights);
+    departureFlights = [];
+  }
 }
 
 let returnFlights = [];
@@ -294,13 +301,27 @@ if (isRoundTrip) {
   returnFlights = await fetchAmadeusFlights(toCode, fromCode, returnDate, token);
   console.log("🛬 Найдено рейсов обратно (Amadeus):", returnFlights);
 
-  if (!returnFlights.length) {
+  if (!Array.isArray(returnFlights) || !returnFlights.length) {
     console.warn("🔁 Fallback: запрашиваем обратные рейсы из Aviasales");
-    returnFlights = await fetchAviasalesFlights(toCode, fromCode, returnDate);
-    console.log("🛬 Найдено рейсов обратно (Aviasales):", returnFlights);
+    const fallbackReturn = await fetchAviasalesFlights(toCode, fromCode, returnDate);
+
+    if (Array.isArray(fallbackReturn) && fallbackReturn[0]?.departure_at) {
+      returnFlights = fallbackReturn;
+      console.log("🛬 Найдено рейсов обратно (Aviasales):", returnFlights);
+    } else {
+      console.warn("❌ Ошибка: некорректный ответ от Aviasales:", fallbackReturn);
+      returnFlights = [];
+    }
   }
+
+
+  
 }
 
+
+
+
+    
 const container = document.getElementById("hotDeals");
 container.innerHTML = "";
 
