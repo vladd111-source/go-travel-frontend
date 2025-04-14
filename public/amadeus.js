@@ -23,8 +23,8 @@ const manualMap = {
 
 // 🔐 Получение токена доступа от Amadeus
 export async function getAmadeusToken() {
-  const clientId = "10UMyGcxHVsK1sK8x1U8MCqgR7g1LuDo"; // 👉 замени на свой
-  const clientSecret = "0bXLQrqxEAyFjdkx";              // 👉 замени на свой
+  const clientId = "10UMyGcxHVsK1sK8x1U8MCqgR7g1LuDo";
+  const clientSecret = "0bXLQrqxEAyFjdkx";
 
   const response = await fetch("https://test.api.amadeus.com/v1/security/oauth2/token", {
     method: "POST",
@@ -42,7 +42,7 @@ export async function getAmadeusToken() {
   return data.access_token;
 }
 
-// 🌍 Поиск IATA-кода по названию города (на любом языке)
+// 🌍 Поиск IATA-кода по названию города
 export async function fetchCityIATA(cityName) {
   const token = await getAmadeusToken();
 
@@ -73,11 +73,10 @@ export async function fetchCityIATA(cityName) {
   };
 }
 
-// ✈️ Поиск рейсов через Amadeus API (с улучшенной валидацией и логами)
+// ✈️ Поиск рейсов через Amadeus API
 export async function fetchAmadeusFlights(from, to, date) {
   const token = await getAmadeusToken();
 
-  // ✅ Проверка параметров
   if (!from || !to || !date) {
     console.warn("❌ Недостаточно данных для запроса рейсов", { from, to, date });
     return [];
@@ -129,12 +128,4 @@ export async function fetchAmadeusFlights(from, to, date) {
     console.error("❌ Ошибка запроса к Amadeus:", err);
     return [];
   }
-}
-  return data.data.map(offer => ({
-    from,
-    to,
-    date,
-    airline: offer.validatingAirlineCodes?.[0] || "—",
-    price: offer.price?.total || "—"
-  }));
 }
