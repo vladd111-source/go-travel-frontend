@@ -73,33 +73,63 @@ export async function fetchCityIATA(cityName) {
   };
 }
 
-// ✈️ Поиск рейсов через Amadeus API
+// ✈️ Поиск рейсов через Amadeus API (с улучшенной валидацией и логами)
 export async function fetchAmadeusFlights(from, to, date) {
   const token = await getAmadeusToken();
 
-  const response = await fetch("https://test.api.amadeus.com/v2/shopping/flight-offers", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      currencyCode: "USD",
-      originLocationCode: from,
-      destinationLocationCode: to,
-      departureDate: date,
-      adults: 1,
-      max: 5
-    })
-  });
-
-  const data = await response.json();
-
-  if (!data?.data?.length) {
-    console.warn("⚠️ Рейсы не найдены в Amadeus");
+  // ✅ Проверка параметров
+  if (!from || !to || !date) {
+    console.warn("❌ Недостаточно данных для запроса рейсов", { from, to, date });
     return [];
   }
 
+  const payload = {
+    currencyCode: "USD",
+    originLocationCode: from,
+    destinationLocationCode: to,
+    departureDate: date,
+    adults: 1,
+    max: 5
+  };
+
+  try {
+    console.log("📤 Запрос в Amadeus:", JSON.stringify(payload, null, 2));
+
+    const response = await fetch("https://test.api.amadeus.com/v2/shopping/flight-offers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const text = await response.text();
+
+    try {
+      const data = JSON.parse(text);
+
+      if (!data?.data?.length) {
+        console.warn("⚠️ Рейсы не найдены в Amadeus:", data);
+        return [];
+      }
+
+      return data.data.map(offer => ({
+        from,
+        to,
+        date,
+        airline: offer.validatingAirlineCodes?.[0] || "—",
+        price: offer.price?.total || "—"
+      }));
+    } catch (jsonError) {
+      console.error("❌ Ошибка парсинга JSON от Amadeus:", text);
+      return [];
+    }
+  } catch (err) {
+    console.error("❌ Ошибка запроса к Amadeus:", err);
+    return [];
+  }
+}
   return data.data.map(offer => ({
     from,
     to,
