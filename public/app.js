@@ -418,7 +418,7 @@ trackEvent("Поиск рейсов", {
   departureDate,
   returnDate: isRoundTrip ? returnDate : null,
   isRoundTrip,
-  count: (departureFlights?.length || 0) + (returnFlights?.length || 0),
+  count: (departureFlights?.length || 0) + (returnFlights?.length || 0)
 });
 
 } catch (err) {
