@@ -411,15 +411,16 @@ if (!departureFlights?.length && (!isRoundTrip || !returnFlights?.length)) {
   Telegram.WebApp.sendData?.(`✈️ Найдены рейсы: ${from} → ${to}${isRoundTrip ? " и обратно" : ""}`);
 }
 
-// 📊 Трекинг события
-trackEvent("Поиск рейсов", {
-  from,
-  to,
-  departureDate,
-  returnDate: isRoundTrip ? returnDate : null,
-  isRoundTrip,
-  count: (departureFlights?.length || 0) + (returnFlights?.length || 0)
-});
+try {
+  // 📊 Трекинг события
+  trackEvent("Поиск рейсов", {
+    from,
+    to,
+    departureDate,
+    returnDate: isRoundTrip ? returnDate : null,
+    isRoundTrip,
+    count: (departureFlights?.length || 0) + (returnFlights?.length || 0)
+  });
 
 } catch (err) {
   console.error("❌ Ошибка при поиске рейсов:", err);
