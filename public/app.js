@@ -23,15 +23,24 @@ document.addEventListener("DOMContentLoaded", () => {
       throw new Error("❌ Один из элементов формы не найден!");
     }
 
-    // 🎯 Обработка сабмита формы
+    // ✈️ Обработка сабмита формы
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const from = fromInput.value.trim();
       const to = toInput.value.trim();
       const date = departureInput.value.trim();
 
-      const flights = await fetchAmadeusFlights(from, to, date);
+      const rawFlights = await fetchAmadeusFlights(from, to, date);
+      const flights = rawFlights.filter(f => f.origin && f.destination && f.departure_at);
       renderFlights(flights);
+
+      trackEvent("Поиск рейсов", {
+        from,
+        to,
+        departureDate: date,
+        count: flights.length,
+        isRoundTrip: false,
+      });
     });
 
     trackEvent("Загрузка приложения", {
@@ -44,11 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
 // 🔍 Доступ для отладки из консоли
 window.fetchLocation = fetchLocation;
 window.fetchAviasalesFlights = fetchAviasalesFlights;
-
 
 // ─── Telegram WebApp Init ─────────────────────────────────────────
 function initTelegram() {
