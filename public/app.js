@@ -664,8 +664,8 @@ window.addEventListener("beforeunload", () => {
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
 });
 
-// ✅ Закрываем try/catch и DOMContentLoaded
-} catch (err) {
+// ✅ УБРАНА лишняя }
+catch (err) {
   console.error("❌ Ошибка в инициализации:", err);
 }
 });
