@@ -582,7 +582,7 @@ function toggleFavoritePlaceFromEncoded(encoded, element) {
     place: place.name,
   });
 }
-
+  }
 // ─── Лог выхода (длительность сессии) ────────────────────────────
 window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - window.appStart) / 1000);
