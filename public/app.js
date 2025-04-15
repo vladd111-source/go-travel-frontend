@@ -1,7 +1,9 @@
 import { getAmadeusToken, fetchCityIATA, fetchAmadeusFlights } from './amadeus.js';
 import { fetchLocation, fetchAviasalesFlights } from './api.js';
 import { renderFlights } from './render.js';
-   let lastTab = localStorage.getItem("activeTab") || "flights";
+
+let lastTab = localStorage.getItem("activeTab") || "flights";
+
 // ─── DOMContentLoaded и инициализация ─────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   try {
@@ -23,81 +25,87 @@ document.addEventListener("DOMContentLoaded", () => {
       throw new Error("❌ Один из элементов формы не найден!");
     }
 
-// ✈️ Обработка сабмита формы
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+    // ✈️ Обработка сабмита формы
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  const fromCity = fromInput.value.trim();
-  const toCity = toInput.value.trim();
-  const date = departureInput.value.trim();
+      const fromCity = fromInput.value.trim();
+      const toCity = toInput.value.trim();
+      const date = departureInput.value.trim();
 
-// ⛽ Получаем IATA коды через Amadeus
-const fromIATA = await fetchCityIATA(fromCity);
-const toIATA = await fetchCityIATA(toCity);
+      // ⛽ Получаем IATA коды через Amadeus
+      const fromIATA = await fetchCityIATA(fromCity);
+      const toIATA = await fetchCityIATA(toCity);
 
-if (!fromIATA || !toIATA) {
-  console.warn("❌ Не удалось найти IATA коды для городов", { fromCity, toCity });
-  return;
-}
+      if (!fromIATA || !toIATA) {
+        console.warn("❌ Не удалось найти IATA коды для городов", { fromCity, toCity });
+        return;
+      }
 
-const rawFlights = await fetchAmadeusFlights(fromIATA.code, toIATA.code, date);
-const flights = rawFlights.filter(f => f.origin && f.destination && f.departure_at);
+      const rawFlights = await fetchAmadeusFlights(fromIATA.code, toIATA.code, date);
+      const flights = rawFlights.filter(f => f.origin && f.destination && f.departure_at);
 
-// ✅ вот тут подставляем нормальные названия для отображения
-renderFlights(flights, fromIATA.name, toIATA.name);
+      // ✅ Подставляем названия для отображения
+      renderFlights(flights, fromIATA.name, toIATA.name);
 
-trackEvent("Поиск рейсов", {
-  from: fromIATA.code,
-  to: toIATA.code,
-  departureDate: date,
-  count: flights.length,
-  isRoundTrip: false,
-});
-
-// 📦 Аналитика загрузки
-trackEvent("Загрузка приложения", {
-  lang: window._appLang,
-  timestamp: new Date().toISOString(),
-});
-
-// 🔍 Доступ для отладки из консоли
-window.fetchLocation = fetchLocation;
-window.fetchAviasalesFlights = fetchAviasalesFlights;
-
-// ─── Telegram WebApp Init ─────────────────────────────────────────
-function initTelegram() {
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.ready();
-    const user = Telegram.WebApp.initDataUnsafe?.user;
-    if (user?.id) {
-      window._telegramId = user.id.toString();
-      console.log("✅ Telegram ID установлен:", window._telegramId);
-    } else {
-      console.warn("❌ Не удалось получить Telegram ID");
-    }
-  }
-}
-
-// ─── Язык и переключатель ────────────────────────────────────────
-function initLanguageSwitcher() {
-  window._appLang = localStorage.getItem("lang") || "ru";
-  applyTranslations(window._appLang);
-
-  const langSwitcher = document.getElementById("langSwitcher");
-  if (langSwitcher) {
-    langSwitcher.value = window._appLang;
-    langSwitcher.addEventListener("change", (e) => {
-      const newLang = e.target.value;
-      window._appLang = newLang;
-      localStorage.setItem("lang", newLang);
-      applyTranslations(newLang);
-      trackEvent("Смена языка", newLang);
+      // 📦 Аналитика
+      trackEvent("Поиск рейсов", {
+        from: fromIATA.code,
+        to: toIATA.code,
+        departureDate: date,
+        count: flights.length,
+        isRoundTrip: false,
+      });
     });
+
+    // 📦 Аналитика загрузки
+    trackEvent("Загрузка приложения", {
+      lang: window._appLang,
+      timestamp: new Date().toISOString(),
+    });
+
+    // 🔍 Доступ для отладки
+    window.fetchLocation = fetchLocation;
+    window.fetchAviasalesFlights = fetchAviasalesFlights;
+
+    // ─── Telegram WebApp Init ─────────────────────────────────────
+    function initTelegram() {
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        const user = Telegram.WebApp.initDataUnsafe?.user;
+        if (user?.id) {
+          window._telegramId = user.id.toString();
+          console.log("✅ Telegram ID установлен:", window._telegramId);
+        } else {
+          console.warn("❌ Не удалось получить Telegram ID");
+        }
+      }
+    }
+
+    // ─── Язык и переключатель ─────────────────────────────────────
+    function initLanguageSwitcher() {
+      window._appLang = localStorage.getItem("lang") || "ru";
+      applyTranslations(window._appLang);
+
+      const langSwitcher = document.getElementById("langSwitcher");
+      if (langSwitcher) {
+        langSwitcher.value = window._appLang;
+        langSwitcher.addEventListener("change", (e) => {
+          const newLang = e.target.value;
+          window._appLang = newLang;
+          localStorage.setItem("lang", newLang);
+          applyTranslations(newLang);
+          trackEvent("Смена языка", newLang);
+        });
+      }
+    }
+
+  } catch (err) {
+    console.error("❌ Ошибка в инициализации:", err);
   }
-}
+});
 
 // ─── Вкладка ─────────────────────────────────────────────────────
-
 function restoreLastTab() {
   if (lastTab === "sights") {
     lastTab = "places";
@@ -130,7 +138,7 @@ function initRatingInputValidation() {
   if (!ratingInput) return;
 
   ratingInput.addEventListener("input", () => {
-    let val = parseInt(ratingInput.value);
+    const val = parseInt(ratingInput.value);
     if (val > 10) ratingInput.value = 10;
     if (val < 0 || isNaN(val)) ratingInput.value = '';
   });
@@ -150,9 +158,10 @@ const returnDateInput = document.getElementById("returnDate");
 
 if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
   const updateReturnDateVisibility = () => {
-    returnDateWrapper.classList.toggle("hidden", !roundTripCheckbox.checked);
-    returnDateInput.required = roundTripCheckbox.checked;
-    if (!roundTripCheckbox.checked) returnDateInput.value = "";
+    const checked = roundTripCheckbox.checked;
+    returnDateWrapper.classList.toggle("hidden", !checked);
+    returnDateInput.required = checked;
+    if (!checked) returnDateInput.value = "";
   };
 
   roundTripCheckbox.checked = localStorage.getItem("roundTripChecked") === "1";
@@ -181,6 +190,7 @@ if (hotelFiltersToggle && hotelFiltersSection) {
 
 // ─── Ползунок цены ───────────────────────────────────────────────
 const priceRange = document.getElementById("priceRange");
+
 if (priceRange) {
   priceRange.value = 250;
   priceRange.addEventListener("input", updatePriceTooltip);
@@ -197,73 +207,85 @@ if (hotelCityInput) {
 
   hotelCityInput.setAttribute("autofocus", "autofocus");
 
-  document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    showLoading();
+  const hotelForm = document.getElementById("hotelForm");
 
-    const city = hotelCityInput.value.trim();
-    localStorage.setItem("lastHotelCity", city);
+  if (hotelForm) {
+    hotelForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      showLoading();
 
-    const maxPrice = parseFloat(priceRange.value) || Infinity;
-    const minRating = parseFloat(document.getElementById("minRating").value) || 0;
+      const city = hotelCityInput.value.trim();
+      localStorage.setItem("lastHotelCity", city);
 
-    fetch("https://go-travel-backend.vercel.app/api/hotels")
-      .then(res => res.json())
-      .then(hotels => {
-        const filtered = hotels.filter(h =>
-          h.price <= maxPrice &&
-          h.rating >= minRating &&
-          (!city || h.city.toLowerCase().includes(city.toLowerCase()))
-        );
+      const maxPrice = parseFloat(priceRange?.value) || Infinity;
+      const minRating = parseFloat(document.getElementById("minRating")?.value) || 0;
 
-        const t = translations[window._appLang];
-        const resultBlock = document.getElementById("hotelsResult");
-        resultBlock.classList.remove("visible");
+      fetch("https://go-travel-backend.vercel.app/api/hotels")
+        .then(res => res.json())
+        .then(hotels => {
+          const filtered = hotels.filter(h =>
+            h.price <= maxPrice &&
+            h.rating >= minRating &&
+            (!city || h.city.toLowerCase().includes(city.toLowerCase()))
+          );
 
-        resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-          filtered.length ? filtered.map(h => {
-            const hotelId = `${h.name}-${h.city}-${h.price}`;
-            const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-            const isFav = favHotels.some(fav => fav.name === h.name && fav.city === h.city && fav.price === h.price);
+          const t = translations[window._appLang];
+          const resultBlock = document.getElementById("hotelsResult");
+          resultBlock.classList.remove("visible");
 
-            return `
-              <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
-                <strong>${h.name}</strong> (${h.city})<br>
-                Цена: $${h.price} / ночь<br>
-                Рейтинг: ${h.rating}
-                <div class="flex justify-between items-center mt-2">
-                  <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
-                  <button 
-                    onclick='toggleFavoriteHotel(${JSON.stringify(h)}, this)' 
-                    class="text-xl ml-2"
-                    data-hotel-id="${hotelId}">
-                    ${isFav ? "💙" : "🤍"}
-                  </button>
-                </div>
-              </div>
-            `;
-          }).join("") : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-        );
+          resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+            filtered.length
+              ? filtered.map(h => {
+                  const hotelId = `${h.name}-${h.city}-${h.price}`;
+                  const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+                  const isFav = favHotels.some(fav =>
+                    fav.name === h.name && fav.city === h.city && fav.price === h.price
+                  );
 
-        updateHotelHearts();
-        resultBlock.classList.add("visible");
-        animateCards("#hotelsResult .card");
+                  return `
+                    <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
+                      <strong>${h.name}</strong> (${h.city})<br>
+                      Цена: $${h.price} / ночь<br>
+                      Рейтинг: ${h.rating}
+                      <div class="flex justify-between items-center mt-2">
+                        <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1"
+                          onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">
+                          ${t.bookNow}
+                        </button>
+                        <button 
+                          onclick='toggleFavoriteHotel(${JSON.stringify(h)}, this)' 
+                          class="text-xl ml-2"
+                          data-hotel-id="${hotelId}">
+                          ${isFav ? "💙" : "🤍"}
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                }).join("")
+              : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+          );
 
-        trackEvent("Поиск отеля", {
-          city,
-          maxPrice,
-          minRating,
-          resultCount: filtered.length
+          updateHotelHearts();
+          resultBlock.classList.add("visible");
+          animateCards("#hotelsResult .card");
+
+          trackEvent("Поиск отеля", {
+            city,
+            maxPrice,
+            minRating,
+            resultCount: filtered.length
+          });
+
+          hideLoading();
+        })
+        .catch(err => {
+          console.error("❌ Ошибка загрузки отелей:", err);
+          const resultBlock = document.getElementById("hotelsResult");
+          resultBlock.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
+          hideLoading();
         });
-
-        hideLoading();
-      })
-      .catch(err => {
-        console.error("❌ Ошибка загрузки отелей:", err);
-        document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
-        hideLoading();
-      });
-  });
+    });
+  }
 }
 
 // ─── Инициализация полей рейсов ──────────────────────────────────
@@ -273,7 +295,7 @@ if (fromInput && toInput && departureInput) {
   departureInput.value = localStorage.getItem("lastDepartureDate") || "";
   fromInput.setAttribute("autofocus", "autofocus");
 }
-    
+
 // ─── Обработка формы поиска рейсов ──────────────────────────────
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -281,16 +303,14 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   const from = fromInput.value.trim();
   const to = toInput.value.trim();
   const departureDate = departureInput.value;
-  const isRoundTrip = document.getElementById("roundTrip").checked;
+  const isRoundTrip = document.getElementById("roundTrip")?.checked;
   const returnDate = document.getElementById("returnDate")?.value;
 
-  // ─── Проверка на заполнение обязательных полей ────────────────
   if (!from || !to || !departureDate || (isRoundTrip && !returnDate)) {
     alert("Пожалуйста, заполните все поля.");
     return;
   }
 
-  // ─── Сохраняем значения в localStorage ────────────────────────
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
@@ -299,10 +319,8 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   showLoading();
 
   try {
-    // 🔐 Получаем access token для Amadeus
     const token = await getAmadeusToken();
 
-    // 🔍 Ищем IATA-коды по названиям городов
     const fromCode = await fetchCityIATA(from, token);
     const toCode = await fetchCityIATA(to, token);
 
@@ -310,65 +328,82 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
 
     if (!fromCode || !toCode) {
       alert("Города не найдены.");
+      hideLoading();
       return;
     }
-   
-// ✈️ Запрашиваем рейсы туда
-let departureFlights = await fetchAmadeusFlights(fromCode.code, toCode.code, departureDate, token);
-console.log("🛫 Найдено рейсов туда (Amadeus):", departureFlights);
 
-// 🔁 Fallback на Aviasales, если Amadeus ничего не вернул
-if (!Array.isArray(departureFlights) || !departureFlights.length) {
-  console.warn("🔁 Fallback: запрашиваем рейсы из Aviasales");
-  const fallback = await fetchAviasalesFlights(fromCode.code, toCode.code, departureDate);
+    // ✈️ Рейсы туда
+    let departureFlights = await fetchAmadeusFlights(fromCode.code, toCode.code, departureDate, token);
+    console.log("🛫 Найдено рейсов туда (Amadeus):", departureFlights);
 
-  if (Array.isArray(fallback) && fallback[0]?.departure_at) {
-    departureFlights = fallback;
-    console.log("🛫 Найдено рейсов туда (Aviasales):", departureFlights);
-  } else {
-    console.error("❌ Ошибка: некорректный ответ от Aviasales:", fallback);
-    departureFlights = [];
-  }
-}
+    if (!Array.isArray(departureFlights) || !departureFlights.length) {
+      console.warn("🔁 Fallback: запрашиваем рейсы из Aviasales");
+      const fallback = await fetchAviasalesFlights(fromCode.code, toCode.code, departureDate);
 
-let returnFlights = [];
-if (isRoundTrip) {
-  returnFlights = await fetchAmadeusFlights(toCode.code, fromCode.code, returnDate, token);
-  console.log("🛬 Найдено рейсов обратно (Amadeus):", returnFlights);
-
-  if (!Array.isArray(returnFlights) || !returnFlights.length) {
-    console.warn("🔁 Fallback: запрашиваем обратные рейсы из Aviasales");
-    const fallbackReturn = await fetchAviasalesFlights(toCode.code, fromCode.code, returnDate);
-
-    if (Array.isArray(fallbackReturn) && fallbackReturn[0]?.departure_at) {
-      returnFlights = fallbackReturn;
-      console.log("🛬 Найдено рейсов обратно (Aviasales):", returnFlights);
-    } else {
-      console.warn("❌ Ошибка: некорректный ответ от Aviasales:", fallbackReturn);
-      returnFlights = [];
+      if (Array.isArray(fallback) && fallback[0]?.departure_at) {
+        departureFlights = fallback;
+        console.log("🛫 Найдено рейсов туда (Aviasales):", departureFlights);
+      } else {
+        console.error("❌ Ошибка: некорректный ответ от Aviasales:", fallback);
+        departureFlights = [];
+      }
     }
+
+    // 🔁 Рейсы обратно (если выбран "туда-обратно")
+    let returnFlights = [];
+
+    if (isRoundTrip) {
+      returnFlights = await fetchAmadeusFlights(toCode.code, fromCode.code, returnDate, token);
+      console.log("🛬 Найдено рейсов обратно (Amadeus):", returnFlights);
+
+      if (!Array.isArray(returnFlights) || !returnFlights.length) {
+        console.warn("🔁 Fallback: запрашиваем обратные рейсы из Aviasales");
+        const fallbackReturn = await fetchAviasalesFlights(toCode.code, fromCode.code, returnDate);
+
+        if (Array.isArray(fallbackReturn) && fallbackReturn[0]?.departure_at) {
+          returnFlights = fallbackReturn;
+          console.log("🛬 Найдено рейсов обратно (Aviasales):", returnFlights);
+        } else {
+          console.warn("❌ Ошибка: некорректный ответ от Aviasales:", fallbackReturn);
+          returnFlights = [];
+        }
+      }
+    }
+
+    // Тут ты можешь вставить renderFlights(departureFlights) и т.д.
+
+  } catch (err) {
+    console.error("❌ Ошибка при загрузке рейсов:", err);
+  } finally {
+    hideLoading();
   }
-}
+});
+
 
 const container = document.getElementById("hotDeals");
 container.innerHTML = "";
-  
+
+// ✈️ Рейсы туда
 if (departureFlights?.length) {
   const title = document.createElement("h3");
   title.textContent = "Рейсы туда:";
   title.className = "text-lg font-semibold mb-2 mt-4";
   container.appendChild(title);
-  renderFlights(departureFlights);
+
+  renderFlights(departureFlights, from, to);
 }
 
+// 🛬 Рейсы обратно (если туда-обратно)
 if (isRoundTrip && returnFlights?.length) {
   const titleBack = document.createElement("h3");
   titleBack.textContent = "Рейсы обратно:";
   titleBack.className = "text-lg font-semibold mb-2 mt-4";
   container.appendChild(titleBack);
-  renderFlights(returnFlights);
+
+  renderFlights(returnFlights, to, from);
 }
 
+// 🤷 Если ничего не найдено
 if (!departureFlights?.length && (!isRoundTrip || !returnFlights?.length)) {
   container.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
   Telegram.WebApp.sendData?.("😢 Рейсы не найдены.");
@@ -376,34 +411,34 @@ if (!departureFlights?.length && (!isRoundTrip || !returnFlights?.length)) {
   Telegram.WebApp.sendData?.(`✈️ Найдены рейсы: ${from} → ${to}${isRoundTrip ? " и обратно" : ""}`);
 }
 
+// 📊 Трекинг события
 trackEvent("Поиск рейсов", {
   from,
   to,
   departureDate,
   returnDate: isRoundTrip ? returnDate : null,
   isRoundTrip,
-  count: (departureFlights.length || 0) + (returnFlights.length || 0)
+  count: (departureFlights?.length || 0) + (returnFlights?.length || 0),
 });
 
-  } catch (err) {
-    console.error("❌ Ошибка при поиске рейсов:", err);
-    Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
-    trackEvent("Ошибка загрузки рейсов", err.message);
-  } finally {
-    hideLoading();
-  }
-});
+} catch (err) {
+  console.error("❌ Ошибка при поиске рейсов:", err);
+  Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
+  trackEvent("Ошибка загрузки рейсов", err.message);
+} finally {
+  hideLoading();
+}
 
 // ─── Очистка формы рейсов ───────────────────────────────────────
-document.getElementById('clearFlights')?.addEventListener('click', () => {
+document.getElementById("clearFlights")?.addEventListener("click", () => {
   fromInput.value = '';
   toInput.value = '';
   departureInput.value = '';
-  document.getElementById('returnDate').value = '';
-  document.getElementById('roundTrip').checked = false;
+  document.getElementById("returnDate").value = '';
+  document.getElementById("roundTrip").checked = false;
 
-  document.getElementById('returnDateWrapper')?.classList.add('hidden');
-  document.getElementById('hotDeals').innerHTML = '';
+  document.getElementById("returnDateWrapper")?.classList.add("hidden");
+  document.getElementById("hotDeals").innerHTML = '';
 
   localStorage.removeItem("lastFrom");
   localStorage.removeItem("lastTo");
@@ -415,44 +450,78 @@ document.getElementById('clearFlights')?.addEventListener('click', () => {
   trackEvent?.("Очистка формы рейсов", "Пользователь сбросил поля и кэш");
 });
 
+
 // ─── Поиск достопримечательностей ───────────────────────────────
 const placeCityInput = document.getElementById("placeCity");
 const placeCategorySelect = document.getElementById("placeCategory");
 const resultBlock = document.getElementById("placesResult");
 
+// 🔄 Восстановление кэша
 if (placeCityInput) {
   const cachedCity = localStorage.getItem("placeCity");
   if (cachedCity) placeCityInput.value = cachedCity;
+
   placeCityInput.addEventListener("input", (e) => {
     localStorage.setItem("placeCity", e.target.value.trim());
   });
+
+  placeCityInput.setAttribute("autofocus", "autofocus");
 }
 
 if (placeCategorySelect) {
   const cachedCategory = localStorage.getItem("placeCategory");
   if (cachedCategory) placeCategorySelect.value = cachedCategory;
+
   placeCategorySelect.addEventListener("change", (e) => {
     localStorage.setItem("placeCategory", e.target.value);
   });
 }
 
-placeCityInput?.setAttribute("autofocus", "autofocus");
-
 document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const city = placeCityInput.value.trim().toLowerCase();
-  const category = placeCategorySelect.value;
+  const city = placeCityInput?.value.trim().toLowerCase() || "";
+  const category = placeCategorySelect?.value || "";
 
   localStorage.setItem("placeCity", city);
   localStorage.setItem("placeCategory", category);
 
   const dummyPlaces = [
-    { name: "Castelo de São Jorge", description: "Древняя крепость с видом на Лиссабон", city: "лиссабон", category: "culture", image: "https://picsum.photos/300/180?random=1" },
-    { name: "Miradouro da Senhora do Monte", description: "Лучший панорамный вид на город", city: "лиссабон", category: "nature", image: "https://picsum.photos/300/180?random=2" },
-    { name: "Oceanário de Lisboa", description: "Современный океанариум", city: "лиссабон", category: "fun", image: "https://picsum.photos/300/180?random=3" },
-    { name: "Time Out Market", description: "Фудкорт и рынок в центре города", city: "лиссабон", category: "food", image: "https://picsum.photos/300/180?random=4" },
-    { name: "Centro Colombo", description: "Крупный торговый центр", city: "лиссабон", category: "shopping", image: "https://picsum.photos/300/180?random=5" }
+    {
+      name: "Castelo de São Jorge",
+      description: "Древняя крепость с видом на Лиссабон",
+      city: "лиссабон",
+      category: "culture",
+      image: "https://picsum.photos/300/180?random=1"
+    },
+    {
+      name: "Miradouro da Senhora do Monte",
+      description: "Лучший панорамный вид на город",
+      city: "лиссабон",
+      category: "nature",
+      image: "https://picsum.photos/300/180?random=2"
+    },
+    {
+      name: "Oceanário de Lisboa",
+      description: "Современный океанариум",
+      city: "лиссабон",
+      category: "fun",
+      image: "https://picsum.photos/300/180?random=3"
+    },
+    {
+      name: "Time Out Market",
+      description: "Фудкорт и рынок в центре города",
+      city: "лиссабон",
+      category: "food",
+      image: "https://picsum.photos/300/180?random=4"
+    },
+    {
+      name: "Centro Colombo",
+      description: "Крупный торговый центр",
+      city: "лиссабон",
+      category: "shopping",
+      image: "https://picsum.photos/300/180?random=5"
+    }
   ];
 
   resultBlock.classList.remove("visible");
@@ -485,7 +554,10 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
       moreBtn.remove();
 
       setTimeout(() => {
-        resultBlock.querySelectorAll(".card")[3]?.scrollIntoView({ behavior: "smooth", block: "start" });
+        resultBlock.querySelectorAll(".card")[3]?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
       }, 100);
     });
 
@@ -571,7 +643,9 @@ function toggleFavoritePlaceFromEncoded(encoded, element) {
   const favs = JSON.parse(localStorage.getItem(key) || "[]");
 
   const exists = favs.find(f => f.name === place.name && f.city === place.city);
-  const updated = exists ? favs.filter(f => !(f.name === place.name && f.city === place.city)) : [...favs, place];
+  const updated = exists
+    ? favs.filter(f => !(f.name === place.name && f.city === place.city))
+    : [...favs, place];
 
   localStorage.setItem(key, JSON.stringify(updated));
   element.innerHTML = exists ? "🤍" : "💙";
@@ -582,14 +656,15 @@ function toggleFavoritePlaceFromEncoded(encoded, element) {
     place: place.name,
   });
 }
-    });
-    // Лог сессии
-    window.addEventListener("beforeunload", () => {
-      const duration = Math.round((Date.now() - window.appStart) / 1000);
-      logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
-    });
 
-  } catch (err) {
-    console.error("❌ Ошибка в инициализации:", err);
-  }
+// ─── Лог выхода (длительность сессии) ────────────────────────────
+window.addEventListener("beforeunload", () => {
+  const duration = Math.round((Date.now() - window.appStart) / 1000);
+  logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
+});
+
+// ✅ Закрываем try/catch и DOMContentLoaded
+} catch (err) {
+  console.error("❌ Ошибка в инициализации:", err);
+}
 });
