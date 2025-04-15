@@ -5,13 +5,19 @@ import { renderFlights } from './render.js';
 // 🛫 Нормализация Amadeus рейса
 function normalizeAmadeusFlight(flight) {
   const segment = flight?.itineraries?.[0]?.segments?.[0];
+  const departure_at = segment?.departure?.at;
+
+  if (!departure_at) {
+    console.warn("❌ Рейс без departure_at:", flight);
+    return null;
+  }
 
   return {
     from: flight.from,
     to: flight.to,
-    departure_at: segment?.departure?.at || null,
-    airline: flight.airline,
-    price: flight.price
+    departure_at,
+    airline: flight.airline || "—",
+    price: flight.price || "—"
   };
 }
 
@@ -44,8 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const date = departureInput.value.trim();
 
       const rawFlights = await fetchAmadeusFlights(from, to, date);
-      const flights = rawFlights.map(normalizeAmadeusFlight);
-      renderFlights(flights);
+const flights = rawFlights.map(normalizeAmadeusFlight).filter(f => f !== null);
+renderFlights(flights);
     });
 
     trackEvent("Загрузка приложения", {
