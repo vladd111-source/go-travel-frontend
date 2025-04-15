@@ -23,34 +23,40 @@ document.addEventListener("DOMContentLoaded", () => {
       throw new Error("❌ Один из элементов формы не найден!");
     }
 
-    // ✈️ Обработка сабмита формы
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const from = fromInput.value.trim();
-      const to = toInput.value.trim();
-      const date = departureInput.value.trim();
+// ✈️ Обработка сабмита формы
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-      const rawFlights = await fetchAmadeusFlights(from, to, date);
-      const flights = rawFlights.filter(f => f.origin && f.destination && f.departure_at);
-      renderFlights(flights);
+  const fromCity = fromInput.value.trim();
+  const toCity = toInput.value.trim();
+  const date = departureInput.value.trim();
 
-      trackEvent("Поиск рейсов", {
-        from,
-        to,
-        departureDate: date,
-        count: flights.length,
-        isRoundTrip: false,
-      });
-    });
+  // ⛽ Получаем IATA коды через Amadeus
+  const fromIATA = await fetchCityIATA(fromCity);
+  const toIATA = await fetchCityIATA(toCity);
 
-    trackEvent("Загрузка приложения", {
-      lang: window._appLang,
-      timestamp: new Date().toISOString(),
-    });
-
-  } catch (e) {
-    console.error("❌ Ошибка при инициализации:", e);
+  if (!fromIATA || !toIATA) {
+    console.warn("❌ Не удалось найти IATA коды для городов", { fromCity, toCity });
+    return;
   }
+
+  const rawFlights = await fetchAmadeusFlights(fromIATA.code, toIATA.code, date);
+  const flights = rawFlights.filter(f => f.origin && f.destination && f.departure_at);
+  renderFlights(flights);
+
+  trackEvent("Поиск рейсов", {
+    from: fromIATA.code,
+    to: toIATA.code,
+    departureDate: date,
+    count: flights.length,
+    isRoundTrip: false,
+  });
+});
+
+// 📦 Аналитика загрузки
+trackEvent("Загрузка приложения", {
+  lang: window._appLang,
+  timestamp: new Date().toISOString(),
 });
 
 // 🔍 Доступ для отладки из консоли
