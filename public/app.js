@@ -305,24 +305,43 @@ if (fromInput && toInput && departureInput) {
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  // 🧠 Получаем input-элементы
+  const fromInput = document.getElementById("from");
+  const toInput = document.getElementById("to");
+  const departureInput = document.getElementById("departureDate");
+  const roundTripCheckbox = document.getElementById("roundTrip");
+  const returnInput = document.getElementById("returnDate");
+
+  // ❗ Проверка на наличие элементов
+  if (!fromInput || !toInput || !departureInput) {
+    alert("⛔️ Ошибка: Не найдены поля формы");
+    return;
+  }
+
+  // ✏️ Получаем значения
   const from = fromInput.value.trim();
   const to = toInput.value.trim();
   const departureDate = departureInput.value;
-  const isRoundTrip = document.getElementById("roundTrip")?.checked;
-  const returnDate = document.getElementById("returnDate")?.value;
+  const isRoundTrip = roundTripCheckbox?.checked;
+  const returnDate = returnInput?.value;
 
+  // ✅ Валидация
   if (!from || !to || !departureDate || (isRoundTrip && !returnDate)) {
     alert("Пожалуйста, заполните все поля.");
     return;
   }
 
+  // 💾 Сохраняем в localStorage
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
-  if (isRoundTrip) localStorage.setItem("lastReturnDate", returnDate);
+  if (isRoundTrip) {
+    localStorage.setItem("lastReturnDate", returnDate);
+  }
 
+  // 🔄 Показываем загрузку
   showLoading();
-
+  
   try {
     const token = await getAmadeusToken();
 
