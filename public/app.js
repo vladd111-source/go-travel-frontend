@@ -7,6 +7,8 @@ let fromInput, toInput, departureInput;
 let lastTab = localStorage.getItem("activeTab") || "flights";
 let returnFlights = [];
 let departureFlights = [];
+let isRoundTrip = false;
+
 // ─── DOMContentLoaded и инициализация ─────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   try {
