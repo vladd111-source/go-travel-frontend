@@ -2,6 +2,8 @@ import { getAmadeusToken, fetchCityIATA, fetchAmadeusFlights } from './amadeus.j
 import { fetchLocation, fetchAviasalesFlights } from './api.js';
 import { renderFlights } from './render.js';
 
+// 🔧 Глобальные переменные формы
+let fromInput, toInput, departureInput;
 let lastTab = localStorage.getItem("activeTab") || "flights";
 
 // ─── DOMContentLoaded и инициализация ─────────────────────────────
