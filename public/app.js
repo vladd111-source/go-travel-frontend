@@ -15,27 +15,6 @@ function normalizeAmadeusFlight(flight) {
   };
 }
 
-// 🎯 Получаем элементы формы
-const searchBtn = document.getElementById('searchBtn');
-const fromInput = document.getElementById('fromInput');
-const toInput = document.getElementById('toInput');
-const departureInput = document.getElementById('departureInput');
-
-// 🚀 Обработка нажатия кнопки поиска
-searchBtn.addEventListener('click', async () => {
-  const from = fromInput.value.trim();
-  const to = toInput.value.trim();
-  const date = departureInput.value.trim();
-
-  const rawFlights = await fetchAmadeusFlights(from, to, date);
-  const flights = rawFlights.map(normalizeAmadeusFlight);
-  renderFlights(flights);
-});
-
-// 🔍 Доступ для отладки из консоли
-window.fetchLocation = fetchLocation;
-window.fetchAviasalesFlights = fetchAviasalesFlights;
-
 // ─── DOMContentLoaded и инициализация ─────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   try {
@@ -45,6 +24,25 @@ document.addEventListener("DOMContentLoaded", () => {
     initFocus(lastTab);
     fadeInBody();
     initRatingInputValidation();
+
+    // 🎯 Получаем элементы формы
+    const searchBtn = document.getElementById('searchBtn');
+    const fromInput = document.getElementById('fromInput');
+    const toInput = document.getElementById('toInput');
+    const departureInput = document.getElementById('departureInput');
+
+    // 🚀 Обработка нажатия кнопки поиска
+    searchBtn.addEventListener('click', async () => {
+      const from = fromInput.value.trim();
+      const to = toInput.value.trim();
+      const date = departureInput.value.trim();
+
+      const rawFlights = await fetchAmadeusFlights(from, to, date);
+      const flights = rawFlights.map(normalizeAmadeusFlight);
+      renderFlights(flights);
+    });
+
+    // 📊 Лог запуска
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
       timestamp: new Date().toISOString(),
@@ -53,6 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("❌ Ошибка при инициализации:", e);
   }
 });
+
+// 🔍 Доступ для отладки из консоли
+window.fetchLocation = fetchLocation;
+window.fetchAviasalesFlights = fetchAviasalesFlights;
+
 
 // ─── Telegram WebApp Init ─────────────────────────────────────────
 function initTelegram() {
