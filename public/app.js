@@ -18,6 +18,7 @@ function normalizeAmadeusFlight(flight) {
 // ─── DOMContentLoaded и инициализация ─────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   try {
+    // Инициализация
     initTelegram();
     initLanguageSwitcher();
     restoreLastTab();
@@ -25,13 +26,17 @@ document.addEventListener("DOMContentLoaded", () => {
     fadeInBody();
     initRatingInputValidation();
 
-    // 🎯 Получаем элементы формы
+    // 👉 Вот тут ищем DOM-элементы, когда всё загружено
     const searchBtn = document.getElementById('searchBtn');
     const fromInput = document.getElementById('fromInput');
     const toInput = document.getElementById('toInput');
     const departureInput = document.getElementById('departureInput');
 
-    // 🚀 Обработка нажатия кнопки поиска
+    if (!searchBtn || !fromInput || !toInput || !departureInput) {
+      throw new Error("❌ Один из элементов формы не найден!");
+    }
+
+    // Добавляем слушатель
     searchBtn.addEventListener('click', async () => {
       const from = fromInput.value.trim();
       const to = toInput.value.trim();
@@ -42,15 +47,16 @@ document.addEventListener("DOMContentLoaded", () => {
       renderFlights(flights);
     });
 
-    // 📊 Лог запуска
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
       timestamp: new Date().toISOString(),
     });
+
   } catch (e) {
     console.error("❌ Ошибка при инициализации:", e);
   }
 });
+
 
 // 🔍 Доступ для отладки из консоли
 window.fetchLocation = fetchLocation;
