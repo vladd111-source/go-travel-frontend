@@ -587,3 +587,7 @@ window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - window.appStart) / 1000);
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
 });
+    } catch (err) {
+    console.error("❌ Ошибка в инициализации:", err);
+  }
+}); // ← ВОТ ЭТА СКОБКА БЫЛА ОТСУТСТВУЮЩЕЙ! ЭТО И БЫЛА ВСЯ ПРОБЛЕМА!
