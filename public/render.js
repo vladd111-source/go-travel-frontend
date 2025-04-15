@@ -6,13 +6,20 @@
  * @returns {string} - Ссылка на Aviasales
  */
 export function generateAviasalesLink(flight) {
-  const datePart = flight.departure_at.split("T")[0].replace(/-/g, "");
-  return `https://www.aviasales.com/search/${flight.origin}${datePart}${flight.destination}1`;
+  if (!flight || typeof flight.departure_at !== "string") {
+    console.warn("⚠️ Невалидный рейс для ссылки:", flight);
+    return "#";
+  }
+
+  const [date] = flight.departure_at.split("T");
+  const formattedDate = date.split("-").reverse().join(".");
+
+  return `https://www.aviasales.ru/search/${flight.from}${formattedDate}${flight.to}1`;
 }
 
 /**
  * Отрисовывает список рейсов на странице.
- * @param {Array} flights - Массив рейсов от Aviasales API
+ * @param {Array} flights - Массив рейсов от Amadeus API
  */
 export function renderFlights(flights) {
   const container = document.getElementById("hotDeals");
@@ -24,15 +31,17 @@ export function renderFlights(flights) {
   }
 
   flights.forEach(flight => {
+    if (!flight?.departure_at) return;
+
     const card = document.createElement("div");
     card.className = "card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300";
 
-    const departureDate = flight.departure_at?.split("T")[0] || "—";
+    const departureDate = flight.departure_at.split("T")[0] || "—";
     const link = generateAviasalesLink(flight);
 
     card.innerHTML = `
       <h3 class="text-lg font-semibold mb-1">${flight.airline || "Авиакомпания"}</h3>
-      <div class="text-sm text-gray-600 mb-1">🛫 ${flight.origin} → 🛬 ${flight.destination}</div>
+      <div class="text-sm text-gray-600 mb-1">🛫 ${flight.from} → 🛬 ${flight.to}</div>
       <div class="text-sm text-gray-600 mb-1">📅 ${departureDate}</div>
       <div class="text-sm text-gray-600 mb-1">💰 $${flight.price}</div>
       <a href="${link}" target="_blank" class="btn btn-blue mt-3">Перейти к бронированию</a>
