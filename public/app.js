@@ -15,17 +15,24 @@ function normalizeAmadeusFlight(flight) {
   };
 }
 
+// 🎯 Получаем элементы формы
+const searchBtn = document.getElementById('searchBtn');
+const fromInput = document.getElementById('fromInput');
+const toInput = document.getElementById('toInput');
+const departureInput = document.getElementById('departureInput');
+
+// 🚀 Обработка нажатия кнопки поиска
 searchBtn.addEventListener('click', async () => {
-  const from = fromInput.value;
-  const to = toInput.value;
-  const date = departureInput.value;
+  const from = fromInput.value.trim();
+  const to = toInput.value.trim();
+  const date = departureInput.value.trim();
 
   const rawFlights = await fetchAmadeusFlights(from, to, date);
   const flights = rawFlights.map(normalizeAmadeusFlight);
   renderFlights(flights);
 });
 
-// Делает доступным из консоли для отладки
+// 🔍 Доступ для отладки из консоли
 window.fetchLocation = fetchLocation;
 window.fetchAviasalesFlights = fetchAviasalesFlights;
 
