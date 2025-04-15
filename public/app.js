@@ -267,7 +267,7 @@ if (hotelCityInput) {
 }
 
 // ─── Инициализация полей рейсов ──────────────────────────────────
-fromInput = document.getElementById('from');
+document.getElementById("from");
 const toInput = document.getElementById("to");
 const departureInput = document.getElementById("departureDate");
 
