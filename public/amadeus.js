@@ -11,7 +11,7 @@ function transliterate(text) {
   return text.split('').map(char => map[char] || char).join('');
 }
 
-// 🧠 Ручной маппинг для нестандартных названий
+// 🧠 Ручной маппинг
 const manualMap = {
   "Прага": "Prague",
   "Варшава": "Warsaw",
@@ -40,7 +40,7 @@ export async function getAmadeusToken() {
   return data.access_token;
 }
 
-// 🌍 Поиск IATA-кода по названию города (через аэропорты)
+// 🌍 Получение IATA-кода
 export async function fetchCityIATA(cityName) {
   const token = await getAmadeusToken();
   const mapped = manualMap[cityName] || cityName;
