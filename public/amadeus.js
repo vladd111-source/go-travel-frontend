@@ -21,8 +21,11 @@ const manualMap = {
   "Неаполь": "Naples"
 };
 
-// 🔐 Получение токена от Amadeus API
+// 🔐 Кэшируем токен Amadeus
+let tokenCache = null;
 export async function getAmadeusToken() {
+  if (tokenCache) return tokenCache;
+
   const clientId = "10UMyGcxHVsK1sK8x1U8MCqgR7g1LuDo";
   const clientSecret = "0bXLQrqxEAyFjdkx";
 
@@ -37,7 +40,12 @@ export async function getAmadeusToken() {
   });
 
   const data = await response.json();
-  return data.access_token;
+  tokenCache = data.access_token;
+
+  // очищаем через 25 минут
+  setTimeout(() => { tokenCache = null }, 25 * 60 * 1000);
+
+  return tokenCache;
 }
 
 // 🌍 Получение IATA кода по названию города
@@ -111,6 +119,7 @@ export async function fetchAmadeusFlights(from, to, date) {
   };
 
   try {
+    await new Promise(resolve => setTimeout(resolve, 500)); // Защита от 429
     console.log("📤 Запрос в Amadeus:", JSON.stringify(payload, null, 2));
 
     const response = await fetch("https://test.api.amadeus.com/v2/shopping/flight-offers", {
