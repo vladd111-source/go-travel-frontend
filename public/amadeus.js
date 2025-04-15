@@ -74,13 +74,13 @@ export async function fetchCityIATA(cityName) {
   }
 }
 
-// ✈️ Поиск рейсов через Amadeus API
+// ✈️ Поиск рейсов через Amadeus API (новый формат payload!)
 export async function fetchAmadeusFlights(from, to, date) {
   const token = await getAmadeusToken();
 
   const cleanFrom = from?.toUpperCase().trim();
   const cleanTo = to?.toUpperCase().trim();
-  const cleanDate = typeof date === "string" && date.match(/^\d{4}-\d{2}-\d{2}$/) ? date : null;
+  const cleanDate = typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null;
 
   if (!cleanFrom || !cleanTo || !cleanDate) {
     console.warn("❌ Недостаточно данных для запроса рейсов", { from, to, date });
@@ -88,10 +88,16 @@ export async function fetchAmadeusFlights(from, to, date) {
   }
 
   const payload = {
-    currencyCode: "USD",
-    originLocationCode: cleanFrom,
-    destinationLocationCode: cleanTo,
-    departureDate: cleanDate,
+    originDestinations: [
+      {
+        id: "1",
+        originLocationCode: cleanFrom,
+        destinationLocationCode: cleanTo,
+        departureDateTimeRange: {
+          date: cleanDate
+        }
+      }
+    ],
     travelers: [
       {
         id: "1",
