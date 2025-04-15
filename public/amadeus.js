@@ -1,4 +1,4 @@
-// 🎤 Транслитерация с кириллицы на латиницу
+// 🔤 Транслитерация с кириллицы на латиницу
 function transliterate(text) {
   const map = {
     А: "A", Б: "B", В: "V", Г: "G", Д: "D", Е: "E", Ё: "E", Ж: "Zh", З: "Z", И: "I", Й: "Y",
@@ -40,7 +40,7 @@ export async function getAmadeusToken() {
   return data.access_token;
 }
 
-// 🌍 Поиск IATA-кода по названию города (subType=AIRPORT)
+// 🌍 Поиск IATA-кода по названию города (через аэропорты)
 export async function fetchCityIATA(cityName) {
   const token = await getAmadeusToken();
   const mapped = manualMap[cityName] || cityName;
@@ -88,6 +88,7 @@ export async function fetchAmadeusFlights(from, to, date) {
   }
 
   const payload = {
+    currencyCode: "USD",
     originLocationCode: cleanFrom,
     destinationLocationCode: cleanTo,
     departureDate: cleanDate,
@@ -97,7 +98,10 @@ export async function fetchAmadeusFlights(from, to, date) {
         travelerType: "ADULT"
       }
     ],
-    sources: ["GDS"]
+    sources: ["GDS"],
+    searchCriteria: {
+      maxFlightOffers: 10
+    }
   };
 
   try {
