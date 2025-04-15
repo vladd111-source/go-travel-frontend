@@ -1,5 +1,9 @@
 // render.js
 
+/**
+ * Генерирует корректную ссылку на Aviasales
+ * @param {Object} flight - Объект рейса
+ */
 export function generateAviasalesLink(flight) {
   if (!flight || typeof flight.departure_at !== "string") {
     console.warn("⚠️ Невалидный рейс для ссылки:", flight);
@@ -7,14 +11,23 @@ export function generateAviasalesLink(flight) {
   }
 
   const [date] = flight.departure_at.split("T");
-  const formattedDate = date.split("-").reverse().join(".");
+  const [year, month, day] = date.split("-");
 
-  return `https://www.aviasales.ru/search/${flight.origin}${formattedDate}${flight.destination}1`;
+  const formattedDate = `${day}${month}`;
+  const fromCode = flight.from || flight.origin;
+  const toCode = flight.to || flight.destination;
+
+  if (!fromCode || !toCode) {
+    console.warn("⚠️ Невалидные IATA коды:", flight);
+    return "#";
+  }
+
+  return `https://www.aviasales.ru/search/${fromCode}${formattedDate}${toCode}1`;
 }
 
 /**
  * Отрисовывает список рейсов на странице.
- * @param {Array} flights - Массив рейсов от Amadeus API
+ * @param {Array} flights - Массив рейсов
  * @param {string} fromCity - Название города отправления
  * @param {string} toCity - Название города прибытия
  */
