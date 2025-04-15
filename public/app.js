@@ -663,7 +663,7 @@ window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - window.appStart) / 1000);
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
 });
-
+}
 // ✅ УБРАНА лишняя }
 catch (err) {
   console.error("❌ Ошибка в инициализации:", err);
