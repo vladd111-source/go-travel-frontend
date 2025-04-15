@@ -581,6 +581,7 @@ function toggleFavoritePlaceFromEncoded(encoded, element) {
     action: exists ? "remove" : "add",
     place: place.name,
   });
+}
 // ─── Лог выхода (длительность сессии) ────────────────────────────
 window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - window.appStart) / 1000);
