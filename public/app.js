@@ -423,7 +423,7 @@ trackEvent("Поиск рейсов", {
 
 } catch (err) {
   console.error("❌ Ошибка при поиске рейсов:", err);
-  Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
+  Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
   trackEvent("Ошибка загрузки рейсов", err.message);
 } finally {
   hideLoading();
