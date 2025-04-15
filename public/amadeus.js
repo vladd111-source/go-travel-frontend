@@ -11,7 +11,7 @@ function transliterate(text) {
   return text.split('').map(char => map[char] || char).join('');
 }
 
-// 🧠 Ручной маппинг
+// 🧠 Ручной маппинг нестандартных городов
 const manualMap = {
   "Прага": "Prague",
   "Варшава": "Warsaw",
@@ -21,7 +21,7 @@ const manualMap = {
   "Неаполь": "Naples"
 };
 
-// 🔐 Получение токена доступа от Amadeus
+// 🔐 Получение токена от Amadeus API
 export async function getAmadeusToken() {
   const clientId = "10UMyGcxHVsK1sK8x1U8MCqgR7g1LuDo";
   const clientSecret = "0bXLQrqxEAyFjdkx";
@@ -40,7 +40,7 @@ export async function getAmadeusToken() {
   return data.access_token;
 }
 
-// 🌍 Получение IATA-кода
+// 🌍 Получение IATA кода по названию города
 export async function fetchCityIATA(cityName) {
   const token = await getAmadeusToken();
   const mapped = manualMap[cityName] || cityName;
@@ -74,7 +74,7 @@ export async function fetchCityIATA(cityName) {
   }
 }
 
-// ✈️ Поиск рейсов через Amadeus API (новый формат payload!)
+// ✈️ Поиск рейсов через Amadeus API (новый формат v2)
 export async function fetchAmadeusFlights(from, to, date) {
   const token = await getAmadeusToken();
 
@@ -136,13 +136,16 @@ export async function fetchAmadeusFlights(from, to, date) {
       return [];
     }
 
-    return data.data.map(offer => ({
-      from: cleanFrom,
-      to: cleanTo,
-      date: cleanDate,
-      airline: offer.validatingAirlineCodes?.[0] || "—",
-      price: offer.price?.total || "—"
-    }));
+    return data.data.map(offer => {
+      const segment = offer.itineraries?.[0]?.segments?.[0];
+      return {
+        origin: segment?.departure?.iataCode || cleanFrom,
+        destination: segment?.arrival?.iataCode || cleanTo,
+        departure_at: segment?.departure?.at || null,
+        airline: offer.validatingAirlineCodes?.[0] || "—",
+        price: offer.price?.total || "—"
+      };
+    }).filter(flight => flight.departure_at); // удаляем пустые
   } catch (err) {
     console.error("❌ Ошибка запроса к Amadeus:", err);
     return [];
