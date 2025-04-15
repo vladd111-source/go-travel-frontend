@@ -5,7 +5,8 @@ import { renderFlights } from './render.js';
 // 🔧 Глобальные переменные формы
 let fromInput, toInput, departureInput;
 let lastTab = localStorage.getItem("activeTab") || "flights";
-
+let returnFlights = [];
+let departureFlights = [];
 // ─── DOMContentLoaded и инициализация ─────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   try {
@@ -335,7 +336,7 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     }
 
     // ✈️ Рейсы туда
-    let departureFlights = await fetchAmadeusFlights(fromCode.code, toCode.code, departureDate, token);
+    departureFlights = await fetchAmadeusFlights(fromCode.code, toCode.code, departureDate, token);
     console.log("🛫 Найдено рейсов туда (Amadeus):", departureFlights);
 
     if (!Array.isArray(departureFlights) || !departureFlights.length) {
@@ -352,7 +353,6 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     }
 
     // 🔁 Рейсы обратно (если выбран "туда-обратно")
-    let returnFlights = [];
 
     if (isRoundTrip) {
       returnFlights = await fetchAmadeusFlights(toCode.code, fromCode.code, returnDate, token);
