@@ -267,17 +267,13 @@ if (hotelCityInput) {
 }
 
 // ─── Инициализация полей рейсов ──────────────────────────────────
-//const document.getElementById("from");
-const toInput = document.getElementById("to");
-const departureInput = document.getElementById("departureDate");
-
 if (fromInput && toInput && departureInput) {
   fromInput.value = localStorage.getItem("lastFrom") || "";
   toInput.value = localStorage.getItem("lastTo") || "";
   departureInput.value = localStorage.getItem("lastDepartureDate") || "";
   fromInput.setAttribute("autofocus", "autofocus");
 }
-
+    
 // ─── Обработка формы поиска рейсов ──────────────────────────────
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
