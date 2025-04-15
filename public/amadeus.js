@@ -138,6 +138,7 @@ export async function fetchAmadeusFlights(from, to, date) {
 
     return data.data.map(offer => {
       const segment = offer.itineraries?.[0]?.segments?.[0];
+
       return {
         origin: segment?.departure?.iataCode || cleanFrom,
         destination: segment?.arrival?.iataCode || cleanTo,
@@ -145,7 +146,7 @@ export async function fetchAmadeusFlights(from, to, date) {
         airline: offer.validatingAirlineCodes?.[0] || "—",
         price: offer.price?.total || "—"
       };
-    }).filter(flight => flight.departure_at); // удаляем пустые
+    }).filter(flight => flight.origin && flight.destination && flight.departure_at);
   } catch (err) {
     console.error("❌ Ошибка запроса к Amadeus:", err);
     return [];
