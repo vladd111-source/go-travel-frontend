@@ -31,26 +31,27 @@ form.addEventListener('submit', async (e) => {
   const toCity = toInput.value.trim();
   const date = departureInput.value.trim();
 
-  // ⛽ Получаем IATA коды через Amadeus
-  const fromIATA = await fetchCityIATA(fromCity);
-  const toIATA = await fetchCityIATA(toCity);
+// ⛽ Получаем IATA коды через Amadeus
+const fromIATA = await fetchCityIATA(fromCity);
+const toIATA = await fetchCityIATA(toCity);
 
-  if (!fromIATA || !toIATA) {
-    console.warn("❌ Не удалось найти IATA коды для городов", { fromCity, toCity });
-    return;
-  }
+if (!fromIATA || !toIATA) {
+  console.warn("❌ Не удалось найти IATA коды для городов", { fromCity, toCity });
+  return;
+}
 
-  const rawFlights = await fetchAmadeusFlights(fromIATA.code, toIATA.code, date);
-  const flights = rawFlights.filter(f => f.origin && f.destination && f.departure_at);
-  renderFlights(flights);
+const rawFlights = await fetchAmadeusFlights(fromIATA.code, toIATA.code, date);
+const flights = rawFlights.filter(f => f.origin && f.destination && f.departure_at);
 
-  trackEvent("Поиск рейсов", {
-    from: fromIATA.code,
-    to: toIATA.code,
-    departureDate: date,
-    count: flights.length,
-    isRoundTrip: false,
-  });
+// ✅ вот тут подставляем нормальные названия для отображения
+renderFlights(flights, fromIATA.name, toIATA.name);
+
+trackEvent("Поиск рейсов", {
+  from: fromIATA.code,
+  to: toIATA.code,
+  departureDate: date,
+  count: flights.length,
+  isRoundTrip: false,
 });
 
 // 📦 Аналитика загрузки
