@@ -2,7 +2,6 @@ import { getAmadeusToken, fetchCityIATA, fetchAmadeusFlights } from './amadeus.j
 import { fetchLocation, fetchAviasalesFlights } from './api.js';
 import { renderFlights } from './render.js';
 
-
 // 🛫 Нормализация Amadeus рейса
 function normalizeAmadeusFlight(flight) {
   const segment = flight?.itineraries?.[0]?.segments?.[0];
@@ -15,6 +14,16 @@ function normalizeAmadeusFlight(flight) {
     price: flight.price
   };
 }
+
+searchBtn.addEventListener('click', async () => {
+  const from = fromInput.value;
+  const to = toInput.value;
+  const date = departureInput.value;
+
+  const rawFlights = await fetchAmadeusFlights(from, to, date);
+  const flights = rawFlights.map(normalizeAmadeusFlight);
+  renderFlights(flights);
+});
 
 // Делает доступным из консоли для отладки
 window.fetchLocation = fetchLocation;
