@@ -352,7 +352,9 @@ if (isRoundTrip) {
 
 const container = document.getElementById("hotDeals");
 container.innerHTML = "";
-
+    
+  }
+  
 if (departureFlights?.length) {
   const title = document.createElement("h3");
   title.textContent = "Рейсы туда:";
