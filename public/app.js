@@ -582,12 +582,13 @@ function toggleFavoritePlaceFromEncoded(encoded, element) {
     place: place.name,
   });
 }
-   // ✅ Закрываем try
-} catch (err) {
-  console.error("❌ Ошибка в инициализации:", err);
-   }
-// ─── Лог выхода (длительность сессии) ────────────────────────────
-window.addEventListener("beforeunload", () => {
-  const duration = Math.round((Date.now() - window.appStart) / 1000);
-  logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
+    // Лог сессии
+    window.addEventListener("beforeunload", () => {
+      const duration = Math.round((Date.now() - window.appStart) / 1000);
+      logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
+    });
+
+  } catch (err) {
+    console.error("❌ Ошибка в инициализации:", err);
+  }
 });
