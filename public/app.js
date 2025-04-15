@@ -26,18 +26,19 @@ document.addEventListener("DOMContentLoaded", () => {
     fadeInBody();
     initRatingInputValidation();
 
-    // 👉 Вот тут ищем DOM-элементы, когда всё загружено
-    const searchBtn = document.getElementById('searchBtn');
-    const fromInput = document.getElementById('fromInput');
-    const toInput = document.getElementById('toInput');
-    const departureInput = document.getElementById('departureInput');
+    // 🎯 Элементы формы
+    const form = document.getElementById('search-form');
+    const fromInput = document.getElementById('from');
+    const toInput = document.getElementById('to');
+    const departureInput = document.getElementById('departureDate');
 
-    if (!searchBtn || !fromInput || !toInput || !departureInput) {
+    if (!form || !fromInput || !toInput || !departureInput) {
       throw new Error("❌ Один из элементов формы не найден!");
     }
 
-    // Добавляем слушатель
-    searchBtn.addEventListener('click', async () => {
+    // 🎯 Обработка сабмита формы
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
       const from = fromInput.value.trim();
       const to = toInput.value.trim();
       const date = departureInput.value.trim();
