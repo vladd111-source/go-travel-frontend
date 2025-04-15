@@ -312,7 +312,7 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
       alert("Города не найдены.");
       return;
     }
-
+   
 // ✈️ Запрашиваем рейсы туда
 let departureFlights = await fetchAmadeusFlights(fromCode.code, toCode.code, departureDate, token);
 console.log("🛫 Найдено рейсов туда (Amadeus):", departureFlights);
@@ -582,17 +582,12 @@ function toggleFavoritePlaceFromEncoded(encoded, element) {
     place: place.name,
   });
 }
-
+   // ✅ Закрываем try
+} catch (err) {
+  console.error("❌ Ошибка в инициализации:", err);
+   }
 // ─── Лог выхода (длительность сессии) ────────────────────────────
 window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - window.appStart) / 1000);
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
-});
-
-// ✅ Закрываем try
-} catch (err) {
-  console.error("❌ Ошибка в инициализации:", err);
-}
-
-// ✅ Закрываем DOMContentLoaded
 });
