@@ -1,4 +1,3 @@
-import { getAmadeusToken, fetchCityIATA, fetchAmadeusFlights } from './amadeus.js';
 import { fetchLocation, fetchAviasalesFlights } from './api.js';
 import { renderFlights } from './render.js';
 
@@ -339,69 +338,61 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     localStorage.setItem("lastReturnDate", returnDate);
   }
 
-  // 🔄 Показываем загрузку
-  showLoading();
-  
-  try {
-    const token = await getAmadeusToken();
+// 🔄 Показываем загрузку
+showLoading();
 
-    const fromCode = await fetchCityIATA(from, token);
-    const toCode = await fetchCityIATA(to, token);
+try {
+  const response = await fetch(`/api/flights?from=${from}&to=${to}&date=${departureDate}`);
+  const departureFlights = await response.json();
 
-    console.log("📍 IATA:", fromCode, toCode);
+  let returnFlights = [];
 
-    if (!fromCode || !toCode) {
-      alert("Города не найдены.");
-      hideLoading();
-      return;
-    }
-
-    // ✈️ Рейсы туда
-    departureFlights = await fetchAmadeusFlights(fromCode.code, toCode.code, departureDate, token);
-    console.log("🛫 Найдено рейсов туда (Amadeus):", departureFlights);
-
-    if (!Array.isArray(departureFlights) || !departureFlights.length) {
-      console.warn("🔁 Fallback: запрашиваем рейсы из Aviasales");
-      const fallback = await fetchAviasalesFlights(fromCode.code, toCode.code, departureDate);
-
-      if (Array.isArray(fallback) && fallback[0]?.departure_at) {
-        departureFlights = fallback;
-        console.log("🛫 Найдено рейсов туда (Aviasales):", departureFlights);
-      } else {
-        console.error("❌ Ошибка: некорректный ответ от Aviasales:", fallback);
-        departureFlights = [];
-      }
-    }
-
-    // 🔁 Рейсы обратно (если выбран "туда-обратно")
-
-    if (isRoundTrip) {
-      returnFlights = await fetchAmadeusFlights(toCode.code, fromCode.code, returnDate, token);
-      console.log("🛬 Найдено рейсов обратно (Amadeus):", returnFlights);
-
-      if (!Array.isArray(returnFlights) || !returnFlights.length) {
-        console.warn("🔁 Fallback: запрашиваем обратные рейсы из Aviasales");
-        const fallbackReturn = await fetchAviasalesFlights(toCode.code, fromCode.code, returnDate);
-
-        if (Array.isArray(fallbackReturn) && fallbackReturn[0]?.departure_at) {
-          returnFlights = fallbackReturn;
-          console.log("🛬 Найдено рейсов обратно (Aviasales):", returnFlights);
-        } else {
-          console.warn("❌ Ошибка: некорректный ответ от Aviasales:", fallbackReturn);
-          returnFlights = [];
-        }
-      }
-    }
-
-    // Тут ты можешь вставить renderFlights(departureFlights) и т.д.
-
-  } catch (err) {
-    console.error("❌ Ошибка при загрузке рейсов:", err);
-  } finally {
-    hideLoading();
+  // ✈️ Рейсы туда
+  if (Array.isArray(departureFlights) && departureFlights.length) {
+    renderFlights(departureFlights, from, to);
+  } else {
+    console.warn("😢 Рейсы туда не найдены");
   }
+
+  // 🔁 Рейсы обратно (если выбран "туда-обратно")
+  if (isRoundTrip) {
+    const returnRes = await fetch(`/api/flights?from=${to}&to=${from}&date=${returnDate}`);
+    returnFlights = await returnRes.json();
+
+    if (Array.isArray(returnFlights) && returnFlights.length) {
+      renderFlights(returnFlights, to, from);
+    } else {
+      console.warn("😢 Рейсы обратно не найдены");
+    }
+  }
+
+  // 📊 Трекинг
+  trackEvent("Поиск рейсов", {
+    from,
+    to,
+    departureDate,
+    returnDate: isRoundTrip ? returnDate : null,
+    isRoundTrip,
+    count: (departureFlights?.length || 0) + (returnFlights?.length || 0)
+  });
+
+  // ✅ Telegram сообщение
+  Telegram.WebApp?.sendData?.(
+    (departureFlights?.length || returnFlights?.length)
+      ? `✈️ Найдены рейсы: ${from} → ${to}${isRoundTrip ? " и обратно" : ""}`
+      : "😢 Рейсы не найдены."
+  );
+
+} catch (err) {
+  console.error("❌ Ошибка при загрузке рейсов:", err);
+  Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
+} finally {
+  hideLoading();
+}
 });
 
+
+  
 
 const container = document.getElementById("hotDeals");
 container.innerHTML = "";
