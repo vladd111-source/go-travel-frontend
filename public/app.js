@@ -5,52 +5,64 @@ import { renderFlights } from './render.js';
 let fromInput, toInput, departureInput;
 let lastTab = localStorage.getItem("activeTab") || "flights";
 
-// ✈️ Обработка сабмита формы
-const form = document.getElementById('search-form');
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+// ⚙️ Ждём, пока DOM будет готов
+document.addEventListener("DOMContentLoaded", () => {
+  // ⛳️ Находим элементы формы
+  const form = document.getElementById('search-form');
+  fromInput = document.getElementById('from');
+  toInput = document.getElementById('to');
+  departureInput = document.getElementById('departureDate');
 
-  const fromCity = fromInput.value.trim();
-  const toCity = toInput.value.trim();
-  const date = departureInput.value.trim();
-
-  if (!fromCity || !toCity || !date) {
-    alert("Пожалуйста, заполните все поля.");
+  if (!form || !fromInput || !toInput || !departureInput) {
+    console.error("❌ Элементы формы не найдены");
     return;
   }
 
-  showLoading();
+  // ✈️ Обработка сабмита формы
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  try {
-    const response = await fetch(`/api/flights?from=${fromCity}&to=${toCity}&date=${date}`);
-    const flights = await response.json();
+    const fromCity = fromInput.value.trim();
+    const toCity = toInput.value.trim();
+    const date = departureInput.value.trim();
 
-    if (!Array.isArray(flights) || !flights.length) {
-      console.warn("❌ Рейсы не найдены");
-      document.getElementById("hotDeals").innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
-      Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
+    if (!fromCity || !toCity || !date) {
+      alert("Пожалуйста, заполните все поля.");
       return;
     }
 
-    renderFlights(flights, fromCity, toCity);
+    showLoading();
 
-    trackEvent("Поиск рейсов", {
-      from: fromCity,
-      to: toCity,
-      departureDate: date,
-      isRoundTrip: false,
-      count: flights.length,
-    });
+    try {
+      const response = await fetch(`/api/flights?from=${fromCity}&to=${toCity}&date=${date}`);
+      const flights = await response.json();
 
-    Telegram.WebApp?.sendData?.(`✈️ Найдено ${flights.length} рейсов: ${fromCity} → ${toCity}`);
-  } catch (err) {
-    console.error("❌ Ошибка при загрузке рейсов:", err);
-    Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
-  } finally {
-    hideLoading();
-  }
-}); // <-- ЭТОЙ СКОБКИ У ТЕБЯ НЕ ХВАТАЛО
+      if (!Array.isArray(flights) || !flights.length) {
+        console.warn("❌ Рейсы не найдены");
+        document.getElementById("hotDeals").innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
+        Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
+        return;
+      }
 
+      renderFlights(flights, fromCity, toCity);
+
+      trackEvent("Поиск рейсов", {
+        from: fromCity,
+        to: toCity,
+        departureDate: date,
+        isRoundTrip: false,
+        count: flights.length,
+      });
+
+      Telegram.WebApp?.sendData?.(`✈️ Найдено ${flights.length} рейсов: ${fromCity} → ${toCity}`);
+    } catch (err) {
+      console.error("❌ Ошибка при загрузке рейсов:", err);
+      Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
+    } finally {
+      hideLoading();
+    }
+  });
+});
 
 // ─── Вкладка ─────────────────────────────────────────────────────
 function restoreLastTab() {
