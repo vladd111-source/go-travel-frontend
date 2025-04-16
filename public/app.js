@@ -62,14 +62,14 @@ document.addEventListener("DOMContentLoaded", () => {
           count: flights.length,
         });
 
-        Telegram.WebApp?.sendData?.(`✈️ Найдено ${flights.length} рейсов: ${fromCity} → ${toCity}`);
-      } catch (err) {
-        console.error("❌ Ошибка при загрузке рейсов:", err);
-        Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
-      } finally {
-        hideLoading();
-      }
-    });
+    Telegram.WebApp?.sendData?.(`✈️ Найдено ${flights.length} рейсов: ${fromCity} → ${toCity}`);
+} catch (err) {
+  console.error("❌ Ошибка при загрузке рейсов:", err);
+  Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
+} finally {
+  hideLoading();
+}
+});
 
     // 📦 Аналитика загрузки
     trackEvent("Загрузка приложения", {
