@@ -5,118 +5,51 @@ import { renderFlights } from './render.js';
 let fromInput, toInput, departureInput;
 let lastTab = localStorage.getItem("activeTab") || "flights";
 
-// ─── DOMContentLoaded и инициализация ─────────────────────────────
-document.addEventListener("DOMContentLoaded", () => {
+// ✈️ Обработка сабмита формы
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const fromCity = fromInput.value.trim();
+  const toCity = toInput.value.trim();
+  const date = departureInput.value.trim();
+
+  if (!fromCity || !toCity || !date) {
+    alert("Пожалуйста, заполните все поля.");
+    return;
+  }
+
+  showLoading();
+
   try {
-    // Инициализация
-    initTelegram();
-    initLanguageSwitcher();
-    restoreLastTab();
-    initFocus(lastTab);
-    fadeInBody();
-    initRatingInputValidation();
+    const response = await fetch(`/api/flights?from=${fromCity}&to=${toCity}&date=${date}`);
+    const flights = await response.json();
 
-    // 🎯 Элементы формы
-    const form = document.getElementById('search-form');
-    fromInput = document.getElementById('from');
-    toInput = document.getElementById('to');
-    departureInput = document.getElementById('departureDate');
-
-    if (!form || !fromInput || !toInput || !departureInput) {
-      throw new Error("❌ Один из элементов формы не найден!");
+    if (!Array.isArray(flights) || !flights.length) {
+      console.warn("❌ Рейсы не найдены");
+      document.getElementById("hotDeals").innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
+      Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
+      return;
     }
 
-    // ✈️ Обработка сабмита формы
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    renderFlights(flights, fromCity, toCity);
 
-      const fromCity = fromInput.value.trim();
-      const toCity = toInput.value.trim();
-      const date = departureInput.value.trim();
-
-      if (!fromCity || !toCity || !date) {
-        alert("Пожалуйста, заполните все поля.");
-        return;
-      }
-
-      showLoading();
-
-      try {
-        const response = await fetch(`/api/flights?from=${fromCity}&to=${toCity}&date=${date}`);
-        const flights = await response.json();
-
-        if (!Array.isArray(flights) || !flights.length) {
-          console.warn("❌ Рейсы не найдены");
-          document.getElementById("hotDeals").innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
-          Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
-          return;
-        }
-
-        renderFlights(flights, fromCity, toCity);
-
-        trackEvent("Поиск рейсов", {
-          from: fromCity,
-          to: toCity,
-          departureDate: date,
-          isRoundTrip: false,
-          count: flights.length,
-        });
-
-    Telegram.WebApp?.sendData?.(`✈️ Найдено ${flights.length} рейсов: ${fromCity} → ${toCity}`);
-} catch (err) {
-  console.error("❌ Ошибка при загрузке рейсов:", err);
-  Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
-} finally {
-  hideLoading();
-}
-});
-
-    // 📦 Аналитика загрузки
-    trackEvent("Загрузка приложения", {
-      lang: window._appLang,
-      timestamp: new Date().toISOString(),
+    trackEvent("Поиск рейсов", {
+      from: fromCity,
+      to: toCity,
+      departureDate: date,
+      isRoundTrip: false,
+      count: flights.length,
     });
 
-    // 🔍 Доступ для отладки
-    window.fetchLocation = fetchLocation;
-    window.fetchAviasalesFlights = fetchAviasalesFlights;
-
-    // ─── Telegram WebApp Init ─────────────────────────────────────
-    function initTelegram() {
-      if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.ready();
-        const user = Telegram.WebApp.initDataUnsafe?.user;
-        if (user?.id) {
-          window._telegramId = user.id.toString();
-          console.log("✅ Telegram ID установлен:", window._telegramId);
-        } else {
-          console.warn("❌ Не удалось получить Telegram ID");
-        }
-      }
-    }
-    
-    // ─── Язык и переключатель ─────────────────────────────────────
-    function initLanguageSwitcher() {
-      window._appLang = localStorage.getItem("lang") || "ru";
-      applyTranslations(window._appLang);
-
-      const langSwitcher = document.getElementById("langSwitcher");
-      if (langSwitcher) {
-        langSwitcher.value = window._appLang;
-        langSwitcher.addEventListener("change", (e) => {
-          const newLang = e.target.value;
-          window._appLang = newLang;
-          localStorage.setItem("lang", newLang);
-          applyTranslations(newLang);
-          trackEvent("Смена языка", newLang);
-        });
-      }
-    }
-
+    Telegram.WebApp?.sendData?.(`✈️ Найдено ${flights.length} рейсов: ${fromCity} → ${toCity}`);
   } catch (err) {
-    console.error("❌ Ошибка в инициализации:", err);
+    console.error("❌ Ошибка при загрузке рейсов:", err);
+    Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
+  } finally {
+    hideLoading();
   }
-});
+}); // <-- ЭТОЙ СКОБКИ У ТЕБЯ НЕ ХВАТАЛО
+
 
 // ─── Вкладка ─────────────────────────────────────────────────────
 function restoreLastTab() {
