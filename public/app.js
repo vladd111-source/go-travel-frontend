@@ -29,39 +29,52 @@ document.addEventListener("DOMContentLoaded", () => {
       throw new Error("❌ Один из элементов формы не найден!");
     }
 
-    // ✈️ Обработка сабмита формы
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+   // ✈️ Обработка сабмита формы
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-      const fromCity = fromInput.value.trim();
-      const toCity = toInput.value.trim();
-      const date = departureInput.value.trim();
+  const fromCity = fromInput.value.trim();
+  const toCity = toInput.value.trim();
+  const date = departureInput.value.trim();
 
-      // ⛽ Получаем IATA коды через Amadeus
-      const fromIATA = await fetchCityIATA(fromCity);
-      const toIATA = await fetchCityIATA(toCity);
+  if (!fromCity || !toCity || !date) {
+    alert("Пожалуйста, заполните все поля.");
+    return;
+  }
 
-      if (!fromIATA || !toIATA) {
-        console.warn("❌ Не удалось найти IATA коды для городов", { fromCity, toCity });
-        return;
-      }
+  showLoading();
 
-      const rawFlights = await fetchAmadeusFlights(fromIATA.code, toIATA.code, date);
-      const flights = rawFlights.filter(f => f.origin && f.destination && f.departure_at);
+  try {
+    const response = await fetch(`/api/flights?from=${fromCity}&to=${toCity}&date=${date}`);
+    const flights = await response.json();
 
-      // ✅ Подставляем названия для отображения
-      renderFlights(flights, fromIATA.name, toIATA.name);
+    if (!Array.isArray(flights) || !flights.length) {
+      console.warn("❌ Рейсы не найдены");
+      document.getElementById("hotDeals").innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
+      Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
+      return;
+    }
 
-      // 📦 Аналитика
-      trackEvent("Поиск рейсов", {
-        from: fromIATA.code,
-        to: toIATA.code,
-        departureDate: date,
-        count: flights.length,
-        isRoundTrip: false,
-      });
+    renderFlights(flights, fromCity, toCity);
+
+    trackEvent("Поиск рейсов", {
+      from: fromCity,
+      to: toCity,
+      departureDate: date,
+      isRoundTrip: false,
+      count: flights.length,
     });
 
+    Telegram.WebApp?.sendData?.(`✈️ Найдено ${flights.length} рейсов: ${fromCity} → ${toCity}`);
+  } catch (err) {
+    console.error("❌ Ошибка при загрузке рейсов:", err);
+    Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
+  } finally {
+    hideLoading();
+  }
+});
+
+    
     // 📦 Аналитика загрузки
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
