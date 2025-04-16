@@ -4,9 +4,6 @@ import { renderFlights } from './render.js';
 // 🔧 Глобальные переменные формы
 let fromInput, toInput, departureInput;
 let lastTab = localStorage.getItem("activeTab") || "flights";
-let returnFlights = [];
-let departureFlights = [];
-let isRoundTrip = false;
 
 // ─── DOMContentLoaded и инициализация ─────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
@@ -21,60 +18,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 🎯 Элементы формы
     const form = document.getElementById('search-form');
-    const fromInput = document.getElementById('from');
-    const toInput = document.getElementById('to');
-    const departureInput = document.getElementById('departureDate');
+    fromInput = document.getElementById('from');
+    toInput = document.getElementById('to');
+    departureInput = document.getElementById('departureDate');
 
     if (!form || !fromInput || !toInput || !departureInput) {
       throw new Error("❌ Один из элементов формы не найден!");
     }
 
-   // ✈️ Обработка сабмита формы
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+    // ✈️ Обработка сабмита формы
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  const fromCity = fromInput.value.trim();
-  const toCity = toInput.value.trim();
-  const date = departureInput.value.trim();
+      const fromCity = fromInput.value.trim();
+      const toCity = toInput.value.trim();
+      const date = departureInput.value.trim();
 
-  if (!fromCity || !toCity || !date) {
-    alert("Пожалуйста, заполните все поля.");
-    return;
-  }
+      if (!fromCity || !toCity || !date) {
+        alert("Пожалуйста, заполните все поля.");
+        return;
+      }
 
-  showLoading();
+      showLoading();
 
-  try {
-    const response = await fetch(`/api/flights?from=${fromCity}&to=${toCity}&date=${date}`);
-    const flights = await response.json();
+      try {
+        const response = await fetch(`/api/flights?from=${fromCity}&to=${toCity}&date=${date}`);
+        const flights = await response.json();
 
-    if (!Array.isArray(flights) || !flights.length) {
-      console.warn("❌ Рейсы не найдены");
-      document.getElementById("hotDeals").innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
-      Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
-      return;
-    }
+        if (!Array.isArray(flights) || !flights.length) {
+          console.warn("❌ Рейсы не найдены");
+          document.getElementById("hotDeals").innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
+          Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
+          return;
+        }
 
-    renderFlights(flights, fromCity, toCity);
+        renderFlights(flights, fromCity, toCity);
 
-    trackEvent("Поиск рейсов", {
-      from: fromCity,
-      to: toCity,
-      departureDate: date,
-      isRoundTrip: false,
-      count: flights.length,
+        trackEvent("Поиск рейсов", {
+          from: fromCity,
+          to: toCity,
+          departureDate: date,
+          isRoundTrip: false,
+          count: flights.length,
+        });
+
+        Telegram.WebApp?.sendData?.(`✈️ Найдено ${flights.length} рейсов: ${fromCity} → ${toCity}`);
+      } catch (err) {
+        console.error("❌ Ошибка при загрузке рейсов:", err);
+        Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
+      } finally {
+        hideLoading();
+      }
     });
 
-    Telegram.WebApp?.sendData?.(`✈️ Найдено ${flights.length} рейсов: ${fromCity} → ${toCity}`);
-  } catch (err) {
-    console.error("❌ Ошибка при загрузке рейсов:", err);
-    Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
-  } finally {
-    hideLoading();
-  }
-});
-
-    
     // 📦 Аналитика загрузки
     trackEvent("Загрузка приложения", {
       lang: window._appLang,
@@ -98,7 +94,7 @@ form.addEventListener('submit', async (e) => {
         }
       }
     }
-
+    
     // ─── Язык и переключатель ─────────────────────────────────────
     function initLanguageSwitcher() {
       window._appLang = localStorage.getItem("lang") || "ru";
@@ -324,138 +320,87 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   const roundTripCheckbox = document.getElementById("roundTrip");
   const returnInput = document.getElementById("returnDate");
 
-  // ❗ Проверка на наличие элементов
   if (!fromInput || !toInput || !departureInput) {
     alert("⛔️ Ошибка: Не найдены поля формы");
     return;
   }
 
-  // ✏️ Получаем значения
   const from = fromInput.value.trim();
   const to = toInput.value.trim();
   const departureDate = departureInput.value;
   const isRoundTrip = roundTripCheckbox?.checked;
   const returnDate = returnInput?.value;
 
-  // ✅ Валидация
   if (!from || !to || !departureDate || (isRoundTrip && !returnDate)) {
     alert("Пожалуйста, заполните все поля.");
     return;
   }
 
-  // 💾 Сохраняем в localStorage
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
-  if (isRoundTrip) {
-    localStorage.setItem("lastReturnDate", returnDate);
-  }
+  if (isRoundTrip) localStorage.setItem("lastReturnDate", returnDate);
 
-// 🔄 Показываем загрузку
-showLoading();
+  showLoading();
 
-try {
-  const response = await fetch(`/api/flights?from=${from}&to=${to}&date=${departureDate}`);
-  const departureFlights = await response.json();
+  try {
+    const container = document.getElementById("hotDeals");
+    container.innerHTML = "";
 
-  let returnFlights = [];
+    // ✈️ Запрашиваем рейсы туда
+    const response = await fetch(`/api/flights?from=${from}&to=${to}&date=${departureDate}`);
+    const departureFlights = await response.json();
 
-  // ✈️ Рейсы туда
-  if (Array.isArray(departureFlights) && departureFlights.length) {
-    renderFlights(departureFlights, from, to);
-  } else {
-    console.warn("😢 Рейсы туда не найдены");
-  }
-
-  // 🔁 Рейсы обратно (если выбран "туда-обратно")
-  if (isRoundTrip) {
-    const returnRes = await fetch(`/api/flights?from=${to}&to=${from}&date=${returnDate}`);
-    returnFlights = await returnRes.json();
-
-    if (Array.isArray(returnFlights) && returnFlights.length) {
-      renderFlights(returnFlights, to, from);
+    if (Array.isArray(departureFlights) && departureFlights.length) {
+      const title = document.createElement("h3");
+      title.textContent = "Рейсы туда:";
+      title.className = "text-lg font-semibold mb-2 mt-4";
+      container.appendChild(title);
+      renderFlights(departureFlights, from, to);
     } else {
-      console.warn("😢 Рейсы обратно не найдены");
+      console.warn("😢 Рейсы туда не найдены");
     }
+
+    // 🔁 Запрашиваем рейсы обратно (если выбран "туда-обратно")
+    let returnFlights = [];
+    if (isRoundTrip) {
+      const returnRes = await fetch(`/api/flights?from=${to}&to=${from}&date=${returnDate}`);
+      returnFlights = await returnRes.json();
+
+      if (Array.isArray(returnFlights) && returnFlights.length) {
+        const title = document.createElement("h3");
+        title.textContent = "Рейсы обратно:";
+        title.className = "text-lg font-semibold mb-2 mt-4";
+        container.appendChild(title);
+        renderFlights(returnFlights, to, from);
+      } else {
+        console.warn("😢 Рейсы обратно не найдены");
+      }
+    }
+
+    // 📊 Трекинг
+    trackEvent("Поиск рейсов", {
+      from,
+      to,
+      departureDate,
+      returnDate: isRoundTrip ? returnDate : null,
+      isRoundTrip,
+      count: (departureFlights?.length || 0) + (returnFlights?.length || 0),
+    });
+
+    Telegram.WebApp?.sendData?.(
+      (departureFlights?.length || returnFlights?.length)
+        ? `✈️ Найдены рейсы: ${from} → ${to}${isRoundTrip ? " и обратно" : ""}`
+        : "😢 Рейсы не найдены."
+    );
+
+  } catch (err) {
+    console.error("❌ Ошибка при загрузке рейсов:", err);
+    Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
+  } finally {
+    hideLoading();
   }
-
-  // 📊 Трекинг
-  trackEvent("Поиск рейсов", {
-    from,
-    to,
-    departureDate,
-    returnDate: isRoundTrip ? returnDate : null,
-    isRoundTrip,
-    count: (departureFlights?.length || 0) + (returnFlights?.length || 0)
-  });
-
-  // ✅ Telegram сообщение
-  Telegram.WebApp?.sendData?.(
-    (departureFlights?.length || returnFlights?.length)
-      ? `✈️ Найдены рейсы: ${from} → ${to}${isRoundTrip ? " и обратно" : ""}`
-      : "😢 Рейсы не найдены."
-  );
-
-} catch (err) {
-  console.error("❌ Ошибка при загрузке рейсов:", err);
-  Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
-} finally {
-  hideLoading();
-}
 });
-
-
-  
-
-const container = document.getElementById("hotDeals");
-container.innerHTML = "";
-
-// ✈️ Рейсы туда
-if (departureFlights?.length) {
-  const title = document.createElement("h3");
-  title.textContent = "Рейсы туда:";
-  title.className = "text-lg font-semibold mb-2 mt-4";
-  container.appendChild(title);
-
-  renderFlights(departureFlights, from, to);
-}
-
-// 🛬 Рейсы обратно (если туда-обратно)
-if (isRoundTrip && returnFlights?.length) {
-  const titleBack = document.createElement("h3");
-  titleBack.textContent = "Рейсы обратно:";
-  titleBack.className = "text-lg font-semibold mb-2 mt-4";
-  container.appendChild(titleBack);
-
-  renderFlights(returnFlights, to, from);
-}
-
-// 🤷 Если ничего не найдено
-if (!departureFlights?.length && (!isRoundTrip || !returnFlights?.length)) {
-  container.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
-  Telegram.WebApp.sendData?.("😢 Рейсы не найдены.");
-} else {
-  Telegram.WebApp.sendData?.(`✈️ Найдены рейсы: ${from} → ${to}${isRoundTrip ? " и обратно" : ""}`);
-}
-
-try {
-  // 📊 Трекинг события
-  trackEvent("Поиск рейсов", {
-    from,
-    to,
-    departureDate,
-    returnDate: isRoundTrip ? returnDate : null,
-    isRoundTrip,
-    count: (departureFlights?.length || 0) + (returnFlights?.length || 0)
-  });
-
-} catch (err) {
-  console.error("❌ Ошибка при поиске рейсов:", err);
-  Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
-  trackEvent("Ошибка загрузки рейсов", err.message);
-} finally {
-  hideLoading();
-}
 
 // ─── Очистка формы рейсов ───────────────────────────────────────
 document.getElementById("clearFlights")?.addEventListener("click", () => {
@@ -477,7 +422,6 @@ document.getElementById("clearFlights")?.addEventListener("click", () => {
 
   trackEvent?.("Очистка формы рейсов", "Пользователь сбросил поля и кэш");
 });
-
 
 // ─── Поиск достопримечательностей ───────────────────────────────
 const placeCityInput = document.getElementById("placeCity");
