@@ -6,6 +6,7 @@ let fromInput, toInput, departureInput;
 let lastTab = localStorage.getItem("activeTab") || "flights";
 
 // ✈️ Обработка сабмита формы
+const form = document.getElementById('search-form');
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
