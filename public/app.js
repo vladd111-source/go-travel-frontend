@@ -1,24 +1,19 @@
 import { fetchLocation, fetchAviasalesFlights } from './api.js';
 import { renderFlights } from './render.js';
 
-// 🔧 Глобальные переменные формы
 let fromInput, toInput, departureInput;
-let lastTab = localStorage.getItem("activeTab") || "flights";
 
-// ⚙️ Ждём, пока DOM будет готов
 document.addEventListener("DOMContentLoaded", () => {
-  // ⛳️ Находим элементы формы
-  const form = document.getElementById('search-form');
   fromInput = document.getElementById('from');
   toInput = document.getElementById('to');
   departureInput = document.getElementById('departureDate');
+  const form = document.getElementById('search-form');
 
   if (!form || !fromInput || !toInput || !departureInput) {
-    console.error("❌ Элементы формы не найдены");
+    console.error("❌ Один из элементов формы не найден!");
     return;
   }
 
-  // ✈️ Обработка сабмита формы
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -38,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const flights = await response.json();
 
       if (!Array.isArray(flights) || !flights.length) {
-        console.warn("❌ Рейсы не найдены");
         document.getElementById("hotDeals").innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
         Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
         return;
