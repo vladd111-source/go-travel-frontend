@@ -48,12 +48,13 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
 
     const departureDate = flight.departure_at.split("T")[0] || "—";
     const link = generateAviasalesLink(flight);
+    const price = flight.price || flight.value || "—";
 
     card.innerHTML = `
       <h3 class="text-lg font-semibold mb-1">${flight.airline || "Авиакомпания"}</h3>
       <div class="text-sm text-gray-600 mb-1">🛫 ${fromCity} → 🛬 ${toCity}</div>
       <div class="text-sm text-gray-600 mb-1">📅 ${departureDate}</div>
-      <div class="text-sm text-gray-600 mb-1">💰 $${flight.price}</div>
+      <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
       <a href="${link}" target="_blank" class="btn btn-blue mt-3">Перейти к бронированию</a>
     `;
 
