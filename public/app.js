@@ -1,123 +1,103 @@
-import { fetchLocation, fetchAviasalesFlights } from './api.js';
-import { renderFlights } from './render.js';
-
-let fromInput, toInput, departureInput;
-
+// ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
-  fromInput = document.getElementById('from');
-  toInput = document.getElementById('to');
-  departureInput = document.getElementById('departureDate');
-  const form = document.getElementById('search-form');
-
-  if (!form || !fromInput || !toInput || !departureInput) {
-    console.error("❌ Один из элементов формы не найден!");
-    return;
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const fromCity = fromInput.value.trim();
-    const toCity = toInput.value.trim();
-    const date = departureInput.value.trim();
-
-    if (!fromCity || !toCity || !date) {
-      alert("Пожалуйста, заполните все поля.");
-      return;
+  try {
+    // ✅ Telegram init
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.ready();
+      console.log("📦 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
+      const user = Telegram.WebApp.initDataUnsafe?.user;
+      if (user && user.id) {
+        window._telegramId = user.id.toString();
+        console.log("✅ Telegram ID установлен:", window._telegramId);
+      } else {
+        console.warn("❌ Не удалось получить Telegram ID");
+      }
     }
 
-    showLoading();
+    // ✅ Установка языка и переключатель
+    window._appLang = localStorage.getItem("lang") || "ru";
+    applyTranslations(window._appLang);
 
-    try {
-      const response = await fetch(`/api/flights?from=${fromCity}&to=${toCity}&date=${date}`);
-      const flights = await response.json();
+    const langSwitcher = document.getElementById("langSwitcher");
+    if (langSwitcher) {
+      langSwitcher.value = window._appLang;
+      langSwitcher.addEventListener("change", (e) => {
+        window._appLang = e.target.value;
+        localStorage.setItem("lang", window._appLang);
+        applyTranslations(window._appLang);
+        trackEvent("Смена языка", window._appLang);
+      });
+    }
 
-      if (!Array.isArray(flights) || !flights.length) {
-        document.getElementById("hotDeals").innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
-        Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
-        return;
+    // ✅ Восстановление активной вкладки
+    let lastTab = localStorage.getItem("activeTab") || "flights";
+    if (lastTab === "sights") {
+      lastTab = "places";
+      localStorage.setItem("activeTab", "places");
+    }
+    showTab(lastTab);
+
+    // ✅ Автофокус безопасно
+    setTimeout(() => {
+      if (typeof window.focusFirstInputIn === "function") {
+        window.focusFirstInputIn(lastTab);
+      } else {
+        console.warn("⚠️ focusFirstInputIn пока не доступна");
       }
+    }, 200);
 
-      renderFlights(flights, fromCity, toCity);
+    // ✅ Плавное появление
+    setTimeout(() => {
+      document.body.classList.remove("opacity-0");
+    }, 100);
 
-      trackEvent("Поиск рейсов", {
-        from: fromCity,
-        to: toCity,
-        departureDate: date,
-        isRoundTrip: false,
-        count: flights.length,
+    // 💡 Ограничение поля рейтинга
+    const ratingInput = document.getElementById("minRating");
+    if (ratingInput) {
+      ratingInput.addEventListener("input", () => {
+        let val = parseInt(ratingInput.value);
+        if (val > 10) ratingInput.value = 10;
+        if (val < 0 || isNaN(val)) ratingInput.value = '';
       });
 
-      Telegram.WebApp?.sendData?.(`✈️ Найдено ${flights.length} рейсов: ${fromCity} → ${toCity}`);
-    } catch (err) {
-      console.error("❌ Ошибка при загрузке рейсов:", err);
-      Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
-    } finally {
-      hideLoading();
+      ratingInput.addEventListener("keydown", (e) => {
+        const invalidKeys = ["e", "E", "+", "-", ".", ","];
+        if (invalidKeys.includes(e.key)) {
+          e.preventDefault();
+        }
+      });
     }
-  });
+
+    // 📊 Отправка события
+    trackEvent("Загрузка приложения", {
+      lang: window._appLang,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (e) {
+    console.error("❌ Ошибка при инициализации:", e);
+  }
 });
 
-// ─── Вкладка ─────────────────────────────────────────────────────
-function restoreLastTab() {
-  if (lastTab === "sights") {
-    lastTab = "places";
-    localStorage.setItem("activeTab", "places");
-  }
-  showTab(lastTab);
-}
-
-// ─── Автофокус на вкладке ────────────────────────────────────────
-function initFocus(tab) {
-  setTimeout(() => {
-    if (typeof window.focusFirstInputIn === "function") {
-      window.focusFirstInputIn(tab);
-    } else {
-      console.warn("⚠️ focusFirstInputIn пока не доступна");
-    }
-  }, 200);
-}
-
-// ─── Плавное появление ───────────────────────────────────────────
-function fadeInBody() {
-  setTimeout(() => {
-    document.body.classList.remove("opacity-0");
-  }, 100);
-}
-
-// ─── Валидация рейтинга ──────────────────────────────────────────
-function initRatingInputValidation() {
-  const ratingInput = document.getElementById("minRating");
-  if (!ratingInput) return;
-
-  ratingInput.addEventListener("input", () => {
-    const val = parseInt(ratingInput.value);
-    if (val > 10) ratingInput.value = 10;
-    if (val < 0 || isNaN(val)) ratingInput.value = '';
-  });
-
-  ratingInput.addEventListener("keydown", (e) => {
-    const invalidKeys = ["e", "E", "+", "-", ".", ","];
-    if (invalidKeys.includes(e.key)) {
-      e.preventDefault();
-    }
-  });
-}
-
-// ─── Чекбокс "Туда и обратно" ────────────────────────────────────
+// ✅ Чекбокс "Туда и обратно"
 const roundTripCheckbox = document.getElementById("roundTrip");
 const returnDateWrapper = document.getElementById("returnDateWrapper");
 const returnDateInput = document.getElementById("returnDate");
 
 if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
   const updateReturnDateVisibility = () => {
-    const checked = roundTripCheckbox.checked;
-    returnDateWrapper.classList.toggle("hidden", !checked);
-    returnDateInput.required = checked;
-    if (!checked) returnDateInput.value = "";
-  };
+    if (roundTripCheckbox.checked) {
+      returnDateWrapper.classList.remove("hidden");
+    } else {
+      returnDateWrapper.classList.add("hidden");
+    }
+    returnDateInput.required = roundTripCheckbox.checked;
+    if (!roundTripCheckbox.checked) returnDateInput.value = "";
+  }
 
-  roundTripCheckbox.checked = localStorage.getItem("roundTripChecked") === "1";
+  const saved = localStorage.getItem("roundTripChecked");
+  if (saved === "1") {
+    roundTripCheckbox.checked = true;
+  }
   updateReturnDateVisibility();
 
   roundTripCheckbox.addEventListener("change", () => {
@@ -126,7 +106,7 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
   });
 }
 
-// ─── Показ/скрытие фильтров отелей ───────────────────────────────
+// ✅ Показ/скрытие фильтров
 const hotelFiltersToggle = document.getElementById("toggleFilters");
 const hotelFiltersSection = document.getElementById("hotelFilters");
 
@@ -134,16 +114,17 @@ if (hotelFiltersToggle && hotelFiltersSection) {
   const toggleVisibility = () => {
     const isVisible = hotelFiltersToggle.checked;
     hotelFiltersSection.classList.toggle("hidden", !isVisible);
-    if (isVisible) setTimeout(updatePriceTooltip, 100);
+    if (isVisible) {
+      setTimeout(updatePriceTooltip, 100);
+    }
   };
 
   hotelFiltersToggle.addEventListener("change", toggleVisibility);
   toggleVisibility();
 }
 
-// ─── Ползунок цены ───────────────────────────────────────────────
+// ✅ Инициализация ползунка и tooltip
 const priceRange = document.getElementById("priceRange");
-
 if (priceRange) {
   priceRange.value = 250;
   priceRange.addEventListener("input", updatePriceTooltip);
@@ -151,7 +132,7 @@ if (priceRange) {
   window.addEventListener("load", updatePriceTooltip);
 }
 
-// ─── Поиск отелей ────────────────────────────────────────────────
+// ✅ Поиск отелей
 const hotelCityInput = document.getElementById("hotelCity");
 
 if (hotelCityInput) {
@@ -160,88 +141,80 @@ if (hotelCityInput) {
 
   hotelCityInput.setAttribute("autofocus", "autofocus");
 
-  const hotelForm = document.getElementById("hotelForm");
+  document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    showLoading();
 
-  if (hotelForm) {
-    hotelForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      showLoading();
+    const city = hotelCityInput.value.trim();
+    localStorage.setItem("lastHotelCity", city);
 
-      const city = hotelCityInput.value.trim();
-      localStorage.setItem("lastHotelCity", city);
+    const maxPrice = parseFloat(priceRange.value) || Infinity;
+    const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
-      const maxPrice = parseFloat(priceRange?.value) || Infinity;
-      const minRating = parseFloat(document.getElementById("minRating")?.value) || 0;
+    fetch("https://go-travel-backend.vercel.app/api/hotels")
+      .then(res => res.json())
+      .then(hotels => {
+        const filtered = hotels.filter(h =>
+          h.price <= maxPrice &&
+          h.rating >= minRating &&
+          (!city || h.city.toLowerCase().includes(city.toLowerCase()))
+        );
 
-      fetch("https://go-travel-backend.vercel.app/api/hotels")
-        .then(res => res.json())
-        .then(hotels => {
-          const filtered = hotels.filter(h =>
-            h.price <= maxPrice &&
-            h.rating >= minRating &&
-            (!city || h.city.toLowerCase().includes(city.toLowerCase()))
-          );
+        const t = translations[window._appLang];
+        const resultBlock = document.getElementById("hotelsResult");
+        resultBlock.classList.remove("visible");
 
-          const t = translations[window._appLang];
-          const resultBlock = document.getElementById("hotelsResult");
-          resultBlock.classList.remove("visible");
+        resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+          filtered.length ? filtered.map(h => {
+            const hotelId = `${h.name}-${h.city}-${h.price}`;
+            const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+            const isFav = favHotels.some(fav => fav.name === h.name && fav.city === h.city && fav.price === h.price);
 
-          resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-            filtered.length
-              ? filtered.map(h => {
-                  const hotelId = `${h.name}-${h.city}-${h.price}`;
-                  const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-                  const isFav = favHotels.some(fav =>
-                    fav.name === h.name && fav.city === h.city && fav.price === h.price
-                  );
+            return `
+              <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
+                <strong>${h.name}</strong> (${h.city})<br>
+                Цена: $${h.price} / ночь<br>
+                Рейтинг: ${h.rating}
+                <div class="flex justify-between items-center mt-2">
+                  <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
+                  <button 
+                    onclick='toggleFavoriteHotel(${JSON.stringify(h)}, this)' 
+                    class="text-xl ml-2"
+                    data-hotel-id="${hotelId}">
+                    ${isFav ? "💙" : "🤍"}
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join("") : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+        );
 
-                  return `
-                    <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
-                      <strong>${h.name}</strong> (${h.city})<br>
-                      Цена: $${h.price} / ночь<br>
-                      Рейтинг: ${h.rating}
-                      <div class="flex justify-between items-center mt-2">
-                        <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1"
-                          onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">
-                          ${t.bookNow}
-                        </button>
-                        <button 
-                          onclick='toggleFavoriteHotel(${JSON.stringify(h)}, this)' 
-                          class="text-xl ml-2"
-                          data-hotel-id="${hotelId}">
-                          ${isFav ? "💙" : "🤍"}
-                        </button>
-                      </div>
-                    </div>
-                  `;
-                }).join("")
-              : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-          );
+        updateHotelHearts();
+        resultBlock.classList.add("visible");
+        animateCards("#hotelsResult .card");
 
-          updateHotelHearts();
-          resultBlock.classList.add("visible");
-          animateCards("#hotelsResult .card");
-
-          trackEvent("Поиск отеля", {
-            city,
-            maxPrice,
-            minRating,
-            resultCount: filtered.length
-          });
-
-          hideLoading();
-        })
-        .catch(err => {
-          console.error("❌ Ошибка загрузки отелей:", err);
-          const resultBlock = document.getElementById("hotelsResult");
-          resultBlock.innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
-          hideLoading();
+        trackEvent("Поиск отеля", {
+          city,
+          maxPrice,
+          minRating,
+          resultCount: filtered.length
         });
-    });
-  }
+
+        hideLoading();
+      })
+      .catch(err => {
+        console.error("❌ Ошибка загрузки отелей:", err);
+        document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
+        hideLoading();
+      });
+  });
 }
 
-// ─── Инициализация полей рейсов ──────────────────────────────────
+// ✅ Поиск рейсов
+const fromInput = document.getElementById("from");
+const toInput = document.getElementById("to");
+const departureInput = document.getElementById("departureDate");
+
 if (fromInput && toInput && departureInput) {
   fromInput.value = localStorage.getItem("lastFrom") || "";
   toInput.value = localStorage.getItem("lastTo") || "";
@@ -249,191 +222,107 @@ if (fromInput && toInput && departureInput) {
   fromInput.setAttribute("autofocus", "autofocus");
 }
 
-// ─── Обработка формы поиска рейсов ──────────────────────────────
-document.getElementById("search-form")?.addEventListener("submit", async (e) => {
+document.getElementById("search-form")?.addEventListener("submit", (e) => {
   e.preventDefault();
-
-  // 🧠 Получаем input-элементы
-  const fromInput = document.getElementById("from");
-  const toInput = document.getElementById("to");
-  const departureInput = document.getElementById("departureDate");
-  const roundTripCheckbox = document.getElementById("roundTrip");
-  const returnInput = document.getElementById("returnDate");
-
-  if (!fromInput || !toInput || !departureInput) {
-    alert("⛔️ Ошибка: Не найдены поля формы");
-    return;
-  }
 
   const from = fromInput.value.trim();
   const to = toInput.value.trim();
   const departureDate = departureInput.value;
-  const isRoundTrip = roundTripCheckbox?.checked;
-  const returnDate = returnInput?.value;
-
-  if (!from || !to || !departureDate || (isRoundTrip && !returnDate)) {
-    alert("Пожалуйста, заполните все поля.");
-    return;
-  }
 
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
-  if (isRoundTrip) localStorage.setItem("lastReturnDate", returnDate);
 
   showLoading();
 
-  try {
-    const container = document.getElementById("hotDeals");
-    container.innerHTML = "";
+  fetch("https://go-travel-backend.vercel.app/api/flights")
+    .then(res => res.json())
+    .then(flights => {
+      const match = flights.find(f =>
+        f.from.toLowerCase() === from.toLowerCase() &&
+        f.to.toLowerCase() === to.toLowerCase()
+      );
 
-    // ✈️ Запрашиваем рейсы туда
-    const response = await fetch(`/api/flights?from=${from}&to=${to}&date=${departureDate}`);
-    const departureFlights = await response.json();
+      const hotDeals = document.getElementById("hotDeals");
+      hotDeals.innerHTML = flights.map(deal => {
+        const isFav = JSON.parse(localStorage.getItem("favorites_flights") || "[]")
+          .some(f => f.from === deal.from && f.to === deal.to && f.date === deal.date && f.price === deal.price);
+        const dealId = `${deal.from}-${deal.to}-${deal.date}-${deal.price}`;
+        return `
+          <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
+            <strong>${deal.from} → ${deal.to}</strong><br>
+            Дата: ${deal.date}<br>
+            Цена: $${deal.price}
+            <div class="flex justify-between items-center mt-2">
+              <button class="btn w-full" onclick="bookHotel('${deal.from}', '${deal.to}', ${deal.price}, '${deal.date}')">Забронировать</button>
+              <button onclick="toggleFavoriteFlight('${dealId}', this)" class="text-xl ml-3" data-flight-id="${dealId}">
+                ${isFav ? "💙" : "🤍"}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
 
-    if (Array.isArray(departureFlights) && departureFlights.length) {
-      const title = document.createElement("h3");
-      title.textContent = "Рейсы туда:";
-      title.className = "text-lg font-semibold mb-2 mt-4";
-      container.appendChild(title);
-      renderFlights(departureFlights, from, to);
-    } else {
-      console.warn("😢 Рейсы туда не найдены");
-    }
+      updateHearts("places");
+      animateCards("#hotDeals .card");
 
-    // 🔁 Запрашиваем рейсы обратно (если выбран "туда-обратно")
-    let returnFlights = [];
-    if (isRoundTrip) {
-      const returnRes = await fetch(`/api/flights?from=${to}&to=${from}&date=${returnDate}`);
-      returnFlights = await returnRes.json();
-
-      if (Array.isArray(returnFlights) && returnFlights.length) {
-        const title = document.createElement("h3");
-        title.textContent = "Рейсы обратно:";
-        title.className = "text-lg font-semibold mb-2 mt-4";
-        container.appendChild(title);
-        renderFlights(returnFlights, to, from);
+      if (match) {
+        const msg = `✈️ Нашли рейс\n🛫 ${match.from} → 🛬 ${match.to}\n📅 ${match.date}\n💰 $${match.price}`;
+        Telegram.WebApp.sendData?.(msg);
+        trackEvent("Поиск рейса", msg);
       } else {
-        console.warn("😢 Рейсы обратно не найдены");
+        Telegram.WebApp.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
+        trackEvent("Поиск рейса", `Не найдено: ${from} → ${to}, ${departureDate}`);
       }
-    }
-
-    // 📊 Трекинг
-    trackEvent("Поиск рейсов", {
-      from,
-      to,
-      departureDate,
-      returnDate: isRoundTrip ? returnDate : null,
-      isRoundTrip,
-      count: (departureFlights?.length || 0) + (returnFlights?.length || 0),
+    })
+    .catch(err => {
+      console.error("❌ Ошибка запроса рейсов:", err);
+      Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
+      trackEvent("Ошибка загрузки рейсов", err.message);
+    })
+    .finally(() => {
+      hideLoading();
     });
-
-    Telegram.WebApp?.sendData?.(
-      (departureFlights?.length || returnFlights?.length)
-        ? `✈️ Найдены рейсы: ${from} → ${to}${isRoundTrip ? " и обратно" : ""}`
-        : "😢 Рейсы не найдены."
-    );
-
-  } catch (err) {
-    console.error("❌ Ошибка при загрузке рейсов:", err);
-    Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
-  } finally {
-    hideLoading();
-  }
 });
 
-// ─── Очистка формы рейсов ───────────────────────────────────────
-document.getElementById("clearFlights")?.addEventListener("click", () => {
-  fromInput.value = '';
-  toInput.value = '';
-  departureInput.value = '';
-  document.getElementById("returnDate").value = '';
-  document.getElementById("roundTrip").checked = false;
-
-  document.getElementById("returnDateWrapper")?.classList.add("hidden");
-  document.getElementById("hotDeals").innerHTML = '';
-
-  localStorage.removeItem("lastFrom");
-  localStorage.removeItem("lastTo");
-  localStorage.removeItem("lastDepartureDate");
-  localStorage.removeItem("lastReturnDate");
-
-  fromInput.focus();
-
-  trackEvent?.("Очистка формы рейсов", "Пользователь сбросил поля и кэш");
-});
-
-// ─── Поиск достопримечательностей ───────────────────────────────
+// ✅ Поиск мест
 const placeCityInput = document.getElementById("placeCity");
 const placeCategorySelect = document.getElementById("placeCategory");
 const resultBlock = document.getElementById("placesResult");
 
-// 🔄 Восстановление кэша
 if (placeCityInput) {
   const cachedCity = localStorage.getItem("placeCity");
   if (cachedCity) placeCityInput.value = cachedCity;
-
   placeCityInput.addEventListener("input", (e) => {
     localStorage.setItem("placeCity", e.target.value.trim());
   });
-
-  placeCityInput.setAttribute("autofocus", "autofocus");
 }
 
 if (placeCategorySelect) {
   const cachedCategory = localStorage.getItem("placeCategory");
   if (cachedCategory) placeCategorySelect.value = cachedCategory;
-
   placeCategorySelect.addEventListener("change", (e) => {
     localStorage.setItem("placeCategory", e.target.value);
   });
 }
 
+placeCityInput.setAttribute("autofocus", "autofocus");
+
 document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const city = placeCityInput?.value.trim().toLowerCase() || "";
-  const category = placeCategorySelect?.value || "";
+  const city = placeCityInput.value.trim().toLowerCase();
+  const category = placeCategorySelect.value;
 
   localStorage.setItem("placeCity", city);
   localStorage.setItem("placeCategory", category);
 
   const dummyPlaces = [
-    {
-      name: "Castelo de São Jorge",
-      description: "Древняя крепость с видом на Лиссабон",
-      city: "лиссабон",
-      category: "culture",
-      image: "https://picsum.photos/300/180?random=1"
-    },
-    {
-      name: "Miradouro da Senhora do Monte",
-      description: "Лучший панорамный вид на город",
-      city: "лиссабон",
-      category: "nature",
-      image: "https://picsum.photos/300/180?random=2"
-    },
-    {
-      name: "Oceanário de Lisboa",
-      description: "Современный океанариум",
-      city: "лиссабон",
-      category: "fun",
-      image: "https://picsum.photos/300/180?random=3"
-    },
-    {
-      name: "Time Out Market",
-      description: "Фудкорт и рынок в центре города",
-      city: "лиссабон",
-      category: "food",
-      image: "https://picsum.photos/300/180?random=4"
-    },
-    {
-      name: "Centro Colombo",
-      description: "Крупный торговый центр",
-      city: "лиссабон",
-      category: "shopping",
-      image: "https://picsum.photos/300/180?random=5"
-    }
+    { name: "Castelo de São Jorge", description: "Древняя крепость с видом на Лиссабон", city: "лиссабон", category: "culture", image: "https://picsum.photos/300/180?random=1" },
+    { name: "Miradouro da Senhora do Monte", description: "Лучший панорамный вид на город", city: "лиссабон", category: "nature", image: "https://picsum.photos/300/180?random=2" },
+    { name: "Oceanário de Lisboa", description: "Современный океанариум", city: "лиссабон", category: "fun", image: "https://picsum.photos/300/180?random=3" },
+    { name: "Time Out Market", description: "Фудкорт и рынок в центре города", city: "лиссабон", category: "food", image: "https://picsum.photos/300/180?random=4" },
+    { name: "Centro Colombo", description: "Крупный торговый центр", city: "лиссабон", category: "shopping", image: "https://picsum.photos/300/180?random=5" }
   ];
 
   resultBlock.classList.remove("visible");
@@ -452,43 +341,10 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   const firstBatch = filtered.slice(0, 3);
   const remaining = filtered.slice(3);
 
-  renderPlaces(firstBatch, resultBlock);
-
-  if (remaining.length > 0) {
-    const moreBtn = document.createElement("button");
-    moreBtn.textContent = "Показать ещё";
-    moreBtn.className = "btn w-full mt-4 bg-blue-500 text-white text-sm rounded py-2 px-4";
-
-    moreBtn.addEventListener("click", () => {
-      renderPlaces(remaining, resultBlock);
-      animateCards("#placesResult .card");
-      updateHearts("places");
-      moreBtn.remove();
-
-      setTimeout(() => {
-        resultBlock.querySelectorAll(".card")[3]?.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-      }, 100);
-    });
-
-    resultBlock.appendChild(moreBtn);
-  }
-
-  resultBlock.classList.add("visible");
-  animateCards("#placesResult .card");
-
-  trackEvent("Поиск мест", { city, category });
-});
-
-// ─── Рендер карточек мест ────────────────────────────────────────
-function renderPlaces(places, container) {
-  const t = translations?.[window._appLang] || {};
-  const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-
-  const html = places.map(p => {
+  resultBlock.innerHTML = firstBatch.map(p => {
+    const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
     const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
+    const placeId = `${p.name}-${p.city}`;
     return `
       <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
         <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
@@ -500,7 +356,8 @@ function renderPlaces(places, container) {
           <button 
             onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
             class="text-xl ml-2"
-            data-place-id="${encodeURIComponent(JSON.stringify(p))}">
+            data-place-id="${encodeURIComponent(JSON.stringify(p))}"
+          >
             ${isFav ? "💙" : "🤍"}
           </button>
         </div>
@@ -508,68 +365,59 @@ function renderPlaces(places, container) {
     `;
   }).join("");
 
-  container.insertAdjacentHTML("beforeend", html);
-}
+  updateHearts("places");
 
-// ─── Вспомогательные утилиты ─────────────────────────────────────
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+  if (remaining.length > 0) {
+    const moreBtn = document.createElement("button");
+    moreBtn.textContent = "Показать ещё";
+    moreBtn.className = "btn w-full mt-4 bg-blue-500 text-white text-sm rounded py-2 px-4";
 
-function formatCategory(cat) {
-  const map = {
-    culture: "Культура",
-    nature: "Природа",
-    fun: "Развлечения",
-    food: "Еда",
-    shopping: "Шопинг"
-  };
-  return map[cat] || cat;
-}
+    moreBtn.addEventListener("click", () => {
+      const remainingCards = remaining.map(p => {
+        const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+        const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
+        return `
+          <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+            <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
+            <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+            <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+            <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+            <div class="flex justify-between items-center mt-2">
+              <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
+              <button 
+                onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
+                class="text-xl ml-2"
+                data-place-id="${encodeURIComponent(JSON.stringify(p))}"
+              >
+                ${isFav ? "💙" : "🤍"}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
 
-function animateCards(selector) {
-  const cards = document.querySelectorAll(selector);
-  cards.forEach((card, i) => {
-    setTimeout(() => {
-      card.classList.remove("opacity-0", "scale-95");
-      card.classList.add("opacity-100", "scale-100");
-    }, i * 100);
-  });
-}
+      resultBlock.insertAdjacentHTML("beforeend", remainingCards);
+      animateCards("#placesResult .card");
+      updateHearts("places");
 
-function updateHearts(type) {
-  const items = document.querySelectorAll(`[data-${type.slice(0, -1)}-id]`);
-  const storage = JSON.parse(localStorage.getItem(`favorites_${type}`) || "[]");
+      setTimeout(() => {
+        const cards = resultBlock.querySelectorAll(".card");
+        cards[3]?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
 
-  items.forEach(item => {
-    const data = decodeURIComponent(item.dataset[`${type.slice(0, -1)}Id`]);
-    const parsed = JSON.parse(data);
-    const isFav = storage.some(f => f.name === parsed.name && f.city === parsed.city);
-    item.innerHTML = isFav ? "💙" : "🤍";
-  });
-}
+      moreBtn.remove();
+    });
 
-function toggleFavoritePlaceFromEncoded(encoded, element) {
-  const place = JSON.parse(decodeURIComponent(encoded));
-  const key = "favorites_places";
-  const favs = JSON.parse(localStorage.getItem(key) || "[]");
+    resultBlock.appendChild(moreBtn);
+  }
 
-  const exists = favs.find(f => f.name === place.name && f.city === place.city);
-  const updated = exists
-    ? favs.filter(f => !(f.name === place.name && f.city === place.city))
-    : [...favs, place];
+  resultBlock.classList.add("visible");
+  animateCards("#placesResult .card");
 
-  localStorage.setItem(key, JSON.stringify(updated));
-  element.innerHTML = exists ? "🤍" : "💙";
+  trackEvent("Поиск мест", { city, category });
+});
 
-  trackEvent("Избранное", {
-    type: "place",
-    action: exists ? "remove" : "add",
-    place: place.name,
-  });
-}
-
-// ─── Лог выхода (длительность сессии) ────────────────────────────
+// ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - window.appStart) / 1000);
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
