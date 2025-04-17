@@ -211,9 +211,7 @@ if (hotelCityInput) {
   });
 }
 
-
-
-let lastSearchTime = 0;
+let lastSearchTime = 0; // Защита от спама
 
 // ✅ Поиск рейсов (включая "Туда и обратно")
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
@@ -264,27 +262,23 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     // ✈️ Запрос рейсов туда
     const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${from}&to=${to}&date=${departureDate}`;
     const resOut = await fetch(urlOut);
-
     if (resOut.status === 429) throw new Error("Превышен лимит запросов (429)");
     if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
-
     flightsOut = await resOut.json();
     renderFlights(flightsOut, from, to, "Рейсы туда");
 
-    // ✈️ Запрос рейсов обратно
+    // 🔁 Рейсы обратно
     if (isRoundTrip && returnDate) {
       const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${to}&to=${from}&date=${returnDate}`;
       const resBack = await fetch(urlBack);
-
       if (resBack.status === 429) throw new Error("Превышен лимит запросов (429)");
       if (!resBack.ok) throw new Error(`Ошибка рейсов обратно: ${resBack.status}`);
-
       flightsBack = await resBack.json();
       renderFlights(flightsBack, to, from, "Рейсы обратно");
     }
 
-    // 📲 Telegram + аналитика
-    if (flightsOut.length > 0) {
+    // 📲 Telegram и аналитика
+    if (Array.isArray(flightsOut) && flightsOut.length > 0) {
       const top = flightsOut[0];
       const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value}`;
       Telegram.WebApp.sendData?.(msg);
