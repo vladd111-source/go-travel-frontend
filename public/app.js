@@ -2,17 +2,17 @@ import { renderFlights, renderHotels, renderPlaces } from './render.js';
 
 let lastSearchTime = 0;
 
-// 🔁 Функция с повтором при 429 без async/await
+// 🔁 Повтор при 429 (без async/await)
 function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
   return new Promise((resolve, reject) => {
-    function attempt(tryIndex, delay) {
+    function attempt(tryIndex, currentDelay) {
       fetch(url, options)
         .then(res => {
           if (res.status !== 429) {
             resolve(res);
           } else if (tryIndex < retries - 1) {
             console.warn(`⚠️ Повтор (${tryIndex + 1}) из-за 429`);
-            setTimeout(() => attempt(tryIndex + 1, delay * 2), delay);
+            setTimeout(() => attempt(tryIndex + 1, currentDelay * 1.5), currentDelay);
           } else {
             reject(new Error("❌ Превышен лимит запросов (после повторов)"));
           }
@@ -20,7 +20,7 @@ function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
         .catch(err => {
           if (tryIndex < retries - 1) {
             console.warn(`⚠️ Ошибка запроса, повтор (${tryIndex + 1})`, err);
-            setTimeout(() => attempt(tryIndex + 1, delay * 2), delay);
+            setTimeout(() => attempt(tryIndex + 1, currentDelay * 1.5), currentDelay);
           } else {
             reject(err);
           }
@@ -241,35 +241,6 @@ if (hotelCityInput) {
         document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
         hideLoading();
       });
-  });
-}
-
-// 🔁 Повтор при 429 (без async/await)
-function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
-  return new Promise((resolve, reject) => {
-    function attempt(tryIndex, currentDelay) {
-      fetch(url, options)
-        .then(res => {
-          if (res.status !== 429) {
-            resolve(res);
-          } else if (tryIndex < retries - 1) {
-            console.warn(`⚠️ Повтор (${tryIndex + 1}) из-за 429`);
-            setTimeout(() => attempt(tryIndex + 1, currentDelay * 1.5), currentDelay);
-          } else {
-            reject(new Error("❌ Превышен лимит запросов (после повторов)"));
-          }
-        })
-        .catch(err => {
-          if (tryIndex < retries - 1) {
-            console.warn(`⚠️ Ошибка запроса, повтор (${tryIndex + 1})`, err);
-            setTimeout(() => attempt(tryIndex + 1, currentDelay * 1.5), currentDelay);
-          } else {
-            reject(err);
-          }
-        });
-    }
-
-    attempt(0, backoff);
   });
 }
 
