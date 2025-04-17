@@ -58,10 +58,10 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
       <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
       <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
       <div class="flex justify-between items-center mt-2">
-        <a href="${link}" target="_blank"
-           class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition">
-           Перейти к бронированию
-        </a>
+       <a href="${link}" target="_blank"
+   class="text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-all duration-200">
+   Перейти к бронированию
+</a>
         <button 
   onclick="toggleFavoriteFlight('${dealId}', this)" 
   class="text-2xl ml-3 text-gray-600 hover:text-blue-600 transition"
