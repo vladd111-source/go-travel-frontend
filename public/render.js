@@ -63,11 +63,11 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
            Перейти к бронированию
         </a>
         <button 
-          onclick="toggleFavoriteFlight('${dealId}', this)" 
-          class="text-xl ml-3" 
-          data-flight-id="${dealId}">
-          ${isFav ? "💙" : "🤍"}
-        </button>
+  onclick="toggleFavoriteFlight('${dealId}', this)" 
+  class="text-xl ml-3 text-gray-500 hover:text-red-500 transition"
+  data-flight-id="${dealId}">
+  ${isFav ? "💙" : "🤍"}
+</button>
       </div>
     `;
 
