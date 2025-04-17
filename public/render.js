@@ -24,13 +24,25 @@ export function generateAviasalesLink(flight) {
 
 /**
  * Отрисовывает список рейсов на странице
+ * @param {Array} flights - список рейсов
+ * @param {string} fromCity - название города отправления (для аналитики или заголовка)
+ * @param {string} toCity - название города прибытия (для аналитики или заголовка)
+ * @param {string} title - (необязательно) заголовок секции
  */
-export function renderFlights(flights) {
+export function renderFlights(flights, fromCity = "—", toCity = "—", title = "") {
   const container = document.getElementById("hotDeals");
-  container.innerHTML = "";
+
+  if (title) {
+    const heading = document.createElement("h3");
+    heading.className = "text-lg font-semibold mt-4 mb-2";
+    heading.textContent = title;
+    container.appendChild(heading);
+  } else {
+    container.innerHTML = ""; // если заголовок не передан — очищаем
+  }
 
   if (!flights || !flights.length) {
-    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
+    container.innerHTML += `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
     return;
   }
 
@@ -39,7 +51,8 @@ export function renderFlights(flights) {
   flights.forEach(flight => {
     const from = flight.from || flight.origin || "—";
     const to = flight.to || flight.destination || "—";
-    const date = (flight.date || flight.departure_at || "").split("T")[0] || "—";
+    const rawDate = flight.date || flight.departure_at || "";
+    const date = rawDate.split("T")[0] || "—";
     const airline = flight.airline || "Авиакомпания";
     const rawPrice = flight.price || flight.value || 0;
     const price = parseFloat(rawPrice);
