@@ -308,7 +308,10 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     // 📲 Telegram
     if (Array.isArray(flightsOut) && flightsOut.length > 0) {
       const top = flightsOut[0];
-     const msg = `✈️ Нашли рейс\n🛫 ${top.origin || top.from || "?"} → 🛬 ${top.destination || top.to || "?"}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value || "?"}`;
+     const msg = `✈️ Нашли рейс
+🛫 ${top.origin || top.from || "?"} → 🛬 ${top.destination || top.to || "?"}
+📅 ${top.date || top.departure_at?.split("T")[0] || "?"}
+💰 $${top.price || top.value || "?"}`;
       Telegram.WebApp.sendData?.(msg);
       trackEvent("Поиск рейса", msg);
     } else {
