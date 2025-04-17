@@ -1,4 +1,17 @@
 import { renderFlights, renderHotels, renderPlaces } from './render.js';
+// 📦 Retry-функция с backoff
+async function retryFetch(url, options = {}, retries = 3, backoff = 1000) {
+  for (let i = 0; i < retries; i++) {
+    const res = await fetch(url, options);
+    if (res.status !== 429) return res;
+
+    console.warn(`⚠️ 429, повтор через ${backoff}мс (попытка ${i + 1})`);
+    await new Promise(r => setTimeout(r, backoff));
+    backoff *= 2;
+  }
+  throw new Error("Превышен лимит запросов (после повторов)");
+}
+
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
   try {
@@ -259,42 +272,40 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   let flightsBack = [];
 
   try {
-    // ✈️ Запрос рейсов туда
-    const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${from}&to=${to}&date=${departureDate}`;
-    const resOut = await fetch(urlOut);
-    if (resOut.status === 429) throw new Error("Превышен лимит запросов (429)");
-    if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
-    flightsOut = await resOut.json();
-    renderFlights(flightsOut, from, to, "Рейсы туда");
+  // ✈️ Запрос рейсов туда
+  const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${from}&to=${to}&date=${departureDate}`;
+  const resOut = await retryFetch(urlOut);
+  if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
+  flightsOut = await resOut.json();
+  renderFlights(flightsOut, from, to, "Рейсы туда");
 
-    // 🔁 Рейсы обратно
-    if (isRoundTrip && returnDate) {
-      const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${to}&to=${from}&date=${returnDate}`;
-      const resBack = await fetch(urlBack);
-      if (resBack.status === 429) throw new Error("Превышен лимит запросов (429)");
-      if (!resBack.ok) throw new Error(`Ошибка рейсов обратно: ${resBack.status}`);
-      flightsBack = await resBack.json();
-      renderFlights(flightsBack, to, from, "Рейсы обратно");
-    }
-
-    // 📲 Telegram и аналитика
-    if (Array.isArray(flightsOut) && flightsOut.length > 0) {
-      const top = flightsOut[0];
-      const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value}`;
-      Telegram.WebApp.sendData?.(msg);
-      trackEvent("Поиск рейса", msg);
-    } else {
-      Telegram.WebApp.sendData?.("😢 Рейсы не найдены.");
-      trackEvent("Поиск рейса", "Ничего не найдено");
-    }
-
-  } catch (err) {
-    console.error("❌ Ошибка при загрузке рейсов:", err);
-    Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
-    trackEvent("Ошибка загрузки рейсов", err.message);
-  } finally {
-    hideLoading();
+  // 🔁 Рейсы обратно
+  if (isRoundTrip && returnDate) {
+    const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${to}&to=${from}&date=${returnDate}`;
+    const resBack = await retryFetch(urlBack);
+    if (!resBack.ok) throw new Error(`Ошибка рейсов обратно: ${resBack.status}`);
+    flightsBack = await resBack.json();
+    renderFlights(flightsBack, to, from, "Рейсы обратно");
   }
+
+  // 📲 Telegram и аналитика
+  if (Array.isArray(flightsOut) && flightsOut.length > 0) {
+    const top = flightsOut[0];
+    const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value}`;
+    Telegram.WebApp.sendData?.(msg);
+    trackEvent("Поиск рейса", msg);
+  } else {
+    Telegram.WebApp.sendData?.("😢 Рейсы не найдены.");
+    trackEvent("Поиск рейса", "Ничего не найдено");
+  }
+
+} catch (err) {
+  console.error("❌ Ошибка при загрузке рейсов:", err);
+  Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
+  trackEvent("Ошибка загрузки рейсов", err.message);
+} finally {
+  hideLoading();
+}
 });
 
 
