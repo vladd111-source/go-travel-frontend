@@ -1,5 +1,3 @@
-// render.js
-
 /**
  * Генерирует корректную ссылку на Aviasales
  * @param {Object} flight - Объект рейса
@@ -12,7 +10,6 @@ export function generateAviasalesLink(flight) {
 
   const [date] = flight.departure_at.split("T");
   const [year, month, day] = date.split("-");
-
   const formattedDate = `${day}${month}`;
   const fromCode = flight.from || flight.origin;
   const toCode = flight.to || flight.destination;
@@ -22,15 +19,11 @@ export function generateAviasalesLink(flight) {
     return "#";
   }
 
-  // ✅ Добавлен партнёрский marker
   return `https://www.aviasales.ru/search/${fromCode}${formattedDate}${toCode}1?marker=618281`;
 }
 
 /**
- * Отрисовывает список рейсов на странице.
- * @param {Array} flights - Массив рейсов
- * @param {string} fromCity - Название города отправления
- * @param {string} toCity - Название города прибытия
+ * Отрисовывает список рейсов на странице
  */
 export function renderFlights(flights, fromCity = "—", toCity = "—") {
   const container = document.getElementById("hotDeals");
@@ -42,21 +35,25 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
   }
 
   flights.forEach(flight => {
-    if (!flight?.departure_at) return;
+    const from = flight.from || flight.origin || "—";
+    const to = flight.to || flight.destination || "—";
+    const date = (flight.date || flight.departure_at || "").split("T")[0] || "—";
+    const airline = flight.airline || "Авиакомпания";
+    const price = flight.price || flight.value || "—";
+    const link = generateAviasalesLink(flight);
 
     const card = document.createElement("div");
     card.className = "card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300";
 
-    const departureDate = flight.departure_at.split("T")[0] || "—";
-    const link = generateAviasalesLink(flight);
-    const price = flight.price || flight.value || "—";
-
     card.innerHTML = `
-      <h3 class="text-lg font-semibold mb-1">${flight.airline || "Авиакомпания"}</h3>
-      <div class="text-sm text-gray-600 mb-1">🛫 ${fromCity} → 🛬 ${toCity}</div>
-      <div class="text-sm text-gray-600 mb-1">📅 ${departureDate}</div>
+      <h3 class="text-lg font-semibold mb-1">${airline}</h3>
+      <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
+      <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
       <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
-      <a href="${link}" target="_blank" class="btn btn-blue mt-3">Перейти к бронированию</a>
+      <a href="${link}" target="_blank" 
+         class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded mt-3 transition">
+         Перейти к бронированию
+      </a>
     `;
 
     container.appendChild(card);
@@ -64,8 +61,7 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
 }
 
 /**
- * Отрисовывает список отелей.
- * @param {Array} hotels - Массив отелей
+ * Отрисовывает список отелей
  */
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
@@ -92,8 +88,7 @@ export function renderHotels(hotels) {
 }
 
 /**
- * Отрисовывает список достопримечательностей.
- * @param {Array} places - Массив мест
+ * Отрисовывает список достопримечательностей
  */
 export function renderPlaces(places) {
   const container = document.getElementById("placesResult");
