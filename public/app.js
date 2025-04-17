@@ -213,15 +213,16 @@ if (hotelCityInput) {
 
 
 
-// ✅ Поиск рейсов
+// ✅ Поиск рейсов (включая "Туда и обратно")
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const fromInput = document.getElementById("from");
   const toInput = document.getElementById("to");
   const departureInput = document.getElementById("departureDate");
+  const returnInput = document.getElementById("returnDate");
+  const roundTripCheckbox = document.getElementById("roundTrip");
 
-  // Проверка на наличие полей формы
   if (!fromInput || !toInput || !departureInput) {
     alert("⛔ Не найдены поля формы.");
     return;
@@ -230,50 +231,51 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   const from = fromInput.value.trim();
   const to = toInput.value.trim();
   const departureDate = departureInput.value;
+  const returnDate = returnInput?.value;
+  const isRoundTrip = roundTripCheckbox?.checked;
 
-  // Проверка заполненности полей
-  if (!from || !to || !departureDate) {
+  if (!from || !to || !departureDate || (isRoundTrip && !returnDate)) {
     alert("Пожалуйста, заполните все поля.");
     return;
   }
 
-  // 💾 Сохранение в localStorage
+  // 💾 Сохраняем в localStorage
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
+  if (isRoundTrip) {
+    localStorage.setItem("lastReturnDate", returnDate);
+  }
 
   showLoading();
+  const hotDeals = document.getElementById("hotDeals");
+  hotDeals.innerHTML = "";
 
   try {
-    const apiUrl = `https://go-travel-backend.vercel.app/api/flights?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${departureDate}`;
-    const res = await fetch(apiUrl);
+    // 🔁 Рейсы туда
+    const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${departureDate}`;
+    const resOut = await fetch(urlOut);
+    if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
+    const flightsOut = await resOut.json();
+    renderFlights(flightsOut, from, to, "Рейсы туда");
 
-    if (!res.ok) throw new Error(`Ошибка запроса: ${res.status}`);
-    const flights = await res.json();
-
-    if (!Array.isArray(flights)) throw new Error("Некорректный формат данных от API");
-
-    const hotDeals = document.getElementById("hotDeals");
-    hotDeals.innerHTML = "";
-
-    if (flights.length === 0) {
-      hotDeals.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
-      Telegram.WebApp?.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
-      trackEvent("Поиск рейса", `Не найдено: ${from} → ${to}, ${departureDate}`);
-      return;
+    // 🔁 Рейсы обратно (если выбрано)
+    if (isRoundTrip && returnDate) {
+      const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${encodeURIComponent(to)}&to=${encodeURIComponent(from)}&date=${returnDate}`;
+      const resBack = await fetch(urlBack);
+      if (!resBack.ok) throw new Error(`Ошибка рейсов обратно: ${resBack.status}`);
+      const flightsBack = await resBack.json();
+      renderFlights(flightsBack, to, from, "Рейсы обратно");
     }
 
-    // 🧩 Отрисовка карточек через модуль render.js
-    renderFlights(flights, from, to);
-
-    // ✅ Телеграм и аналитика
-    const top = flights[0];
+    // ✅ Отправка телеграм и аналитика
+    const top = (flightsOut?.[0]) || {};
     const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date}\n💰 $${top.price}`;
     Telegram.WebApp.sendData?.(msg);
     trackEvent("Поиск рейса", msg);
 
   } catch (err) {
-    console.error("❌ Ошибка запроса рейсов:", err);
+    console.error("❌ Ошибка при загрузке рейсов:", err);
     Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
     trackEvent("Ошибка загрузки рейсов", err.message);
   } finally {
