@@ -41,16 +41,22 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
     const to = flight.to || flight.destination || "—";
     const date = (flight.date || flight.departure_at || "").split("T")[0] || "—";
     const airline = flight.airline || "Авиакомпания";
-    const price = parseFloat(flight.price || flight.value || 0); // ✅ безопасно
-    const link = generateAviasalesLink(flight);
+    const rawPrice = flight.price || flight.value || 0;
+    const price = parseFloat(rawPrice);
 
+    const link = generateAviasalesLink(flight);
     const dealId = `${from}-${to}-${date}-${price}`;
+
     const isFav = favorites.some(f =>
-      f.from === from && f.to === to && f.date === date && f.price === price
+      f.from === from &&
+      f.to === to &&
+      f.date === date &&
+      parseFloat(f.price) === price
     );
 
     const card = document.createElement("div");
-    card.className = "card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300";
+    card.className =
+      "card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300";
 
     card.innerHTML = `
       <h3 class="text-lg font-semibold mb-1">${airline}</h3>
@@ -59,9 +65,9 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
       <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
       <div class="flex justify-between items-center mt-2">
         <a href="${link}" target="_blank"
-   class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded mt-2 transition w-full text-center">
-   Перейти к бронированию
-</a>
+           class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded mt-2 transition w-full text-center">
+           Перейти к бронированию
+        </a>
         <button 
           onclick="toggleFavoriteFlight('${dealId}', this)" 
           class="text-2xl ml-3 text-gray-600 hover:text-blue-600 transition"
