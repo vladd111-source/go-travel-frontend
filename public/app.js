@@ -221,6 +221,7 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   const toInput = document.getElementById("to");
   const departureInput = document.getElementById("departureDate");
 
+  // Проверка на наличие полей формы
   if (!fromInput || !toInput || !departureInput) {
     alert("⛔ Не найдены поля формы.");
     return;
@@ -230,43 +231,42 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   const to = toInput.value.trim();
   const departureDate = departureInput.value;
 
+  // Проверка заполненности полей
   if (!from || !to || !departureDate) {
     alert("Пожалуйста, заполните все поля.");
     return;
   }
 
-  // 💾 Сохраняем в localStorage
+  // 💾 Сохранение в localStorage
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
 
   showLoading();
 
-  const apiUrl = `https://go-travel-backend.vercel.app/api/flights?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${departureDate}`;
-
   try {
+    const apiUrl = `https://go-travel-backend.vercel.app/api/flights?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${departureDate}`;
     const res = await fetch(apiUrl);
+
     if (!res.ok) throw new Error(`Ошибка запроса: ${res.status}`);
     const flights = await res.json();
 
-    if (!Array.isArray(flights)) {
-      throw new Error("Некорректный формат данных от API");
-    }
+    if (!Array.isArray(flights)) throw new Error("Некорректный формат данных от API");
 
     const hotDeals = document.getElementById("hotDeals");
     hotDeals.innerHTML = "";
 
-    if (!flights.length) {
+    if (flights.length === 0) {
       hotDeals.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
       Telegram.WebApp?.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
       trackEvent("Поиск рейса", `Не найдено: ${from} → ${to}, ${departureDate}`);
       return;
     }
 
-    // 🧩 Построение карточек
-renderFlights(flights);
+    // 🧩 Отрисовка карточек через модуль render.js
+    renderFlights(flights, from, to);
 
-    // ✅ Отправка Telegram и аналитики
+    // ✅ Телеграм и аналитика
     const top = flights[0];
     const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date}\n💰 $${top.price}`;
     Telegram.WebApp.sendData?.(msg);
@@ -280,7 +280,6 @@ renderFlights(flights);
     hideLoading();
   }
 });
-
 
 
 
