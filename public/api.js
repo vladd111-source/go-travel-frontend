@@ -1,90 +1,69 @@
-// ✅ Получение билетов через собственный backend (обход CORS)
-export async function fetchAviasalesFlights(from, to, date) {
-  const url = `https://go-travel-backend.vercel.app/api/flights?from=${from}&to=${to}&date=${date}`;
+import { fetchAviasalesFlights, fetchLocation } from './api.js';
+import { renderFlights } from './render.js';
 
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
+let fromInput, toInput, departureInput;
 
-    console.log("📦 Ответ от backend:", data);
+document.addEventListener("DOMContentLoaded", () => {
+  fromInput = document.getElementById("from");
+  toInput = document.getElementById("to");
+  departureInput = document.getElementById("departureDate");
 
-    // ✅ Обработка разных форматов: массив или объект
-    if (Array.isArray(data)) {
-      return data;
-    } else if (data && typeof data === "object") {
-      return Object.values(data);
-    } else {
-      console.warn("⚠️ Неподдерживаемый формат ответа:", data);
-      return [];
-    }
-  } catch (err) {
-    console.error("❌ Ошибка загрузки рейсов с backend:", err.message || err);
-    return [];
+  const form = document.getElementById("search-form");
+
+  if (!form || !fromInput || !toInput || !departureInput) {
+    console.error("❌ Один из элементов формы не найден!");
+    return;
   }
-}
 
-// ✅ Устойчивый поиск города по названию через Aviasales (TravelPayouts) API с поддержкой русского языка
-export async function fetchLocation(query) {
-  const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(query)}&locale=ru&types[]=city`;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const normalize = (s) => (s || "").trim().toLowerCase();
-  const normQuery = normalize(query);
+    const fromCity = fromInput.value.trim();
+    const toCity = toInput.value.trim();
+    const date = departureInput.value.trim();
 
-  try {
-    console.log("🔍 Запрос города:", query);
-    const res = await fetch(url);
-    const data = await res.json();
-
-    console.log("📦 Ответ от API:", data);
-
-    // 1. Ищем точное совпадение по name/code
-    let match = data.find(item =>
-      (normalize(item.name) === normQuery || normalize(item.code) === normQuery) &&
-      item.code
-    );
-
-    // 2. Если не найдено — ищем по вхождению в name, city_name, code
-    if (!match) {
-      match = data.find(item =>
-        (normalize(item.name).includes(normQuery) ||
-         normalize(item.city_name)?.includes(normQuery) ||
-         normalize(item.code) === normQuery) &&
-        item.code
-      );
+    if (!fromCity || !toCity || !date) {
+      alert("Пожалуйста, заполните все поля.");
+      return;
     }
 
-    if (!match) {
-      console.warn("❌ Город не найден:", query);
-      return null;
+    showLoading();
+
+    try {
+      const from = await fetchLocation(fromCity);
+      const to = await fetchLocation(toCity);
+
+      if (!from || !to) {
+        alert("❌ Не удалось определить города");
+        hideLoading();
+        return;
+      }
+
+      const flights = await fetchAviasalesFlights(from.code, to.code, date);
+
+      const container = document.getElementById("hotDeals");
+      container.innerHTML = "";
+
+      if (!flights.length) {
+        container.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
+        Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
+      } else {
+        renderFlights(flights, fromCity, toCity);
+        Telegram.WebApp?.sendData?.(`✈️ Найдено ${flights.length} рейсов: ${fromCity} → ${toCity}`);
+      }
+
+      trackEvent("Поиск рейсов", {
+        from: from.code,
+        to: to.code,
+        departureDate: date,
+        count: flights.length
+      });
+
+    } catch (err) {
+      console.error("❌ Ошибка при загрузке рейсов:", err);
+      Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
+    } finally {
+      hideLoading();
     }
-
-    console.log(`✅ Найден город: ${match.name || match.city_name} (${match.code})`);
-    return {
-      code: match.code
-    };
-  } catch (err) {
-    console.error('❌ Ошибка поиска города:', err);
-    return null;
-  }
-}
-
-// ✅ Альтернатива — прямой поиск рейсов через Skyscanner
-export async function fetchFlights(fromCode, fromId, toCode, toId) {
-  const url = `https://skyscanner89.p.rapidapi.com/flights/one-way/list?origin=${fromCode}&originId=${fromId}&destination=${toCode}&destinationId=${toId}`;
-
-  const options = {
-    method: 'GET',
-    headers: {
-      'X-RapidAPI-Key': '61654e8ea8msh81fd1f2e412c216p164556jsne7c3bbe401bf',
-      'X-RapidAPI-Host': 'skyscanner89.p.rapidapi.com'
-    }
-  };
-
-  try {
-    const res = await fetch(url, options);
-    return await res.json();
-  } catch (err) {
-    console.error('Ошибка загрузки рейсов:', err);
-    return null;
-  }
-}
+  });
+});
