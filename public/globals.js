@@ -251,6 +251,34 @@ window.updatePriceTooltip = function () {
   priceTooltip.style.transform = `translateX(-50%)`;
 };
 
+window.toggleFavoriteFlight = function (dealId, btn) {
+  const [from, to, date, price] = dealId.split("-");
+  const key = "favorites_flights";
+  const list = JSON.parse(localStorage.getItem(key) || "[]");
+
+  const match = list.find(f =>
+    f.from === from &&
+    f.to === to &&
+    f.date === date &&
+    f.price == price
+  );
+
+  const updated = match
+    ? list.filter(f => !(f.from === from && f.to === to && f.date === date && f.price == price))
+    : [...list, { from, to, date, price: +price }];
+
+  localStorage.setItem(key, JSON.stringify(updated));
+  btn.innerHTML = match ? "🤍" : "💙";
+
+  trackEvent?.("Избранное: рейс", {
+    action: match ? "удалено" : "добавлено",
+    route: `${from} → ${to}`,
+    date,
+    price
+  });
+};
+
+
 // 👉 Форматирование деталей
 window.formatDetails = function(type, item) {
   const t = translations?.[window._appLang] || {};
