@@ -1,16 +1,18 @@
 import { renderFlights, renderHotels, renderPlaces } from './render.js';
 
-// 🔁 Универсальная функция с повтором при 429 (экспоненциальный backoff)
-async function retryFetch(url, options = {}, retries = 3, backoff = 1000) {
+let lastSearchTime = 0;
+
+// 🔁 Функция с повтором при 429
+async function retryFetch(url, options = {}, retries = 5, backoff = 1500) {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url, options);
     if (res.status !== 429) return res;
 
-    console.warn(`⚠️ 429, повтор через ${backoff}мс (попытка ${i + 1})`);
+    console.warn(`⚠️ Повтор (${i + 1}) из-за 429`);
     await new Promise(r => setTimeout(r, backoff));
-    backoff *= 2; // увеличиваем интервал экспоненциально
+    backoff *= 1.5;
   }
-  throw new Error("Превышен лимит запросов (после повторов)");
+  throw new Error("❌ Превышен лимит запросов (после повторов)");
 }
 
 // ✅ DOMContentLoaded и инициализация приложения
@@ -225,7 +227,20 @@ if (hotelCityInput) {
   });
 }
 
-let lastSearchTime = 0; // Защита от спама
+// 🔁 Повтор при 429
+async function retryFetch(url, options = {}, retries = 5, backoff = 1500) {
+  for (let i = 0; i < retries; i++) {
+    const res = await fetch(url, options);
+    if (res.status !== 429) return res;
+
+    console.warn(`⚠️ Повтор (${i + 1}) из-за 429`);
+    await new Promise(r => setTimeout(r, backoff));
+    backoff *= 1.5;
+  }
+  throw new Error("❌ Превышен лимит запросов (после повторов)");
+}
+
+let lastSearchTime = 0;
 
 // ✅ Поиск рейсов (включая "Туда и обратно")
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
@@ -243,13 +258,11 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   const returnDate = returnInput?.value;
   const isRoundTrip = roundTripCheckbox?.checked;
 
-  // ⛔ Проверка ввода
   if (!from || !to || !departureDate || (isRoundTrip && !returnDate)) {
     alert("Пожалуйста, заполните все поля.");
     return;
   }
 
-  // ⏱️ Защита от частых запросов (1 секунда)
   const now = Date.now();
   if (now - lastSearchTime < 1000) {
     alert("⏳ Подождите немного перед новым запросом.");
@@ -257,7 +270,6 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   }
   lastSearchTime = now;
 
-  // 💾 Сохраняем в localStorage
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
@@ -272,18 +284,20 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   let flightsOut = [];
   let flightsBack = [];
 
-  try {
-    const encodeCity = (city) => encodeURIComponent(city.trim());
+  const encodeCity = (city) => encodeURIComponent(city.trim());
 
-    // ✈️ Запрос рейсов туда
+  try {
+    // ✈️ Запрос туда
     const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${encodeCity(from)}&to=${encodeCity(to)}&date=${departureDate}`;
     const resOut = await retryFetch(urlOut);
     if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
     flightsOut = await resOut.json();
     renderFlights(flightsOut, from, to, "Рейсы туда");
 
-    // 🔁 Рейсы обратно
+    // 🔁 Запрос обратно (с паузой)
     if (isRoundTrip && returnDate) {
+      await new Promise(r => setTimeout(r, 1200));
+
       const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${encodeCity(to)}&to=${encodeCity(from)}&date=${returnDate}`;
       const resBack = await retryFetch(urlBack);
       if (!resBack.ok) throw new Error(`Ошибка рейсов обратно: ${resBack.status}`);
@@ -291,7 +305,7 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
       renderFlights(flightsBack, to, from, "Рейсы обратно");
     }
 
-    // 📲 Telegram и аналитика
+    // 📲 Telegram
     if (Array.isArray(flightsOut) && flightsOut.length > 0) {
       const top = flightsOut[0];
       const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value}`;
@@ -310,17 +324,6 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     hideLoading();
   }
 });
-
-// 🔁 Универсальный повторитель с защитой от 429
-async function retryFetch(url, attempts = 3, delayMs = 1000) {
-  for (let attempt = 0; attempt < attempts; attempt++) {
-    const res = await fetch(url);
-    if (res.status !== 429) return res;
-    console.warn(`⚠️ Повтор (${attempt + 1}) из-за 429`);
-    await new Promise(r => setTimeout(r, delayMs * (attempt + 1)));
-  }
-  throw new Error("Превышен лимит запросов (429)");
-}
 
 // ✅ Поиск мест
 const placeCityInput = document.getElementById("placeCity");
