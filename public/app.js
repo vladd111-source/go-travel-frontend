@@ -1,5 +1,31 @@
 import { renderFlights, renderHotels, renderPlaces } from './render.js';
 
+const iataCache = {};
+
+async function getIataCode(city) {
+  const normalized = city.trim().toLowerCase();
+  if (iataCache[normalized]) return iataCache[normalized];
+
+  const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(city)}&locale=ru&types[]=city`;
+
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+
+    const match = json.find(item => 
+      item.name?.toLowerCase() === normalized ||
+      item.city_name?.toLowerCase().includes(normalized)
+    );
+
+    const code = match?.code?.toUpperCase();
+    if (code) iataCache[normalized] = code;
+    return code || null;
+  } catch (err) {
+    console.error("❌ Ошибка при получении IATA:", err);
+    return null;
+  }
+}
+
 let lastSearchTime = 0;
 
 // 🔁 Повтор при 429 (без async/await)
@@ -256,8 +282,10 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   const returnInput = document.getElementById("returnDate");
   const roundTripCheckbox = document.getElementById("roundTrip");
 
-  const from = fromInput?.value.trim();
-  const to = toInput?.value.trim();
+  const fromCity = fromInput?.value.trim();
+  const toCity = toInput?.value.trim();
+  const from = fromCity.length === 3 ? fromCity.toUpperCase() : await getIataCode(fromCity);
+  const to = toCity.length === 3 ? toCity.toUpperCase() : await getIataCode(toCity);
   const departureDate = departureInput?.value;
   const returnDate = returnInput?.value;
   const isRoundTrip = roundTripCheckbox?.checked;
