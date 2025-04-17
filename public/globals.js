@@ -251,8 +251,10 @@ window.updatePriceTooltip = function () {
   priceTooltip.style.transform = `translateX(-50%)`;
 };
 
-window.toggleFavoriteFlight = function (dealId, btn) {
-  const [from, to, date, price] = dealId.split("-");
+window.toggleFavoriteFlight = function (encodedDeal, btn) {
+  const deal = JSON.parse(decodeURIComponent(encodedDeal));
+  const { from, to, date, price } = deal;
+
   const key = "favorites_flights";
   const list = JSON.parse(localStorage.getItem(key) || "[]");
 
@@ -260,12 +262,12 @@ window.toggleFavoriteFlight = function (dealId, btn) {
     f.from === from &&
     f.to === to &&
     f.date === date &&
-    f.price == price
+    parseFloat(f.price) === parseFloat(price)
   );
 
   const updated = match
-    ? list.filter(f => !(f.from === from && f.to === to && f.date === date && f.price == price))
-    : [...list, { from, to, date, price: +price }];
+    ? list.filter(f => !(f.from === from && f.to === to && f.date === date && parseFloat(f.price) === parseFloat(price)))
+    : [...list, { from, to, date, price: parseFloat(price) }];
 
   localStorage.setItem(key, JSON.stringify(updated));
   btn.innerHTML = match ? "🤍" : "💙";
@@ -277,7 +279,6 @@ window.toggleFavoriteFlight = function (dealId, btn) {
     price
   });
 };
-
 
 // 👉 Форматирование деталей
 window.formatDetails = function(type, item) {
