@@ -210,29 +210,35 @@ if (hotelCityInput) {
   });
 }
 
+//поиск рейсов
 document.getElementById("search-form")?.addEventListener("submit", (e) => {
   e.preventDefault();
-  
+
   const fromInput = document.getElementById("from");
   const toInput = document.getElementById("to");
   const departureInput = document.getElementById("departureDate");
 
+  if (!fromInput || !toInput || !departureInput) {
+    alert("⛔ Не найдены поля формы.");
+    return;
+  }
+
   const from = fromInput.value.trim();
   const to = toInput.value.trim();
   const departureDate = departureInput.value;
-
-  localStorage.setItem("lastFrom", from);
-  localStorage.setItem("lastTo", to);
-  localStorage.setItem("lastDepartureDate", departureDate);
 
   if (!from || !to || !departureDate) {
     alert("Пожалуйста, заполните все поля.");
     return;
   }
 
+  localStorage.setItem("lastFrom", from);
+  localStorage.setItem("lastTo", to);
+  localStorage.setItem("lastDepartureDate", departureDate);
+
   showLoading();
 
-  const apiUrl = `https://go-travel-backend.vercel.app/api/flights?from=${from}&to=${to}&date=${departureDate}`;
+  const apiUrl = `https://go-travel-backend.vercel.app/api/flights?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${departureDate}`;
 
   fetch(apiUrl)
     .then(res => {
@@ -242,27 +248,29 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
     .then(flights => {
       if (!Array.isArray(flights)) {
         console.warn("❌ Ответ не массив:", flights);
-        throw new Error("Некорректный формат данных");
+        throw new Error("Некорректный формат данных от API");
       }
 
-      const match = flights.find(f =>
-        f.from?.toLowerCase() === from.toLowerCase() &&
-        f.to?.toLowerCase() === to.toLowerCase()
-      );
-
       const hotDeals = document.getElementById("hotDeals");
-      hotDeals.innerHTML = flights.map(deal => {
-        const isFav = JSON.parse(localStorage.getItem("favorites_flights") || "[]")
-          .some(f => f.from === deal.from && f.to === deal.to && f.date === deal.date && f.price === deal.price);
+      hotDeals.innerHTML = "";
 
-        const dealId = `${deal.from}-${deal.to}-${deal.date}-${deal.price}`;
+      const cards = flights.map(flight => {
+        const dealId = `${flight.from}-${flight.to}-${flight.date}-${flight.price}`;
+        const isFav = (JSON.parse(localStorage.getItem("favorites_flights") || "[]"))
+          .some(f =>
+            f.from === flight.from &&
+            f.to === flight.to &&
+            f.date === flight.date &&
+            f.price === flight.price
+          );
+
         return `
           <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
-            <strong>${deal.from} → ${deal.to}</strong><br>
-            📅 Дата: ${deal.date}<br>
-            💰 Цена: $${deal.price}
+            <strong>${flight.from} → ${flight.to}</strong><br>
+            📅 Дата: ${flight.date}<br>
+            💰 Цена: $${flight.price}
             <div class="flex justify-between items-center mt-2">
-              <button class="btn w-full" onclick="bookHotel('${deal.from}', '${deal.to}', ${deal.price}, '${deal.date}')">Забронировать</button>
+              <button class="btn w-full" onclick="bookHotel('${flight.from}', '${flight.to}', ${flight.price}, '${flight.date}')">Забронировать</button>
               <button onclick="toggleFavoriteFlight('${dealId}', this)" class="text-xl ml-3" data-flight-id="${dealId}">
                 ${isFav ? "💙" : "🤍"}
               </button>
@@ -271,11 +279,14 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
         `;
       }).join("");
 
-      updateHearts("places");
+      hotDeals.innerHTML = cards;
+
+      updateHearts("flights");
       animateCards("#hotDeals .card");
 
-      if (match) {
-        const msg = `✈️ Нашли рейс\n🛫 ${match.from} → 🛬 ${match.to}\n📅 ${match.date}\n💰 $${match.price}`;
+      if (flights.length > 0) {
+        const top = flights[0];
+        const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date}\n💰 $${top.price}`;
         Telegram.WebApp.sendData?.(msg);
         trackEvent("Поиск рейса", msg);
       } else {
