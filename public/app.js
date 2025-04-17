@@ -213,6 +213,8 @@ if (hotelCityInput) {
 
 
 
+let lastSearchTime = 0;
+
 // ✅ Поиск рейсов (включая "Туда и обратно")
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -223,18 +225,27 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   const returnInput = document.getElementById("returnDate");
   const roundTripCheckbox = document.getElementById("roundTrip");
 
-  const from = fromInput?.value.trim();
-  const to = toInput?.value.trim();
+  const from = fromInput?.value.trim().toUpperCase();
+  const to = toInput?.value.trim().toUpperCase();
   const departureDate = departureInput?.value;
   const returnDate = returnInput?.value;
   const isRoundTrip = roundTripCheckbox?.checked;
 
+  // ⛔ Проверка ввода
   if (!from || !to || !departureDate || (isRoundTrip && !returnDate)) {
     alert("Пожалуйста, заполните все поля.");
     return;
   }
 
-  // 💾 Сохраняем последние значения
+  // ⏱️ Защита от частых запросов (1 секунда)
+  const now = Date.now();
+  if (now - lastSearchTime < 1000) {
+    alert("⏳ Подождите немного перед новым запросом.");
+    return;
+  }
+  lastSearchTime = now;
+
+  // 💾 Сохраняем в localStorage
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
@@ -249,42 +260,47 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   let flightsOut = [];
   let flightsBack = [];
 
-  // 🔁 Рейсы туда
   try {
-    const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${departureDate}`;
+    // ✈️ Запрос рейсов туда
+    const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${from}&to=${to}&date=${departureDate}`;
     const resOut = await fetch(urlOut);
+
+    if (resOut.status === 429) throw new Error("Превышен лимит запросов (429)");
     if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
+
     flightsOut = await resOut.json();
     renderFlights(flightsOut, from, to, "Рейсы туда");
-  } catch (err) {
-    console.warn("⚠️ Не удалось загрузить рейсы туда:", err);
-  }
 
-  // 🔁 Рейсы обратно
-  if (isRoundTrip && returnDate) {
-    try {
-      const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${encodeURIComponent(to)}&to=${encodeURIComponent(from)}&date=${returnDate}`;
+    // ✈️ Запрос рейсов обратно
+    if (isRoundTrip && returnDate) {
+      const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${to}&to=${from}&date=${returnDate}`;
       const resBack = await fetch(urlBack);
+
+      if (resBack.status === 429) throw new Error("Превышен лимит запросов (429)");
       if (!resBack.ok) throw new Error(`Ошибка рейсов обратно: ${resBack.status}`);
+
       flightsBack = await resBack.json();
       renderFlights(flightsBack, to, from, "Рейсы обратно");
-    } catch (err) {
-      console.warn("⚠️ Не удалось загрузить рейсы обратно:", err);
     }
-  }
 
-  // 📲 Telegram и аналитика — только если есть хотя бы 1 рейс
-  if (Array.isArray(flightsOut) && flightsOut.length > 0) {
-    const top = flightsOut[0];
-    const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value}`;
-    Telegram.WebApp.sendData?.(msg);
-    trackEvent("Поиск рейса", msg);
-  } else {
-    Telegram.WebApp.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
-    trackEvent("Поиск рейса", "Рейсы не найдены");
-  }
+    // 📲 Telegram + аналитика
+    if (flightsOut.length > 0) {
+      const top = flightsOut[0];
+      const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value}`;
+      Telegram.WebApp.sendData?.(msg);
+      trackEvent("Поиск рейса", msg);
+    } else {
+      Telegram.WebApp.sendData?.("😢 Рейсы не найдены.");
+      trackEvent("Поиск рейса", "Ничего не найдено");
+    }
 
-  hideLoading();
+  } catch (err) {
+    console.error("❌ Ошибка при загрузке рейсов:", err);
+    Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
+    trackEvent("Ошибка загрузки рейсов", err.message);
+  } finally {
+    hideLoading();
+  }
 });
 
 
