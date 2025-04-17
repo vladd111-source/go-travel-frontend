@@ -41,12 +41,12 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
     const to = flight.to || flight.destination || "—";
     const date = (flight.date || flight.departure_at || "").split("T")[0] || "—";
     const airline = flight.airline || "Авиакомпания";
-    const price = flight.price || flight.value || "—";
+    const price = parseFloat(flight.price || flight.value || 0); // ✅ безопасно
     const link = generateAviasalesLink(flight);
 
     const dealId = `${from}-${to}-${date}-${price}`;
     const isFav = favorites.some(f =>
-      f.from === from && f.to === to && f.date === date && f.price == price
+      f.from === from && f.to === to && f.date === date && f.price === price
     );
 
     const card = document.createElement("div");
@@ -58,16 +58,16 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
       <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
       <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
       <div class="flex justify-between items-center mt-2">
-       <a href="${link}" target="_blank"
-   class="mt-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition">
-   Перейти к бронированию
-</a>
+        <a href="${link}" target="_blank"
+           class="mt-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition">
+           Перейти к бронированию
+        </a>
         <button 
-  onclick="toggleFavoriteFlight('${dealId}', this)" 
-  class="text-2xl ml-3 text-gray-600 hover:text-blue-600 transition"
-  data-flight-id="${dealId}">
-  ${isFav ? "💙" : "🤍"}
-</button>
+          onclick="toggleFavoriteFlight('${dealId}', this)" 
+          class="text-2xl ml-3 text-gray-600 hover:text-blue-600 transition"
+          data-flight-id="${dealId}">
+          ${isFav ? "💙" : "🤍"}
+        </button>
       </div>
     `;
 
