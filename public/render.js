@@ -22,7 +22,8 @@ export function generateAviasalesLink(flight) {
     return "#";
   }
 
-  return `https://www.aviasales.ru/search/${fromCode}${formattedDate}${toCode}1`;
+  // ✅ Добавлен партнёрский marker
+  return `https://www.aviasales.ru/search/${fromCode}${formattedDate}${toCode}1?marker=618281`;
 }
 
 /**
