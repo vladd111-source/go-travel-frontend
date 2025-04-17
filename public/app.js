@@ -210,18 +210,6 @@ if (hotelCityInput) {
   });
 }
 
-// ✅ Поиск рейсов
-const fromInput = document.getElementById("from");
-const toInput = document.getElementById("to");
-const departureInput = document.getElementById("departureDate");
-
-if (fromInput && toInput && departureInput) {
-  fromInput.value = localStorage.getItem("lastFrom") || "";
-  toInput.value = localStorage.getItem("lastTo") || "";
-  departureInput.value = localStorage.getItem("lastDepartureDate") || "";
-  fromInput.setAttribute("autofocus", "autofocus");
-}
-
 document.getElementById("search-form")?.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -233,26 +221,42 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
 
+  if (!from || !to || !departureDate) {
+    alert("Пожалуйста, заполните все поля.");
+    return;
+  }
+
   showLoading();
 
-  fetch("https://go-travel-backend.vercel.app/api/flights")
-    .then(res => res.json())
+  const apiUrl = `https://go-travel-backend.vercel.app/api/flights?from=${from}&to=${to}&date=${departureDate}`;
+
+  fetch(apiUrl)
+    .then(res => {
+      if (!res.ok) throw new Error(`Ошибка запроса: ${res.status}`);
+      return res.json();
+    })
     .then(flights => {
+      if (!Array.isArray(flights)) {
+        console.warn("❌ Ответ не массив:", flights);
+        throw new Error("Некорректный формат данных");
+      }
+
       const match = flights.find(f =>
-        f.from.toLowerCase() === from.toLowerCase() &&
-        f.to.toLowerCase() === to.toLowerCase()
+        f.from?.toLowerCase() === from.toLowerCase() &&
+        f.to?.toLowerCase() === to.toLowerCase()
       );
 
       const hotDeals = document.getElementById("hotDeals");
       hotDeals.innerHTML = flights.map(deal => {
         const isFav = JSON.parse(localStorage.getItem("favorites_flights") || "[]")
           .some(f => f.from === deal.from && f.to === deal.to && f.date === deal.date && f.price === deal.price);
+
         const dealId = `${deal.from}-${deal.to}-${deal.date}-${deal.price}`;
         return `
           <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
             <strong>${deal.from} → ${deal.to}</strong><br>
-            Дата: ${deal.date}<br>
-            Цена: $${deal.price}
+            📅 Дата: ${deal.date}<br>
+            💰 Цена: $${deal.price}
             <div class="flex justify-between items-center mt-2">
               <button class="btn w-full" onclick="bookHotel('${deal.from}', '${deal.to}', ${deal.price}, '${deal.date}')">Забронировать</button>
               <button onclick="toggleFavoriteFlight('${dealId}', this)" class="text-xl ml-3" data-flight-id="${dealId}">
@@ -284,6 +288,7 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
       hideLoading();
     });
 });
+
 
 // ✅ Поиск мест
 const placeCityInput = document.getElementById("placeCity");
