@@ -1,3 +1,4 @@
+import { renderFlights, renderHotels, renderPlaces } from './render.js';
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
   try {
@@ -263,34 +264,7 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     }
 
     // 🧩 Построение карточек
-    const cards = flights.map(flight => {
-      const dealId = `${flight.from}-${flight.to}-${flight.date}-${flight.price}`;
-      const isFav = (JSON.parse(localStorage.getItem("favorites_flights") || "[]"))
-        .some(f =>
-          f.from === flight.from &&
-          f.to === flight.to &&
-          f.date === flight.date &&
-          f.price === flight.price
-        );
-
-      return `
-        <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
-          <strong>${flight.from} → ${flight.to}</strong><br>
-          📅 Дата: ${flight.date}<br>
-          💰 Цена: $${flight.price}
-          <div class="flex justify-between items-center mt-2">
-            <button class="btn w-full" onclick="bookHotel('${flight.from}', '${flight.to}', ${flight.price}, '${flight.date}')">Забронировать</button>
-            <button onclick="toggleFavoriteFlight('${dealId}', this)" class="text-xl ml-3" data-flight-id="${dealId}">
-              ${isFav ? "💙" : "🤍"}
-            </button>
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    hotDeals.innerHTML = cards;
-    updateHearts("flights");
-    animateCards("#hotDeals .card");
+renderFlights(flights);
 
     // ✅ Отправка Telegram и аналитики
     const top = flights[0];
