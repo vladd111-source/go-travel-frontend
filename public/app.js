@@ -240,7 +240,7 @@ async function retryFetch(url, options = {}, retries = 5, backoff = 1500) {
   throw new Error("❌ Превышен лимит запросов (после повторов)");
 }
 
-let lastSearchTime = 0;
+lastSearchTime = 0;
 
 // ✅ Поиск рейсов (включая "Туда и обратно")
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
