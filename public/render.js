@@ -34,6 +34,8 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
     return;
   }
 
+  const favorites = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+
   flights.forEach(flight => {
     const from = flight.from || flight.origin || "—";
     const to = flight.to || flight.destination || "—";
@@ -41,6 +43,11 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
     const airline = flight.airline || "Авиакомпания";
     const price = flight.price || flight.value || "—";
     const link = generateAviasalesLink(flight);
+
+    const dealId = `${from}-${to}-${date}-${price}`;
+    const isFav = favorites.some(f =>
+      f.from === from && f.to === to && f.date === date && f.price == price
+    );
 
     const card = document.createElement("div");
     card.className = "card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300";
@@ -50,14 +57,26 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
       <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
       <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
       <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
-      <a href="${link}" target="_blank"
-         class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded mt-3 transition">
-         Перейти к бронированию
-      </a>
+      <div class="flex justify-between items-center mt-2">
+        <a href="${link}" target="_blank"
+           class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition">
+           Перейти к бронированию
+        </a>
+        <button 
+          onclick="toggleFavoriteFlight('${dealId}', this)" 
+          class="text-xl ml-3" 
+          data-flight-id="${dealId}">
+          ${isFav ? "💙" : "🤍"}
+        </button>
+      </div>
     `;
 
     container.appendChild(card);
   });
+
+  if (typeof animateCards === "function") {
+    animateCards("#hotDeals .card");
+  }
 }
 
 /**
