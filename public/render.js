@@ -64,7 +64,7 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
         </a>
         <button 
   onclick="toggleFavoriteFlight('${dealId}', this)" 
-  class="text-xl ml-3 text-gray-500 hover:text-red-500 transition"
+  class="text-2xl ml-3 text-gray-600 hover:text-blue-600 transition"
   data-flight-id="${dealId}">
   ${isFav ? "💙" : "🤍"}
 </button>
