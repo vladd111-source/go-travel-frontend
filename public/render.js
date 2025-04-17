@@ -50,7 +50,7 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
       <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
       <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
       <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
-      <a href="${link}" target="_blank" 
+      <a href="${link}" target="_blank"
          class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded mt-3 transition">
          Перейти к бронированию
       </a>
