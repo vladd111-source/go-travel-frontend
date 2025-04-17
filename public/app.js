@@ -212,6 +212,10 @@ if (hotelCityInput) {
 
 document.getElementById("search-form")?.addEventListener("submit", (e) => {
   e.preventDefault();
+  
+  const fromInput = document.getElementById("from");
+  const toInput = document.getElementById("to");
+  const departureInput = document.getElementById("departureDate");
 
   const from = fromInput.value.trim();
   const to = toInput.value.trim();
