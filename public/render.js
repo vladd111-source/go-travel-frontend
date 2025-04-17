@@ -25,7 +25,7 @@ export function generateAviasalesLink(flight) {
 /**
  * Отрисовывает список рейсов на странице
  */
-export function renderFlights(flights, fromCity = "—", toCity = "—") {
+export function renderFlights(flights) {
   const container = document.getElementById("hotDeals");
   container.innerHTML = "";
 
@@ -45,13 +45,12 @@ export function renderFlights(flights, fromCity = "—", toCity = "—") {
     const price = parseFloat(rawPrice);
 
     const link = generateAviasalesLink(flight);
-    const dealId = `${from}-${to}-${date}-${price}`;
+
+    const dealData = { from, to, date, price };
+    const dealId = encodeURIComponent(JSON.stringify(dealData));
 
     const isFav = favorites.some(f =>
-      f.from === from &&
-      f.to === to &&
-      f.date === date &&
-      parseFloat(f.price) === price
+      f.from === from && f.to === to && f.date === date && parseFloat(f.price) === price
     );
 
     const card = document.createElement("div");
