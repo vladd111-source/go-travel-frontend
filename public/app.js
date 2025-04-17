@@ -2,18 +2,35 @@ import { renderFlights, renderHotels, renderPlaces } from './render.js';
 
 let lastSearchTime = 0;
 
-// 🔁 Функция с повтором при 429
-async function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
-  for (let i = 0; i < retries; i++) {
-    const res = await fetch(url, options);
-    if (res.status !== 429) return res;
+// 🔁 Функция с повтором при 429 без async/await
+function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
+  return new Promise((resolve, reject) => {
+    function attempt(tryIndex, delay) {
+      fetch(url, options)
+        .then(res => {
+          if (res.status !== 429) {
+            resolve(res);
+          } else if (tryIndex < retries - 1) {
+            console.warn(`⚠️ Повтор (${tryIndex + 1}) из-за 429`);
+            setTimeout(() => attempt(tryIndex + 1, delay * 2), delay);
+          } else {
+            reject(new Error("❌ Превышен лимит запросов (после повторов)"));
+          }
+        })
+        .catch(err => {
+          if (tryIndex < retries - 1) {
+            console.warn(`⚠️ Ошибка запроса, повтор (${tryIndex + 1})`, err);
+            setTimeout(() => attempt(tryIndex + 1, delay * 2), delay);
+          } else {
+            reject(err);
+          }
+        });
+    }
 
-    console.warn(`⚠️ Повтор (${i + 1}) из-за 429`);
-    await new Promise(r => setTimeout(r, backoff));
-    backoff *= 2;
-  }
-  throw new Error("❌ Превышен лимит запросов (после повторов)");
+    attempt(0, backoff);
+  });
 }
+
 
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
@@ -227,17 +244,33 @@ if (hotelCityInput) {
   });
 }
 
-// 🔁 Повтор при 429
-async function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
-  for (let i = 0; i < retries; i++) {
-    const res = await fetch(url, options);
-    if (res.status !== 429) return res;
+// 🔁 Повтор при 429 (без async/await)
+function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
+  return new Promise((resolve, reject) => {
+    function attempt(tryIndex, currentDelay) {
+      fetch(url, options)
+        .then(res => {
+          if (res.status !== 429) {
+            resolve(res);
+          } else if (tryIndex < retries - 1) {
+            console.warn(`⚠️ Повтор (${tryIndex + 1}) из-за 429`);
+            setTimeout(() => attempt(tryIndex + 1, currentDelay * 1.5), currentDelay);
+          } else {
+            reject(new Error("❌ Превышен лимит запросов (после повторов)"));
+          }
+        })
+        .catch(err => {
+          if (tryIndex < retries - 1) {
+            console.warn(`⚠️ Ошибка запроса, повтор (${tryIndex + 1})`, err);
+            setTimeout(() => attempt(tryIndex + 1, currentDelay * 1.5), currentDelay);
+          } else {
+            reject(err);
+          }
+        });
+    }
 
-    console.warn(`⚠️ Повтор (${i + 1}) из-за 429`);
-    await new Promise(r => setTimeout(r, backoff));
-    backoff *= 1.5;
-  }
-  throw new Error("❌ Превышен лимит запросов (после повторов)");
+    attempt(0, backoff);
+  });
 }
 
 lastSearchTime = 0;
