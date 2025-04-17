@@ -223,14 +223,9 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   const returnInput = document.getElementById("returnDate");
   const roundTripCheckbox = document.getElementById("roundTrip");
 
-  if (!fromInput || !toInput || !departureInput) {
-    alert("⛔ Не найдены поля формы.");
-    return;
-  }
-
-  const from = fromInput.value.trim();
-  const to = toInput.value.trim();
-  const departureDate = departureInput.value;
+  const from = fromInput?.value.trim();
+  const to = toInput?.value.trim();
+  const departureDate = departureInput?.value;
   const returnDate = returnInput?.value;
   const isRoundTrip = roundTripCheckbox?.checked;
 
@@ -239,7 +234,7 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     return;
   }
 
-  // 💾 Сохраняем в localStorage
+  // 💾 Сохраняем последние значения
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
@@ -248,31 +243,36 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   }
 
   showLoading();
+
   const hotDeals = document.getElementById("hotDeals");
   hotDeals.innerHTML = "";
 
   try {
-    // 🔁 Рейсы туда
+    // 🔁 Поиск рейсов туда
     const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${departureDate}`;
     const resOut = await fetch(urlOut);
     if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
     const flightsOut = await resOut.json();
+
     renderFlights(flightsOut, from, to, "Рейсы туда");
 
-    // 🔁 Рейсы обратно (если выбрано)
+    // 🔁 Поиск рейсов обратно, если включено
     if (isRoundTrip && returnDate) {
       const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${encodeURIComponent(to)}&to=${encodeURIComponent(from)}&date=${returnDate}`;
       const resBack = await fetch(urlBack);
       if (!resBack.ok) throw new Error(`Ошибка рейсов обратно: ${resBack.status}`);
       const flightsBack = await resBack.json();
+
       renderFlights(flightsBack, to, from, "Рейсы обратно");
     }
 
-    // ✅ Отправка телеграм и аналитика
-    const top = (flightsOut?.[0]) || {};
-    const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date}\n💰 $${top.price}`;
-    Telegram.WebApp.sendData?.(msg);
-    trackEvent("Поиск рейса", msg);
+    // 📲 Telegram и аналитика
+    if (Array.isArray(flightsOut) && flightsOut.length > 0) {
+      const top = flightsOut[0];
+      const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date}\n💰 $${top.price}`;
+      Telegram.WebApp.sendData?.(msg);
+      trackEvent("Поиск рейса", msg);
+    }
 
   } catch (err) {
     console.error("❌ Ошибка при загрузке рейсов:", err);
