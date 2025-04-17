@@ -284,14 +284,21 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
 
   const fromCity = fromInput?.value.trim();
   const toCity = toInput?.value.trim();
-  const from = fromCity.length === 3 ? fromCity.toUpperCase() : await getIataCode(fromCity);
-  const to = toCity.length === 3 ? toCity.toUpperCase() : await getIataCode(toCity);
   const departureDate = departureInput?.value;
   const returnDate = returnInput?.value;
   const isRoundTrip = roundTripCheckbox?.checked;
 
-  if (!from || !to || !departureDate || (isRoundTrip && !returnDate)) {
+  if (!fromCity || !toCity || !departureDate || (isRoundTrip && !returnDate)) {
     alert("Пожалуйста, заполните все поля.");
+    return;
+  }
+
+  // Получаем IATA коды через API
+  const from = fromCity.length === 3 ? fromCity.toUpperCase() : await getIataCode(fromCity);
+  const to = toCity.length === 3 ? toCity.toUpperCase() : await getIataCode(toCity);
+
+  if (!from || !to) {
+    alert("⛔ Не удалось определить IATA-коды для указанных городов.");
     return;
   }
 
@@ -302,8 +309,8 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   }
   lastSearchTime = now;
 
-  localStorage.setItem("lastFrom", from);
-  localStorage.setItem("lastTo", to);
+  localStorage.setItem("lastFrom", fromCity);
+  localStorage.setItem("lastTo", toCity);
   localStorage.setItem("lastDepartureDate", departureDate);
   if (isRoundTrip) {
     localStorage.setItem("lastReturnDate", returnDate);
@@ -316,34 +323,31 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   let flightsOut = [];
   let flightsBack = [];
 
-  const encodeCity = (city) => encodeURIComponent(city.trim());
+  const encode = str => encodeURIComponent(str.trim());
 
   try {
-    // ✈️ Запрос туда
-    const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${encodeCity(from)}&to=${encodeCity(to)}&date=${departureDate}`;
+    // ✈️ Запрос рейсов туда
+    const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${encode(from)}&to=${encode(to)}&date=${departureDate}`;
     const resOut = await retryFetch(urlOut);
     if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
     flightsOut = await resOut.json();
     renderFlights(flightsOut, from, to, "Рейсы туда");
 
-    // 🔁 Запрос обратно (с паузой)
+    // 🔁 Запрос рейсов обратно
     if (isRoundTrip && returnDate) {
-      await new Promise(r => setTimeout(r, 1200));
+      await new Promise(r => setTimeout(r, 1200)); // небольшая задержка
 
-      const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${encodeCity(to)}&to=${encodeCity(from)}&date=${returnDate}`;
+      const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${encode(to)}&to=${encode(from)}&date=${returnDate}`;
       const resBack = await retryFetch(urlBack);
       if (!resBack.ok) throw new Error(`Ошибка рейсов обратно: ${resBack.status}`);
       flightsBack = await resBack.json();
       renderFlights(flightsBack, to, from, "Рейсы обратно");
     }
 
-    // 📲 Telegram
+    // 📲 Telegram WebApp аналитика
     if (Array.isArray(flightsOut) && flightsOut.length > 0) {
       const top = flightsOut[0];
-     const msg = `✈️ Нашли рейс
-🛫 ${top.origin || top.from || "?"} → 🛬 ${top.destination || top.to || "?"}
-📅 ${top.date || top.departure_at?.split("T")[0] || "?"}
-💰 $${top.price || top.value || "?"}`;
+      const msg = `✈️ Нашли рейс\n🛫 ${top.origin || top.from || "?"} → 🛬 ${top.destination || top.to || "?"}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value || "?"}`;
       Telegram.WebApp.sendData?.(msg);
       trackEvent("Поиск рейса", msg);
     } else {
