@@ -3,14 +3,14 @@ import { renderFlights, renderHotels, renderPlaces } from './render.js';
 let lastSearchTime = 0;
 
 // 🔁 Функция с повтором при 429
-async function retryFetch(url, options = {}, retries = 5, backoff = 1500) {
+async function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url, options);
     if (res.status !== 429) return res;
 
     console.warn(`⚠️ Повтор (${i + 1}) из-за 429`);
     await new Promise(r => setTimeout(r, backoff));
-    backoff *= 1.5;
+    backoff *= 2;
   }
   throw new Error("❌ Превышен лимит запросов (после повторов)");
 }
@@ -228,7 +228,7 @@ if (hotelCityInput) {
 }
 
 // 🔁 Повтор при 429
-async function retryFetch(url, options = {}, retries = 5, backoff = 1500) {
+async function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url, options);
     if (res.status !== 429) return res;
@@ -308,7 +308,7 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     // 📲 Telegram
     if (Array.isArray(flightsOut) && flightsOut.length > 0) {
       const top = flightsOut[0];
-      const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value}`;
+     const msg = `✈️ Нашли рейс\n🛫 ${top.origin || top.from || "?"} → 🛬 ${top.destination || top.to || "?"}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value || "?"}`;
       Telegram.WebApp.sendData?.(msg);
       trackEvent("Поиск рейса", msg);
     } else {
