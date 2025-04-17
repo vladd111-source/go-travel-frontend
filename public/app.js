@@ -210,8 +210,10 @@ if (hotelCityInput) {
   });
 }
 
-//поиск рейсов
-document.getElementById("search-form")?.addEventListener("submit", (e) => {
+
+
+// ✅ Поиск рейсов
+document.getElementById("search-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const fromInput = document.getElementById("from");
@@ -232,6 +234,7 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
     return;
   }
 
+  // 💾 Сохраняем в localStorage
   localStorage.setItem("lastFrom", from);
   localStorage.setItem("lastTo", to);
   localStorage.setItem("lastDepartureDate", departureDate);
@@ -240,69 +243,71 @@ document.getElementById("search-form")?.addEventListener("submit", (e) => {
 
   const apiUrl = `https://go-travel-backend.vercel.app/api/flights?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${departureDate}`;
 
-  fetch(apiUrl)
-    .then(res => {
-      if (!res.ok) throw new Error(`Ошибка запроса: ${res.status}`);
-      return res.json();
-    })
-    .then(flights => {
-      if (!Array.isArray(flights)) {
-        console.warn("❌ Ответ не массив:", flights);
-        throw new Error("Некорректный формат данных от API");
-      }
+  try {
+    const res = await fetch(apiUrl);
+    if (!res.ok) throw new Error(`Ошибка запроса: ${res.status}`);
+    const flights = await res.json();
 
-      const hotDeals = document.getElementById("hotDeals");
-      hotDeals.innerHTML = "";
+    if (!Array.isArray(flights)) {
+      throw new Error("Некорректный формат данных от API");
+    }
 
-      const cards = flights.map(flight => {
-        const dealId = `${flight.from}-${flight.to}-${flight.date}-${flight.price}`;
-        const isFav = (JSON.parse(localStorage.getItem("favorites_flights") || "[]"))
-          .some(f =>
-            f.from === flight.from &&
-            f.to === flight.to &&
-            f.date === flight.date &&
-            f.price === flight.price
-          );
+    const hotDeals = document.getElementById("hotDeals");
+    hotDeals.innerHTML = "";
 
-        return `
-          <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
-            <strong>${flight.from} → ${flight.to}</strong><br>
-            📅 Дата: ${flight.date}<br>
-            💰 Цена: $${flight.price}
-            <div class="flex justify-between items-center mt-2">
-              <button class="btn w-full" onclick="bookHotel('${flight.from}', '${flight.to}', ${flight.price}, '${flight.date}')">Забронировать</button>
-              <button onclick="toggleFavoriteFlight('${dealId}', this)" class="text-xl ml-3" data-flight-id="${dealId}">
-                ${isFav ? "💙" : "🤍"}
-              </button>
-            </div>
+    if (!flights.length) {
+      hotDeals.innerHTML = `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
+      Telegram.WebApp?.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
+      trackEvent("Поиск рейса", `Не найдено: ${from} → ${to}, ${departureDate}`);
+      return;
+    }
+
+    // 🧩 Построение карточек
+    const cards = flights.map(flight => {
+      const dealId = `${flight.from}-${flight.to}-${flight.date}-${flight.price}`;
+      const isFav = (JSON.parse(localStorage.getItem("favorites_flights") || "[]"))
+        .some(f =>
+          f.from === flight.from &&
+          f.to === flight.to &&
+          f.date === flight.date &&
+          f.price === flight.price
+        );
+
+      return `
+        <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
+          <strong>${flight.from} → ${flight.to}</strong><br>
+          📅 Дата: ${flight.date}<br>
+          💰 Цена: $${flight.price}
+          <div class="flex justify-between items-center mt-2">
+            <button class="btn w-full" onclick="bookHotel('${flight.from}', '${flight.to}', ${flight.price}, '${flight.date}')">Забронировать</button>
+            <button onclick="toggleFavoriteFlight('${dealId}', this)" class="text-xl ml-3" data-flight-id="${dealId}">
+              ${isFav ? "💙" : "🤍"}
+            </button>
           </div>
-        `;
-      }).join("");
+        </div>
+      `;
+    }).join("");
 
-      hotDeals.innerHTML = cards;
+    hotDeals.innerHTML = cards;
+    updateHearts("flights");
+    animateCards("#hotDeals .card");
 
-      updateHearts("flights");
-      animateCards("#hotDeals .card");
+    // ✅ Отправка Telegram и аналитики
+    const top = flights[0];
+    const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date}\n💰 $${top.price}`;
+    Telegram.WebApp.sendData?.(msg);
+    trackEvent("Поиск рейса", msg);
 
-      if (flights.length > 0) {
-        const top = flights[0];
-        const msg = `✈️ Нашли рейс\n🛫 ${top.from} → 🛬 ${top.to}\n📅 ${top.date}\n💰 $${top.price}`;
-        Telegram.WebApp.sendData?.(msg);
-        trackEvent("Поиск рейса", msg);
-      } else {
-        Telegram.WebApp.sendData?.("😢 Рейсы не найдены по заданным параметрам.");
-        trackEvent("Поиск рейса", `Не найдено: ${from} → ${to}, ${departureDate}`);
-      }
-    })
-    .catch(err => {
-      console.error("❌ Ошибка запроса рейсов:", err);
-      Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
-      trackEvent("Ошибка загрузки рейсов", err.message);
-    })
-    .finally(() => {
-      hideLoading();
-    });
+  } catch (err) {
+    console.error("❌ Ошибка запроса рейсов:", err);
+    Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
+    trackEvent("Ошибка загрузки рейсов", err.message);
+  } finally {
+    hideLoading();
+  }
 });
+
+
 
 
 // ✅ Поиск мест
