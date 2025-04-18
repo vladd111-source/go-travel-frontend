@@ -80,7 +80,8 @@ export function showFlightModal(flight) {
   document.getElementById("modalContent").innerHTML = html;
   document.getElementById("detailsModal").classList.remove("hidden");
 }
-
+// 👇 Сделать глобально доступной, если вызываешь из HTML
+window.showFlightModal = showFlightModal;
 
 function applyTranslations(lang) {
   const fallback = translations["ru"];
