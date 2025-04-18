@@ -80,19 +80,18 @@
       <span data-i18n="roundTrip"></span>
     </label>
 
-    <!-- Кнопки -->
-    <div class="flex flex-col sm:flex-row gap-2">
-      <button type="submit" id="searchBtn" class="btn btn-blue sm:w-auto" data-i18n="findFlights">Найти билеты</button>
-      <button type="button" id="clearFlights" class="btn btn-red sm:w-auto">Очистить</button>
-      <button type="button" id="loadHotDeals" class="btn bg-orange-500 hover:bg-orange-600 text-white sm:w-auto">🔥 Горячие предложения</button>
+  <!-- Кнопки -->
+<div class="flex flex-col sm:flex-row gap-2">
+  <button type="submit" id="searchBtn" class="btn btn-blue sm:w-auto" data-i18n="findFlights">Найти билеты</button>
+  <button type="button" id="clearFlights" class="btn btn-red sm:w-auto">Очистить</button>
+  <button type="button" id="loadHotDeals" class="btn bg-orange-500 hover:bg-orange-600 text-white sm:w-auto">🔥 Горячие предложения</button>
 </div>
-    <div class="flex flex-wrap gap-2 mt-2" id="hotDealsFilters" style="display: none;">
-  <button class="btn btn-orange" data-price="50">До $50</button>
-  <button class="btn btn-orange" data-price="100">До $100</button>
-  <button class="btn btn-orange" data-price="150">До $150</button>
+
+<!-- 🔥 Фильтры горячих предложений (пока пусто) -->
+<div class="flex flex-wrap gap-2 mt-2" id="hotDealsFilters" style="display: none;">
+  <!-- фильтры можно добавить при необходимости -->
 </div>
-    </div>
-  </form>
+</form>
 
   <!-- Лоадер -->
   <div id="flightsLoader" class="flex justify-center my-4 hidden">
