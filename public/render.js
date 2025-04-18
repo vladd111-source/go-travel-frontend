@@ -1,6 +1,26 @@
+const cityNameCache = {};
+
+async function getCityName(iata, lang = "ru") {
+  const cacheKey = `${iata}_${lang}`;
+  if (cityNameCache[cacheKey]) return cityNameCache[cacheKey];
+
+  try {
+    const url = `https://autocomplete.travelpayouts.com/places2?term=${iata}&locale=${lang}&types[]=city`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const match = data.find(item => item.code === iata);
+    const name = match?.name || iata;
+    cityNameCache[cacheKey] = name;
+    return name;
+  } catch (err) {
+    console.warn("🌐 Ошибка получения названия города:", iata, err);
+    return iata;
+  }
+}
+
 /**
  * Генерирует корректную ссылку на Aviasales
- * @param {Object} flight - Объект рейса
  */
 export function generateAviasalesLink(flight) {
   if (!flight || typeof flight.departure_at !== "string") {
@@ -24,12 +44,8 @@ export function generateAviasalesLink(flight) {
 
 /**
  * Отрисовывает список рейсов на странице
- * @param {Array} flights - список рейсов
- * @param {string} fromCity - название города отправления (для аналитики или заголовка)
- * @param {string} toCity - название города прибытия (для аналитики или заголовка)
- * @param {string} title - (необязательно) заголовок секции
  */
-export function renderFlights(flights, fromCity = "—", toCity = "—", title = "") {
+export async function renderFlights(flights, fromCity = "—", toCity = "—", title = "") {
   const container = document.getElementById("hotDeals");
   container.innerHTML = ""; // Всегда очищаем
 
@@ -46,15 +62,19 @@ export function renderFlights(flights, fromCity = "—", toCity = "—", title =
   }
 
   const favorites = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+  const lang = localStorage.getItem("lang") || "ru";
 
-  // 🔢 Сортировка по цене и ограничение
   const topDeals = [...flights]
     .sort((a, b) => (a.price || a.value || 0) - (b.price || b.value || 0))
     .slice(0, 10);
 
-  topDeals.forEach(flight => {
-    const from = flight.from || flight.origin || "—";
-    const to = flight.to || flight.destination || "—";
+  for (const flight of topDeals) {
+    const fromCode = flight.from || flight.origin || "—";
+    const toCode = flight.to || flight.destination || "—";
+
+    const from = await getCityName(fromCode, lang);
+    const to = await getCityName(toCode, lang);
+
     const rawDate = flight.date || flight.departure_at || "";
     const date = rawDate.split("T")[0] || "—";
     const airline = flight.airline || "Авиакомпания";
@@ -99,12 +119,13 @@ export function renderFlights(flights, fromCity = "—", toCity = "—", title =
     `;
 
     container.appendChild(card);
-  });
+  }
 
   if (typeof animateCards === "function") {
     animateCards("#hotDeals .card");
   }
 }
+
 /**
  * Отрисовывает список отелей
  */
