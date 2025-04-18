@@ -364,20 +364,35 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   }
 });
 
-// ✅ Горячие предложения
+// ✅ Горячие предложения с фильтрами по цене
 document.getElementById("loadHotDeals")?.addEventListener("click", async () => {
+  document.getElementById("hotDealsFilters").style.display = "flex"; // показать фильтры
+  await loadHotDeals(); // загрузка всех без фильтра
+});
+
+// 🧠 Загрузка и фильтрация горячих предложений
+async function loadHotDeals(maxPrice = null) {
   showLoading();
   try {
     const res = await fetch("https://go-travel-backend.vercel.app/api/hot-deals");
     const deals = await res.json();
 
-    renderFlights(deals, "Популярные", "направления", "🔥 Горячие предложения");
+    const filteredDeals = maxPrice ? deals.filter(d => d.price <= maxPrice) : deals;
+    renderFlights(filteredDeals, "Популярные", "направления", "🔥 Горячие предложения");
   } catch (err) {
     console.error("❌ Ошибка загрузки hot deals:", err);
     alert("Не удалось загрузить горячие предложения.");
   } finally {
     hideLoading();
   }
+}
+
+// 🎯 Фильтры по цене (кнопки)
+document.querySelectorAll("#hotDealsFilters button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const max = parseInt(btn.dataset.price, 10);
+    loadHotDeals(max);
+  });
 });
 
 // 🧼 Обработчик кнопки "Очистить"
