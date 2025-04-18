@@ -3,10 +3,13 @@ import { renderFlights, renderHotels, renderPlaces } from './render.js';
 const iataCache = {};
 
 async function getIataCode(city) {
+  const lang = localStorage.getItem("lang") || "ru"; // ← язык из локалки
   const normalized = city.trim().toLowerCase();
-  if (iataCache[normalized]) return iataCache[normalized];
+  const cacheKey = `${normalized}_${lang}`; // ← язык добавлен в ключ кэша
 
-  const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(city)}&locale=ru&types[]=city`;
+  if (iataCache[cacheKey]) return iataCache[cacheKey];
+
+  const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(city)}&locale=${lang}&types[]=city`;
 
   try {
     const res = await fetch(url);
@@ -18,7 +21,7 @@ async function getIataCode(city) {
     );
 
     const code = match?.code?.toUpperCase();
-    if (code) iataCache[normalized] = code;
+    if (code) iataCache[cacheKey] = code;
     return code || null;
   } catch (err) {
     console.error("❌ Ошибка при получении IATA:", err);
