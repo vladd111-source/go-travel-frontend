@@ -507,3 +507,16 @@ window.focusFirstInputIn = function(tabId) {
   const input = el.querySelector("input");
   if (input) input.focus();
 }; // ← вот этой строки не хватало
+
+// 🚀 Автозагрузка горячих предложений при первом заходе
+window.addEventListener("DOMContentLoaded", async () => {
+  const hotDealsBtn = document.getElementById("loadHotDeals");
+
+  // Проверяем, был ли уже автопоказ
+  const shownBefore = localStorage.getItem("hotDealsShown");
+
+  if (!shownBefore && hotDealsBtn) {
+    hotDealsBtn.click(); // имитируем клик по кнопке 🔥
+    localStorage.setItem("hotDealsShown", "1"); // сохраняем метку
+  }
+});
