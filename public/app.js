@@ -369,17 +369,26 @@ document.getElementById("loadHotDeals")?.addEventListener("click", async () => {
   await loadHotDeals(); // загружаем предложения
 });
 
-// 🧠 Загрузка горячих предложений (без фильтров)
+// 🧠 Загрузка горячих предложений (по городу отправления)
 async function loadHotDeals() {
   showLoading();
   try {
-    const origin = localStorage.getItem("lastFrom") || "MOW"; // или другой дефолтный
+    const fromCity = document.getElementById("from")?.value.trim();
+    const origin = fromCity?.length === 3 ? fromCity.toUpperCase() : await getIataCode(fromCity);
+
+    if (!origin) {
+      alert("Введите корректный город отправления.");
+      hideLoading();
+      return;
+    }
+
+    localStorage.setItem("lastFrom", origin);
     const url = `https://go-travel-backend.vercel.app/api/hot-deals?origin=${origin}`;
 
     const res = await fetch(url);
     const { deals, title } = await res.json();
 
-    renderFlights(deals, origin, "Популярные", title || "🔥 Горячие предложения");
+    renderFlights(deals, origin, "Популярные направления", title || "🔥 Горячие предложения");
   } catch (err) {
     console.error("❌ Ошибка загрузки hot deals:", err);
     alert("Не удалось загрузить горячие предложения.");
@@ -387,14 +396,6 @@ async function loadHotDeals() {
     hideLoading();
   }
 }
-
-// 🎯 Фильтры по цене (кнопки)
-document.querySelectorAll("#hotDealsFilters button").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const max = parseInt(btn.dataset.price, 10);
-    loadHotDeals(max);
-  });
-});
 
 // 🧼 Обработчик кнопки "Очистить"
 document.getElementById("clearFlights")?.addEventListener("click", () => {
