@@ -552,3 +552,21 @@ window.addEventListener("beforeunload", () => {
   const duration = Math.round((Date.now() - window.appStart) / 1000);
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
 });
+
+document.getElementById("hotOnly")?.addEventListener("change", (e) => {
+  const isChecked = e.target.checked;
+
+  const toField = document.getElementById("to")?.closest(".input-group") || document.getElementById("to");
+  const dateField = document.getElementById("departureDate")?.closest(".input-group") || document.getElementById("departureDate");
+  const returnField = document.getElementById("returnDate")?.closest(".input-group") || document.getElementById("returnDate");
+  const roundTripField = document.getElementById("roundTrip")?.closest(".input-group") || document.getElementById("roundTrip");
+  const clearBtn = document.getElementById("clearFlights");
+
+  const toggle = (el, show) => el && (el.style.display = show ? "" : "none");
+
+  toggle(toField, !isChecked);
+  toggle(dateField, !isChecked);
+  toggle(returnField, !isChecked);
+  toggle(roundTripField, !isChecked);
+  toggle(clearBtn, !isChecked);
+});
