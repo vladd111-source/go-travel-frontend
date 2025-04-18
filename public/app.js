@@ -138,6 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// ✅ Логика для чекбокса "Туда и обратно"
 const roundTripCheckbox = document.getElementById("roundTrip");
 const returnDateWrapper = document.getElementById("returnDateWrapper");
 const returnDateInput = document.getElementById("returnDate");
@@ -146,10 +147,10 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
   const updateReturnDateVisibility = () => {
     const show = roundTripCheckbox.checked;
 
-    // Показываем или скрываем обёртку
+    // Показываем/скрываем обёртку
     returnDateWrapper.classList.toggle("hidden", !show);
 
-    // Динамически добавляем или убираем name и required
+    // Управляем атрибутами формы
     if (show) {
       returnDateInput.setAttribute("required", "true");
       returnDateInput.setAttribute("name", "returnDate");
@@ -162,12 +163,14 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     }
   };
 
-  // Восстановить состояние с localStorage
+  // Восстанавливаем из localStorage
   const saved = localStorage.getItem("roundTripChecked");
   if (saved === "1") roundTripCheckbox.checked = true;
 
+  // Инициализация
   updateReturnDateVisibility();
 
+  // Переключение по клику
   roundTripCheckbox.addEventListener("change", () => {
     updateReturnDateVisibility();
     localStorage.setItem("roundTripChecked", roundTripCheckbox.checked ? "1" : "0");
