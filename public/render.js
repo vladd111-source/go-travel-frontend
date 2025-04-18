@@ -38,7 +38,7 @@ export function renderFlights(flights, fromCity = "—", toCity = "—", title =
     heading.textContent = title;
     container.appendChild(heading);
   } else {
-    container.innerHTML = ""; // если заголовок не передан — очищаем
+    container.innerHTML = "";
   }
 
   if (!flights || !flights.length) {
@@ -71,7 +71,7 @@ export function renderFlights(flights, fromCity = "—", toCity = "—", title =
       f.from === from && f.to === to && f.date === date && parseFloat(f.price) === price
     );
 
-    const isHot = price < 60; // 🔥 Подсветка дешевых билетов
+    const isHot = price < 60;
 
     const card = document.createElement("div");
     card.className = `
