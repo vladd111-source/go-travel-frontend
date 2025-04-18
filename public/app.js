@@ -570,18 +570,23 @@ window.addEventListener("beforeunload", () => {
 document.getElementById("hotOnly")?.addEventListener("change", (e) => {
   const isChecked = e.target.checked;
 
-  // Точные элементы формы
-  const toField = document.getElementById("to");
-  const departureField = document.getElementById("departureDate");
-  const returnField = document.getElementById("returnDate");
+  // Прячем поля кроме "откуда" и "Найти билеты"
+  const to = document.getElementById("to");
+  const departure = document.getElementById("departureDate");
+  const returnDate = document.getElementById("returnDate");
+  const returnWrapper = document.getElementById("returnDateWrapper");
   const roundTripLabel = document.querySelector("label[for='roundTrip']");
-  const returnDateWrapper = document.getElementById("returnDateWrapper");
   const clearBtn = document.getElementById("clearFlights");
+  const hotDealsBtn = document.getElementById("loadHotDeals");
 
-  // Показываем / скрываем нужные
-  toField?.closest("div") && (toField.closest("div").style.display = isChecked ? "none" : "");
-  departureField?.closest("div") && (departureField.closest("div").style.display = isChecked ? "none" : "");
-  returnDateWrapper && (returnDateWrapper.style.display = isChecked ? "none" : "");
-  roundTripLabel && (roundTripLabel.style.display = isChecked ? "none" : "");
-  clearBtn && (clearBtn.style.display = isChecked ? "none" : "");
+  const toggle = (el, show) => {
+    if (el) el.classList.toggle("hidden", !show);
+  };
+
+  toggle(to?.parentElement, !isChecked);
+  toggle(departure?.parentElement, !isChecked);
+  toggle(returnWrapper, !isChecked);
+  toggle(roundTripLabel, !isChecked);
+  toggle(clearBtn, !isChecked);
+  toggle(hotDealsBtn, !isChecked);
 });
