@@ -364,6 +364,22 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   }
 });
 
+// ✅ Горячие предложения
+document.getElementById("loadHotDeals")?.addEventListener("click", async () => {
+  showLoading();
+  try {
+    const res = await fetch("https://go-travel-backend.vercel.app/api/hot-deals");
+    const deals = await res.json();
+
+    renderFlights(deals, "Популярные", "направления", "🔥 Горячие предложения");
+  } catch (err) {
+    console.error("❌ Ошибка загрузки hot deals:", err);
+    alert("Не удалось загрузить горячие предложения.");
+  } finally {
+    hideLoading();
+  }
+});
+
 // 🧼 Обработчик кнопки "Очистить"
 document.getElementById("clearFlights")?.addEventListener("click", () => {
   document.getElementById("from").value = "";
