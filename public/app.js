@@ -567,17 +567,23 @@ window.addEventListener("beforeunload", () => {
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
 });
 
+// 🔥 Переключение режима "Только горячие предложения"
 document.getElementById("hotOnly")?.addEventListener("change", (e) => {
   const isChecked = e.target.checked;
 
+  // Определяем обёртки или fallback на сам элемент
   const toField = document.getElementById("to")?.closest(".input-group") || document.getElementById("to");
   const dateField = document.getElementById("departureDate")?.closest(".input-group") || document.getElementById("departureDate");
   const returnField = document.getElementById("returnDate")?.closest(".input-group") || document.getElementById("returnDate");
   const roundTripField = document.getElementById("roundTrip")?.closest(".input-group") || document.getElementById("roundTrip");
   const clearBtn = document.getElementById("clearFlights");
 
-  const toggle = (el, show) => el && (el.style.display = show ? "" : "none");
+  // Вспомогательная функция: показать или скрыть
+  const toggle = (el, show) => {
+    if (el) el.style.display = show ? "" : "none";
+  };
 
+  // Скрываем/показываем всё, кроме поля "Откуда"
   toggle(toField, !isChecked);
   toggle(dateField, !isChecked);
   toggle(returnField, !isChecked);
