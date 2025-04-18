@@ -147,23 +147,20 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     const show = roundTripCheckbox.checked;
 
     returnDateWrapper.classList.toggle("hidden", !show);
+    returnDateInput.disabled = !show;
 
     if (show) {
-      returnDateInput.disabled = false;
-      returnDateInput.required = true;
+      returnDateInput.setAttribute("required", "true");
       returnDateInput.setAttribute("name", "returnDate");
     } else {
-      returnDateInput.disabled = true;
-      returnDateInput.required = false;
-      returnDateInput.removeAttribute("name"); // 💥 важно!
+      returnDateInput.removeAttribute("required");
+      returnDateInput.removeAttribute("name");
       returnDateInput.value = "";
     }
   };
 
   const saved = localStorage.getItem("roundTripChecked");
-  if (saved === "1") {
-    roundTripCheckbox.checked = true;
-  }
+  if (saved === "1") roundTripCheckbox.checked = true;
 
   updateReturnDateVisibility();
 
