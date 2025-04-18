@@ -12,7 +12,9 @@ body.opacity-0 {
 body.opacity-100 {
   opacity: 1;
 }
-
+#hotDealsFilters {
+  margin-top: 10px;
+}
 /* ===== Поля ввода ===== */
 .input {
   width: 100%;
