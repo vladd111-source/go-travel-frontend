@@ -147,17 +147,24 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     const show = roundTripCheckbox.checked;
 
     returnDateWrapper.classList.toggle("hidden", !show);
-    returnDateInput.required = show;
-    returnDateInput.disabled = !show;
 
-    if (!show) returnDateInput.value = "";
+    if (show) {
+      returnDateInput.disabled = false;
+      returnDateInput.required = true;
+      returnDateInput.setAttribute("name", "returnDate");
+    } else {
+      returnDateInput.disabled = true;
+      returnDateInput.required = false;
+      returnDateInput.removeAttribute("name"); // 💥 важно!
+      returnDateInput.value = "";
+    }
   };
 
-  // Восстанавливаем состояние из localStorage
   const saved = localStorage.getItem("roundTripChecked");
   if (saved === "1") {
     roundTripCheckbox.checked = true;
   }
+
   updateReturnDateVisibility();
 
   roundTripCheckbox.addEventListener("change", () => {
