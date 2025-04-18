@@ -567,23 +567,21 @@ window.addEventListener("beforeunload", () => {
   logEventToAnalytics("Сессия завершена", { duration_seconds: duration });
 });
 
-// 🔥 Переключение режима "Только горячие предложения"
 document.getElementById("hotOnly")?.addEventListener("change", (e) => {
   const isChecked = e.target.checked;
 
-  const toField = document.getElementById("to")?.closest("div");
-  const departureField = document.getElementById("departureDate")?.closest("div");
-  const returnField = document.getElementById("returnDate")?.closest("div");
-  const roundTripField = document.getElementById("roundTrip")?.closest("label");
+  // Точные элементы формы
+  const toField = document.getElementById("to");
+  const departureField = document.getElementById("departureDate");
+  const returnField = document.getElementById("returnDate");
+  const roundTripLabel = document.querySelector("label[for='roundTrip']");
+  const returnDateWrapper = document.getElementById("returnDateWrapper");
   const clearBtn = document.getElementById("clearFlights");
 
-  const toggle = (el, show) => {
-    if (el) el.style.display = show ? "" : "none";
-  };
-
-  toggle(toField, !isChecked);
-  toggle(departureField, !isChecked);
-  toggle(returnField, !isChecked);
-  toggle(roundTripField, !isChecked);
-  toggle(clearBtn, !isChecked);
+  // Показываем / скрываем нужные
+  toField?.closest("div") && (toField.closest("div").style.display = isChecked ? "none" : "");
+  departureField?.closest("div") && (departureField.closest("div").style.display = isChecked ? "none" : "");
+  returnDateWrapper && (returnDateWrapper.style.display = isChecked ? "none" : "");
+  roundTripLabel && (roundTripLabel.style.display = isChecked ? "none" : "");
+  clearBtn && (clearBtn.style.display = isChecked ? "none" : "");
 });
