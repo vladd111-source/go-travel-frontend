@@ -45,8 +45,8 @@ export function generateAviasalesLink(flight) {
 /**
  * Отрисовывает список рейсов на странице
  */
-export async function renderFlights(flights, fromCity = "—", toCity = "—", title = "") {
-  const container = document.getElementById("hotDeals");
+export async function renderFlights(flights, fromCity = "—", toCity = "—", title = "", containerId = "hotDeals") {
+  const container = document.getElementById(containerId);
   container.innerHTML = ""; // Всегда очищаем
 
   if (title) {
@@ -98,12 +98,12 @@ export async function renderFlights(flights, fromCity = "—", toCity = "—", t
       ${isHot ? 'bg-yellow-100 border-yellow-300' : 'bg-white'}
     `.trim();
 
-card.innerHTML = 
+card.innerHTML = `
   <h3 class="text-lg font-semibold mb-1">${airline}</h3>
   <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
   <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
   <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
-  ${isHot ? <div class="text-xs text-orange-600 mt-1">🔥 Горячее предложение</div> : ""}
+  ${isHot ? `<div class="text-xs text-orange-600 mt-1">🔥 Горячее предложение</div>` : ""}
   <div class="flex flex-col sm:flex-row gap-2 mt-2">
     <a href="${link}" target="_blank"
        class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition w-full text-center">
@@ -116,14 +116,22 @@ card.innerHTML =
       ${isFav ? "💙" : "🤍"}
     </button>
   </div>
-;
-    
-    container.appendChild(card);
-  }
+`;
 
-  if (typeof animateCards === "function") {
-    animateCards("#hotDeals .card");
+container.appendChild(card);
+
+// ✅ Только для вкладки избранного
+ if (container.id === "favContent-flights") {
+    const moreBtn = document.createElement("button");
+    moreBtn.textContent = "Подробнее";
+    moreBtn.className = "btn bg-gray-200 hover:bg-gray-300 text-black text-sm py-2 px-4 rounded transition w-full mt-2";
+    moreBtn.onclick = () => window.showFlightModal(flight);
+    card.appendChild(moreBtn);
   }
+}
+// ✅ ⬇️ Только здесь!
+if (typeof animateCards === "function") {
+  animateCards(`#${container.id} .card`);
 }
 
 /**
