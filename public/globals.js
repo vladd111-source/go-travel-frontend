@@ -1,3 +1,5 @@
+// ВСТАВЛЯЕМ НА САМЫЙ ВЕРХ
+import { generateAviasalesLink } from './render.js';
 // ✅ Supabase init
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA';
@@ -54,6 +56,31 @@ const translations = {
     bookNow: "Book Now"
   }
 };
+
+export function showFlightModal(flight) {
+  const from = flight.from || flight.origin || "—";
+  const to = flight.to || flight.destination || "—";
+  const date = (flight.date || flight.departure_at || "").split("T")[0] || "—";
+  const price = flight.price || flight.value || "—";
+  const airline = flight.airline || "Авиакомпания";
+
+  const link = generateAviasalesLink(flight);
+
+  const html = `
+    <h2 class="text-xl font-semibold mb-2">${from} → ${to}</h2>
+    <p class="mb-1 text-gray-700">📅 Дата: ${date}</p>
+    <p class="mb-1 text-gray-700">💺 Авиакомпания: ${airline}</p>
+    <p class="mb-3 text-gray-700">💰 Цена: $${price}</p>
+    <a href="${link}" target="_blank"
+       class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full block text-center">
+      Перейти к бронированию на Aviasales
+    </a>
+  `;
+
+  document.getElementById("modalContent").innerHTML = html;
+  document.getElementById("detailsModal").classList.remove("hidden");
+}
+
 
 function applyTranslations(lang) {
   const fallback = translations["ru"];
