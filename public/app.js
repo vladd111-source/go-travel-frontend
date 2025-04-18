@@ -570,26 +570,29 @@ window.addEventListener("beforeunload", () => {
 document.getElementById("hotOnly")?.addEventListener("change", (e) => {
   const isChecked = e.target.checked;
 
-  const fromWrapper = document.getElementById("from")?.closest(".form-group") || document.getElementById("from");
-  const toWrapper = document.getElementById("to")?.closest(".form-group") || document.getElementById("to");
-  const dateWrapper = document.getElementById("departureDate")?.closest("div") || document.getElementById("departureDate");
-  const returnWrapper = document.getElementById("returnDateWrapper");
-  const roundTripCheckbox = document.getElementById("roundTrip")?.closest("label");
+  const toField = document.getElementById("to");
+  const dateField = document.getElementById("departureDate");
+  const returnField = document.getElementById("returnDate");
+  const roundTrip = document.getElementById("roundTrip");
   const clearBtn = document.getElementById("clearFlights");
-  const hotBtn = document.getElementById("loadHotDeals");
 
-  const toggle = (el, show) => el && (el.classList.toggle("hidden", !show));
+  // Показ/скрытие
+  const toggle = (el, show) => {
+    if (el) el.style.display = show ? "" : "none";
+  };
 
-  // Показываем только поле "откуда"
-  toggle(toWrapper, !isChecked);
-  toggle(dateWrapper, !isChecked);
-  toggle(returnWrapper, !isChecked);
-  toggle(roundTripCheckbox, !isChecked);
+  toggle(toField?.closest(".input-group") || toField, !isChecked);
+  toggle(dateField?.closest(".input-group") || dateField, !isChecked);
+  toggle(returnField?.closest(".input-group") || returnField, !isChecked);
+  toggle(roundTrip?.closest(".input-group") || roundTrip, !isChecked);
   toggle(clearBtn, !isChecked);
-  toggle(hotBtn, !isChecked);
 
-  // Очищаем результаты, если нужно
+  // ✂️ Удаляем required у скрытых полей
   if (isChecked) {
-    document.getElementById("hotDeals").innerHTML = "";
+    toField?.removeAttribute("required");
+    dateField?.removeAttribute("required");
+  } else {
+    toField?.setAttribute("required", "true");
+    dateField?.setAttribute("required", "true");
   }
 });
