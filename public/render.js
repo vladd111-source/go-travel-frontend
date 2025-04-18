@@ -31,14 +31,13 @@ export function generateAviasalesLink(flight) {
  */
 export function renderFlights(flights, fromCity = "—", toCity = "—", title = "") {
   const container = document.getElementById("hotDeals");
+  container.innerHTML = ""; // Всегда очищаем
 
   if (title) {
     const heading = document.createElement("h3");
     heading.className = "text-lg font-semibold mt-4 mb-2";
     heading.textContent = title;
     container.appendChild(heading);
-  } else {
-    container.innerHTML = "";
   }
 
   if (!flights || !flights.length) {
@@ -71,7 +70,7 @@ export function renderFlights(flights, fromCity = "—", toCity = "—", title =
       f.from === from && f.to === to && f.date === date && parseFloat(f.price) === price
     );
 
-    const isHot = price < 60;
+    const isHot = flight.highlight || price < 60;
 
     const card = document.createElement("div");
     card.className = `
