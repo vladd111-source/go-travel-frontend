@@ -374,11 +374,13 @@ document.getElementById("loadHotDeals")?.addEventListener("click", async () => {
 async function loadHotDeals(maxPrice = null) {
   showLoading();
   try {
-    const res = await fetch("https://go-travel-backend.vercel.app/api/hot-deals");
-    const deals = await res.json();
+    let url = "https://go-travel-backend.vercel.app/api/hot-deals";
+    if (maxPrice) url += `?maxPrice=${maxPrice}`;
 
-    const filteredDeals = maxPrice ? deals.filter(d => d.price <= maxPrice) : deals;
-    renderFlights(filteredDeals, "Популярные", "направления", "🔥 Горячие предложения");
+    const res = await fetch(url);
+    const { deals, title } = await res.json();
+
+    renderFlights(deals, "Популярные", "направления", title || "🔥 Горячие предложения");
   } catch (err) {
     console.error("❌ Ошибка загрузки hot deals:", err);
     alert("Не удалось загрузить горячие предложения.");
