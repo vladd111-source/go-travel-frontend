@@ -274,8 +274,22 @@ lastSearchTime = 0;
 
 // ✅ Поиск рейсов (включая "Туда и обратно")
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
+   e.preventDefault();
+  const isHotOnly = document.getElementById("hotOnly")?.checked;
 
+  if (isHotOnly) {
+    const fromInput = document.getElementById("from");
+    const from = fromInput?.value.trim().toUpperCase();
+
+    if (!from) {
+      alert("Укажите город отправления.");
+      return;
+    }
+
+    localStorage.setItem("lastFrom", from);
+    await loadHotDeals(); // уже должен быть у тебя
+    return;
+  }
   const fromInput = document.getElementById("from");
   const toInput = document.getElementById("to");
   const departureInput = document.getElementById("departureDate");
