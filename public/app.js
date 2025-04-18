@@ -364,23 +364,22 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   }
 });
 
-// ✅ Горячие предложения с фильтрами по цене
+// ✅ Горячие предложения (по умолчанию из MOW или другого города)
 document.getElementById("loadHotDeals")?.addEventListener("click", async () => {
-  document.getElementById("hotDealsFilters").style.display = "flex"; // показать фильтры
-  await loadHotDeals(); // загрузка всех без фильтра
+  await loadHotDeals(); // загружаем предложения
 });
 
-// 🧠 Загрузка и фильтрация горячих предложений
-async function loadHotDeals(maxPrice = null) {
+// 🧠 Загрузка горячих предложений (без фильтров)
+async function loadHotDeals() {
   showLoading();
   try {
-    let url = "https://go-travel-backend.vercel.app/api/hot-deals";
-    if (maxPrice) url += `?maxPrice=${maxPrice}`;
+    const origin = localStorage.getItem("lastFrom") || "MOW"; // или другой дефолтный
+    const url = `https://go-travel-backend.vercel.app/api/hot-deals?origin=${origin}`;
 
     const res = await fetch(url);
     const { deals, title } = await res.json();
 
-    renderFlights(deals, "Популярные", "направления", title || "🔥 Горячие предложения");
+    renderFlights(deals, origin, "Популярные", title || "🔥 Горячие предложения");
   } catch (err) {
     console.error("❌ Ошибка загрузки hot deals:", err);
     alert("Не удалось загрузить горячие предложения.");
