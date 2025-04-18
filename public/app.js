@@ -364,6 +364,24 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
   }
 });
 
+// 🧼 Обработчик кнопки "Очистить"
+document.getElementById("clearFlights")?.addEventListener("click", () => {
+  document.getElementById("from").value = "";
+  document.getElementById("to").value = "";
+  document.getElementById("departureDate").value = "";
+  document.getElementById("returnDate").value = "";
+  document.getElementById("roundTrip").checked = false;
+
+  document.getElementById("hotDeals").innerHTML = "";
+
+  localStorage.removeItem("lastFrom");
+  localStorage.removeItem("lastTo");
+  localStorage.removeItem("lastDepartureDate");
+  localStorage.removeItem("lastReturnDate");
+
+  console.log("🧼 Очищено: поля, localStorage, и результаты");
+});
+
 // ✅ Поиск мест
 const placeCityInput = document.getElementById("placeCity");
 const placeCategorySelect = document.getElementById("placeCategory");
