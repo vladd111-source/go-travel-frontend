@@ -138,22 +138,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ✅ Чекбокс "Туда и обратно"
 const roundTripCheckbox = document.getElementById("roundTrip");
 const returnDateWrapper = document.getElementById("returnDateWrapper");
 const returnDateInput = document.getElementById("returnDate");
 
 if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
   const updateReturnDateVisibility = () => {
-    if (roundTripCheckbox.checked) {
-      returnDateWrapper.classList.remove("hidden");
-    } else {
-      returnDateWrapper.classList.add("hidden");
-    }
-    returnDateInput.required = roundTripCheckbox.checked;
-    if (!roundTripCheckbox.checked) returnDateInput.value = "";
-  }
+    const show = roundTripCheckbox.checked;
 
+    returnDateWrapper.classList.toggle("hidden", !show);
+    returnDateInput.required = show;
+    returnDateInput.disabled = !show;
+
+    if (!show) returnDateInput.value = "";
+  };
+
+  // Восстанавливаем состояние из localStorage
   const saved = localStorage.getItem("roundTripChecked");
   if (saved === "1") {
     roundTripCheckbox.checked = true;
