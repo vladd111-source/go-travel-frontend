@@ -146,19 +146,23 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
   const updateReturnDateVisibility = () => {
     const show = roundTripCheckbox.checked;
 
+    // Показываем или скрываем обёртку
     returnDateWrapper.classList.toggle("hidden", !show);
-    returnDateInput.disabled = !show;
 
+    // Динамически добавляем или убираем name и required
     if (show) {
       returnDateInput.setAttribute("required", "true");
       returnDateInput.setAttribute("name", "returnDate");
+      returnDateInput.removeAttribute("disabled");
     } else {
       returnDateInput.removeAttribute("required");
       returnDateInput.removeAttribute("name");
+      returnDateInput.setAttribute("disabled", "true");
       returnDateInput.value = "";
     }
   };
 
+  // Восстановить состояние с localStorage
   const saved = localStorage.getItem("roundTripChecked");
   if (saved === "1") roundTripCheckbox.checked = true;
 
