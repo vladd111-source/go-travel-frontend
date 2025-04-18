@@ -118,18 +118,19 @@ card.innerHTML = `
   </div>
 `;
 
+// Добавляем карточку в контейнер
 container.appendChild(card);
 
-// ✅ Только для вкладки избранного
- if (container.id === "favContent-flights") {
-    const moreBtn = document.createElement("button");
-    moreBtn.textContent = "Подробнее";
-    moreBtn.className = "btn bg-gray-200 hover:bg-gray-300 text-black text-sm py-2 px-4 rounded transition w-full mt-2";
-    moreBtn.onclick = () => window.showFlightModal(flight);
-    card.appendChild(moreBtn);
-  }
+// ✅ Только для вкладки "Избранное" добавляем кнопку "Подробнее"
+if (container.id === "favContent-flights") {
+  const moreBtn = document.createElement("button");
+  moreBtn.textContent = "Подробнее";
+  moreBtn.className = "btn bg-gray-200 hover:bg-gray-300 text-black text-sm py-2 px-4 rounded transition w-full mt-2";
+  moreBtn.onclick = () => window.showFlightModal(flight);
+  card.appendChild(moreBtn);
 }
-// ✅ ⬇️ Только здесь!
+
+// ✅ Анимация карточек
 if (typeof animateCards === "function") {
   animateCards(`#${container.id} .card`);
 }
