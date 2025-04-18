@@ -578,29 +578,33 @@ window.addEventListener("beforeunload", () => {
 document.getElementById("hotOnly")?.addEventListener("change", (e) => {
   const isChecked = e.target.checked;
 
-  const toField = document.getElementById("to");
-  const dateField = document.getElementById("departureDate");
-  const returnField = document.getElementById("returnDate");
-  const roundTrip = document.getElementById("roundTrip");
+  // Находим обёртки (родители input'ов)
+  const toGroup = document.getElementById("to")?.parentElement;
+  const departureGroup = document.getElementById("departureDate")?.parentElement;
+  const returnGroup = document.getElementById("returnDate")?.parentElement;
+  const roundTripGroup = document.getElementById("roundTrip")?.parentElement;
   const clearBtn = document.getElementById("clearFlights");
 
-  // Показ/скрытие
   const toggle = (el, show) => {
     if (el) el.style.display = show ? "" : "none";
   };
 
-  toggle(toField?.closest(".input-group") || toField, !isChecked);
-  toggle(dateField?.closest(".input-group") || dateField, !isChecked);
-  toggle(returnField?.closest(".input-group") || returnField, !isChecked);
-  toggle(roundTrip?.closest(".input-group") || roundTrip, !isChecked);
+  // Показываем/скрываем группы
+  toggle(toGroup, !isChecked);
+  toggle(departureGroup, !isChecked);
+  toggle(returnGroup, !isChecked);
+  toggle(roundTripGroup, !isChecked);
   toggle(clearBtn, !isChecked);
 
-  // ✂️ Удаляем required у скрытых полей
+  // ✂️ required
+  const toInput = document.getElementById("to");
+  const departureInput = document.getElementById("departureDate");
+
   if (isChecked) {
-    toField?.removeAttribute("required");
-    dateField?.removeAttribute("required");
+    toInput?.removeAttribute("required");
+    departureInput?.removeAttribute("required");
   } else {
-    toField?.setAttribute("required", "true");
-    dateField?.setAttribute("required", "true");
+    toInput?.setAttribute("required", "true");
+    departureInput?.setAttribute("required", "true");
   }
 });
