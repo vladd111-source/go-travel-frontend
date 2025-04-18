@@ -48,7 +48,12 @@ export function renderFlights(flights, fromCity = "—", toCity = "—", title =
 
   const favorites = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
 
-  flights.forEach(flight => {
+  // 🔢 Сортировка по цене и ограничение
+  const topDeals = [...flights]
+    .sort((a, b) => (a.price || a.value || 0) - (b.price || b.value || 0))
+    .slice(0, 10);
+
+  topDeals.forEach(flight => {
     const from = flight.from || flight.origin || "—";
     const to = flight.to || flight.destination || "—";
     const rawDate = flight.date || flight.departure_at || "";
@@ -66,15 +71,20 @@ export function renderFlights(flights, fromCity = "—", toCity = "—", title =
       f.from === from && f.to === to && f.date === date && parseFloat(f.price) === price
     );
 
+    const isHot = price < 60; // 🔥 Подсветка дешевых билетов
+
     const card = document.createElement("div");
-    card.className =
-      "card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300";
+    card.className = `
+      card border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300
+      ${isHot ? 'bg-yellow-100 border-yellow-300' : 'bg-white'}
+    `.trim();
 
     card.innerHTML = `
       <h3 class="text-lg font-semibold mb-1">${airline}</h3>
       <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
       <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
       <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
+      ${isHot ? `<div class="text-xs text-orange-600 mt-1">🔥 Горячее предложение</div>` : ""}
       <div class="flex justify-between items-center mt-2">
         <a href="${link}" target="_blank"
            class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded mt-2 transition w-full text-center">
@@ -96,7 +106,6 @@ export function renderFlights(flights, fromCity = "—", toCity = "—", title =
     animateCards("#hotDeals .card");
   }
 }
-
 /**
  * Отрисовывает список отелей
  */
