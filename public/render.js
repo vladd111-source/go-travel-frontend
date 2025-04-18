@@ -99,24 +99,29 @@ export async function renderFlights(flights, fromCity = "—", toCity = "—", t
     `.trim();
 
     card.innerHTML = `
-      <h3 class="text-lg font-semibold mb-1">${airline}</h3>
-      <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
-      <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
-      <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
-      ${isHot ? `<div class="text-xs text-orange-600 mt-1">🔥 Горячее предложение</div>` : ""}
-      <div class="flex justify-between items-center mt-2">
-        <a href="${link}" target="_blank"
-           class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded mt-2 transition w-full text-center">
-           Перейти к бронированию
-        </a>
-        <button 
-          onclick="toggleFavoriteFlight('${dealId}', this)" 
-          class="text-2xl ml-3 text-gray-600 hover:text-blue-600 transition"
-          data-flight-id="${dealId}">
-          ${isFav ? "💙" : "🤍"}
-        </button>
-      </div>
-    `;
+  <h3 class="text-lg font-semibold mb-1">${airline}</h3>
+  <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
+  <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
+  <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
+  ${isHot ? `<div class="text-xs text-orange-600 mt-1">🔥 Горячее предложение</div>` : ""}
+  <div class="flex flex-col sm:flex-row gap-2 mt-2">
+    <a href="${link}" target="_blank"
+       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition w-full text-center">
+       Перейти к бронированию
+    </a>
+    <button 
+      onclick="toggleFavoriteFlight('${dealId}', this)" 
+      class="text-2xl text-center text-gray-600 hover:text-blue-600 transition"
+      data-flight-id="${dealId}">
+      ${isFav ? "💙" : "🤍"}
+    </button>
+    <button 
+      onclick='showFlightModal(${JSON.stringify(flight).replace(/'/g, "&apos;")})' 
+      class="btn bg-gray-200 hover:bg-gray-300 text-black text-sm py-2 px-4 rounded transition w-full mt-2">
+      Подробнее
+    </button>
+  </div>
+`;
 
     container.appendChild(card);
   }
