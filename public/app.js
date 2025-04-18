@@ -387,18 +387,26 @@ document.getElementById("loadHotDeals")?.addEventListener("click", async () => {
 async function loadHotDeals() {
   showLoading();
   try {
-    const fromCity = document.getElementById("from")?.value.trim();
-    const origin = fromCity?.length === 3 ? fromCity.toUpperCase() : await getIataCode(fromCity);
+    const fromInput = document.getElementById("from");
+    const fromCity = fromInput?.value.trim();
+
+    if (!fromCity) {
+      alert("Введите город отправления.");
+      hideLoading();
+      return;
+    }
+
+    const origin = fromCity.length === 3 ? fromCity.toUpperCase() : await getIataCode(fromCity);
 
     if (!origin) {
-      alert("Введите корректный город отправления.");
+      alert("Не удалось определить IATA-код для указанного города.");
       hideLoading();
       return;
     }
 
     localStorage.setItem("lastFrom", origin);
-    const url = `https://go-travel-backend.vercel.app/api/hot-deals?origin=${origin}`;
 
+    const url = `https://go-travel-backend.vercel.app/api/hot-deals?origin=${origin}`;
     const res = await fetch(url);
     const { deals, title } = await res.json();
 
