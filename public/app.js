@@ -571,21 +571,18 @@ window.addEventListener("beforeunload", () => {
 document.getElementById("hotOnly")?.addEventListener("change", (e) => {
   const isChecked = e.target.checked;
 
-  // Определяем обёртки или fallback на сам элемент
-  const toField = document.getElementById("to")?.closest(".input-group") || document.getElementById("to");
-  const dateField = document.getElementById("departureDate")?.closest(".input-group") || document.getElementById("departureDate");
-  const returnField = document.getElementById("returnDate")?.closest(".input-group") || document.getElementById("returnDate");
-  const roundTripField = document.getElementById("roundTrip")?.closest(".input-group") || document.getElementById("roundTrip");
+  const toField = document.getElementById("to")?.closest("div");
+  const departureField = document.getElementById("departureDate")?.closest("div");
+  const returnField = document.getElementById("returnDate")?.closest("div");
+  const roundTripField = document.getElementById("roundTrip")?.closest("label");
   const clearBtn = document.getElementById("clearFlights");
 
-  // Вспомогательная функция: показать или скрыть
   const toggle = (el, show) => {
     if (el) el.style.display = show ? "" : "none";
   };
 
-  // Скрываем/показываем всё, кроме поля "Откуда"
   toggle(toField, !isChecked);
-  toggle(dateField, !isChecked);
+  toggle(departureField, !isChecked);
   toggle(returnField, !isChecked);
   toggle(roundTripField, !isChecked);
   toggle(clearBtn, !isChecked);
