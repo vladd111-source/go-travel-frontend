@@ -60,37 +60,48 @@
 
 <!-- ✈️ Перелёты -->
 <div id="flights" class="tab block">
-  <form id="search-form" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
+  <form id="search-form" autocomplete="off" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
+  <div class="form-group">
+    <label for="from">Откуда</label>
     <input type="text" name="from" id="from" class="input" required data-i18n-placeholder="fromCity" />
-    <input type="text" name="to" id="to" class="input" required data-i18n-placeholder="toCity" />
+  </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div>
-        <label class="label" for="departureDate" data-i18n="departure"></label>
-        <input type="date" name="departureDate" id="departureDate" class="input" required />
-      </div>
-      <div id="returnDateWrapper" class="hidden">
-        <label class="label" for="returnDate" data-i18n="return"></label>
-        <input type="date" name="returnDate" id="returnDate" class="input" />
-      </div>
+  <div class="form-group">
+    <label for="to">Куда</label>
+    <input type="text" name="to" id="to" class="input" required data-i18n-placeholder="toCity" />
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="form-group">
+      <label class="label" for="departureDate" data-i18n="departure">Дата вылета</label>
+      <input type="date" name="departureDate" id="departureDate" class="input" required />
     </div>
 
+    <div class="form-group" id="returnDateWrapper">
+      <label class="label" for="returnDate" data-i18n="return">Обратно</label>
+      <input type="date" name="returnDate" id="returnDate" class="input" />
+    </div>
+  </div>
+
+  <div class="form-group">
     <label class="flex items-center gap-2">
       <input type="checkbox" id="roundTrip" />
-      <span data-i18n="roundTrip"></span>
+      <span data-i18n="roundTrip">Туда и обратно</span>
     </label>
+  </div>
 
-    <div class="flex items-center mt-2">
-  <input type="checkbox" id="hotOnly" class="mr-2">
-  <label for="hotOnly">🔥 Только горячие предложения</label>
-</div>
+  <div class="form-group flex items-center mt-2">
+    <input type="checkbox" id="hotOnly" class="mr-2" />
+    <label for="hotOnly">🔥 Только горячие предложения</label>
+  </div>
+
   <!-- Кнопки -->
-<div class="flex flex-col sm:flex-row gap-2">
-  <button type="submit" id="searchBtn" class="btn btn-blue sm:w-auto" data-i18n="findFlights">Найти билеты</button>
-  <button type="button" id="clearFlights" class="btn btn-red sm:w-auto">Очистить</button>
-</div>
+  <div class="flex flex-col sm:flex-row gap-2">
+    <button type="submit" id="searchBtn" class="btn btn-blue sm:w-auto" data-i18n="findFlights">Найти билеты</button>
+    <button type="button" id="clearFlights" class="btn btn-red sm:w-auto">Очистить</button>
+  </div>
 </form>
-
+  
   <!-- Лоадер -->
   <div id="flightsLoader" class="flex justify-center my-4 hidden">
     <div class="loader"></div>
