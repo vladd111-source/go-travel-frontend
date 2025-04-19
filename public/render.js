@@ -26,17 +26,19 @@ export function generateAviasalesLink(flight) {
     return "#";
   }
 
-  const [year, month, day] = rawDate.split("T")[0].split("-");
-  if (!year || !month || !day) {
+  const dateParts = rawDate.split("T")[0]?.split("-");
+  if (!dateParts || dateParts.length !== 3) {
     console.warn("❌ Невалидная дата:", rawDate);
     return "#";
   }
 
+  const [year, month, day] = dateParts;
   const formattedDate = `${day}${month}`;
-  const fromCode = flight.from || flight.origin;
-  const toCode = flight.to || flight.destination;
 
-  if (!fromCode || !toCode || fromCode.length !== 3 || toCode.length !== 3) {
+  let fromCode = (flight.from || flight.origin || "").trim().toUpperCase();
+  let toCode = (flight.to || flight.destination || "").trim().toUpperCase();
+
+  if (fromCode.length !== 3 || toCode.length !== 3) {
     console.warn("❌ Невалидные IATA коды:", { fromCode, toCode });
     return "#";
   }
