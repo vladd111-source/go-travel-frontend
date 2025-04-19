@@ -147,33 +147,33 @@ const returnDateWrapper = document.getElementById("returnDateWrapper");
 const returnDateInput = document.getElementById("returnDate");
 
 if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
-  const updateReturnDateVisibility = () => {
+  function updateReturnDateVisibility() {
     const show = roundTripCheckbox.checked;
 
-    // Показываем/скрываем обёртку
+    // Показываем или скрываем обёртку
     returnDateWrapper.classList.toggle("hidden", !show);
 
-    // Управляем атрибутами формы
     if (show) {
+      returnDateInput.removeAttribute("disabled");
       returnDateInput.setAttribute("required", "true");
       returnDateInput.setAttribute("name", "returnDate");
-      returnDateInput.removeAttribute("disabled");
     } else {
+      returnDateInput.setAttribute("disabled", "true");
       returnDateInput.removeAttribute("required");
       returnDateInput.removeAttribute("name");
-      returnDateInput.setAttribute("disabled", "true");
-      returnDateInput.value = "";
+      returnDateInput.value = ""; // сброс значения
     }
-  };
+  }
+
+  // 👇 Сделаем доступной глобально, чтобы вызывать при сабмите формы
+  window.updateReturnDateVisibility = updateReturnDateVisibility;
 
   // Восстанавливаем из localStorage
   const saved = localStorage.getItem("roundTripChecked");
   if (saved === "1") roundTripCheckbox.checked = true;
 
-  // Инициализация
-  updateReturnDateVisibility();
+  updateReturnDateVisibility(); // инициализация при загрузке
 
-  // Переключение по клику
   roundTripCheckbox.addEventListener("change", () => {
     updateReturnDateVisibility();
     localStorage.setItem("roundTripChecked", roundTripCheckbox.checked ? "1" : "0");
@@ -289,6 +289,8 @@ lastSearchTime = 0;
 // ✅ Поиск рейсов (включая "Туда и обратно")
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
    e.preventDefault();
+  // Обновляем видимость и доступность returnDate перед валидацией
+window.updateReturnDateVisibility?.();
   const isHotOnly = document.getElementById("hotOnly")?.checked;
 
   if (isHotOnly) {
