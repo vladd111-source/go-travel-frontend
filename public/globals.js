@@ -352,8 +352,10 @@ window.renderCard = function(type, item, index) {
   const title = titleMap[type] ? titleMap[type](item) : '';
   const details = formatDetails(type, item);
 
-  const isFlight = type === 'flights';
-  const aviaLink = isFlight ? window.generateAviasalesLink({ ...item, departure_at: item.date }) : null;
+  // Генерация ссылки для перелётов
+  const aviaLink = (type === "flights")
+    ? window.generateAviasalesLink({ ...item, departure_at: item.date })
+    : null;
 
   return `
     <div class="card bg-white border border-gray-200 p-4 rounded-xl shadow-md mb-4 transition-all duration-300">
@@ -361,8 +363,8 @@ window.renderCard = function(type, item, index) {
       <div class="text-sm text-gray-600 mb-2">${details}</div>
       <div class="flex justify-between sm:justify-start gap-2 mt-3 flex-wrap">
         ${
-          isFlight
-            ? `<a href="${aviaLink}" target="_blank" class="btn btn-blue">Перейти к бронированию</a>`
+          type === "flights"
+            ? `<a href="${aviaLink}" target="_blank" class="btn btn-blue">🔗 Подробнее</a>`
             : `<button class="btn btn-blue" onclick="showDetails('${type}', ${index})">📄 Подробнее</button>`
         }
         <button 
@@ -374,7 +376,6 @@ window.renderCard = function(type, item, index) {
     </div>
   `;
 };
-
   
 // ✅ Рендер всех карточек
 window.renderFavorites = function(type) {
