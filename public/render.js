@@ -46,9 +46,16 @@ export function generateAviasalesLink(flight) {
   return `https://www.aviasales.ru/search/${fromCode}${formattedDate}${toCode}1?marker=618281`;
 }
 
-export async function renderFlights(flights, fromCity = "—", toCity = "—", title = "", containerId = "hotDeals") {
+export async function renderFlights(
+  flights,
+  fromCity = "—",
+  toCity = "—",
+  title = "",
+  containerId = "hotDeals",
+  clear = true // ← добавили флаг
+) {
   const container = document.getElementById(containerId);
-  container.innerHTML = "";
+  if (clear) container.innerHTML = ""; // ← очищаем ТОЛЬКО если нужно
 
   if (title) {
     const heading = document.createElement("h3");
