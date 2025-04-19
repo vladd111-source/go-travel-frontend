@@ -58,6 +58,11 @@ const translations = {
 };
 
 export function showFlightModal(flight) {
+  // 🔧 Подстраховка: если нет departure_at, подставим date
+  if (!flight.departure_at) {
+    flight.departure_at = flight.date || "";
+  }
+
   const from = flight.from || flight.origin || "—";
   const to = flight.to || flight.destination || "—";
   const date = (flight.date || flight.departure_at || "").split("T")[0] || "—";
@@ -71,15 +76,18 @@ export function showFlightModal(flight) {
     <p class="mb-1 text-gray-700">📅 Дата: ${date}</p>
     <p class="mb-1 text-gray-700">💺 Авиакомпания: ${airline}</p>
     <p class="mb-3 text-gray-700">💰 Цена: $${price}</p>
-    <a href="${link}" target="_blank"
-       class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full block text-center">
-      Перейти к бронированию на Aviasales
-    </a>
+    ${link && link !== "#" ? `
+      <a href="${link}" target="_blank"
+        class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full block text-center">
+        Перейти к бронированию на Aviasales
+      </a>
+    ` : `<p class="text-red-500 text-sm">⚠️ Ссылка недоступна</p>`}
   `;
 
   document.getElementById("modalContent").innerHTML = html;
   document.getElementById("detailsModal").classList.remove("hidden");
 }
+
 // 👇 Сделать глобально доступной, если вызываешь из HTML
 window.showFlightModal = showFlightModal;
 
