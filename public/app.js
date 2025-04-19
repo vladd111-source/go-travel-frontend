@@ -353,24 +353,27 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
 
   const encode = str => encodeURIComponent(str.trim());
 
-  try {
-    // ✈️ Запрос рейсов туда
-    const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${encode(from)}&to=${encode(to)}&date=${departureDate}`;
-    const resOut = await retryFetch(urlOut);
-    if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
-    flightsOut = await resOut.json();
-    renderFlights(flightsOut, from, to, "Рейсы туда");
+ try {
+  // ✈️ Запрос рейсов туда
+  const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${encode(from)}&to=${encode(to)}&date=${departureDate}`;
+  const resOut = await retryFetch(urlOut);
+  if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
+  flightsOut = await resOut.json();
+  await renderFlights(flightsOut, from, to, "Рейсы туда", "hotDeals", true); // очищаем контейнер
 
-    // 🔁 Запрос рейсов обратно
-    if (isRoundTrip && returnDate) {
-      await new Promise(r => setTimeout(r, 1200)); // небольшая задержка
+  // 🔁 Запрос рейсов обратно
+  if (isRoundTrip && returnDate) {
+    await new Promise(r => setTimeout(r, 1200)); // небольшая задержка
 
-      const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${encode(to)}&to=${encode(from)}&date=${returnDate}`;
-      const resBack = await retryFetch(urlBack);
-      if (!resBack.ok) throw new Error(`Ошибка рейсов обратно: ${resBack.status}`);
-      flightsBack = await resBack.json();
-      renderFlights(flightsBack, to, from, "Рейсы обратно");
-    }
+    const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${encode(to)}&to=${encode(from)}&date=${returnDate}`;
+    const resBack = await retryFetch(urlBack);
+    if (!resBack.ok) throw new Error(`Ошибка рейсов обратно: ${resBack.status}`);
+    flightsBack = await resBack.json();
+    await renderFlights(flightsBack, to, from, "Рейсы обратно", "hotDeals", false); // НЕ очищаем
+  }
+} catch (err) {
+  console.error("❌ Ошибка при загрузке рейсов:", err);
+}
 
     // 📲 Telegram WebApp аналитика
     if (Array.isArray(flightsOut) && flightsOut.length > 0) {
