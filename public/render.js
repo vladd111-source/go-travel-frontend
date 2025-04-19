@@ -183,3 +183,5 @@ export function renderPlaces(places) {
     container.appendChild(card);
   });
 }
+// Сделать функции глобально доступными
+window.generateAviasalesLink = generateAviasalesLink;
