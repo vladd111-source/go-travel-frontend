@@ -115,19 +115,19 @@ export async function renderFlights(flights, fromCity = "—", toCity = "—", t
     container.appendChild(card);
 
 if (container.id === "favContent-flights") {
-  // 🔧 Подстраховка: если нет departure_at, подставим date + время
-  if (!flight.departure_at && flight.date) {
-    flight.departure_at = flight.date + "T00:00:00";
+  // 🔧 Подстраховка: если нет departure_at, подставим date
+  if (!flight.departure_at) {
+    flight.departure_at = flight.date || "";
   }
 
-  const directLink = generateAviasalesLink(flight);
+  const aviaLink = generateAviasalesLink(flight);
 
   const moreBtn = document.createElement("a");
-  moreBtn.href = directLink;
+  moreBtn.textContent = "Подробнее";
+  moreBtn.href = aviaLink;
   moreBtn.target = "_blank";
-  moreBtn.rel = "noopener noreferrer";
-  moreBtn.textContent = "Перейти к бронированию";
-  moreBtn.className = "btn bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-4 rounded transition w-full text-center mt-2";
+  moreBtn.className = "btn bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-4 rounded transition w-full text-center block mt-2";
+  
   card.appendChild(moreBtn);
 }
     
