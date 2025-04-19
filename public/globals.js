@@ -353,9 +353,10 @@ window.renderCard = function(type, item, index) {
   const details = formatDetails(type, item);
 
   // Генерация ссылки для перелётов
-  const aviaLink = (type === "flights")
-    ? window.generateAviasalesLink({ ...item, departure_at: item.date })
-    : null;
+ const hasValidDate = item.date && item.date.includes("-");
+const aviaLink = (type === "flights" && hasValidDate)
+  ? window.generateAviasalesLink({ ...item, departure_at: `${item.date}T00:00:00` })
+  : "#";
 
   return `
     <div class="card bg-white border border-gray-200 p-4 rounded-xl shadow-md mb-4 transition-all duration-300">
