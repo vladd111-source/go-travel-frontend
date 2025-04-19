@@ -391,7 +391,7 @@ try {
 } finally {
   hideLoading();
 }
-
+});
 // ✅ Горячие предложения (по умолчанию из MOW или другого города)
 document.getElementById("loadHotDeals")?.addEventListener("click", async () => {
   await loadHotDeals(); // загружаем предложения
