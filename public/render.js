@@ -114,15 +114,18 @@ export async function renderFlights(flights, fromCity = "—", toCity = "—", t
 
     container.appendChild(card);
 
-    if (container.id === "favContent-flights") {
-      const moreBtn = document.createElement("button");
-      moreBtn.textContent = "Подробнее";
-      moreBtn.className = "btn bg-gray-200 hover:bg-gray-300 text-black text-sm py-2 px-4 rounded transition w-full mt-2";
-      moreBtn.onclick = () => window.showFlightModal(flight);
-      card.appendChild(moreBtn);
-    }
+  if (container.id === "favContent-flights") {
+  // 🔧 Подстраховка: если нет departure_at, подставим date
+  if (!flight.departure_at) {
+    flight.departure_at = flight.date || "";
   }
 
+  const moreBtn = document.createElement("button");
+  moreBtn.textContent = "Подробнее";
+  moreBtn.className = "btn bg-gray-200 hover:bg-gray-300 text-black text-sm py-2 px-4 rounded transition w-full mt-2";
+  moreBtn.onclick = () => window.showFlightModal(flight);
+  card.appendChild(moreBtn);
+}
   if (typeof animateCards === "function") {
     animateCards(`#${container.id} .card`);
   }
