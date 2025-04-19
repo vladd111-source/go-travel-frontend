@@ -134,7 +134,7 @@ if (container.id === "favContent-flights") {
 if (typeof animateCards === "function") {
   animateCards(`#${container.id} .card`);
 }
-
+} // ← ВОТ ЭТА СКОБКА ЗДЕСЬ ОБЯЗАТЕЛЬНА!
 /**
  * Отрисовывает список отелей
  */
