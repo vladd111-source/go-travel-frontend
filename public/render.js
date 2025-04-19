@@ -138,7 +138,7 @@ if (typeof animateCards === "function") {
 /**
  * Отрисовывает список отелей
  */
-export function renderHotels(hotels) {
+function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
 
@@ -161,11 +161,12 @@ export function renderHotels(hotels) {
     container.appendChild(card);
   });
 }
+window.renderHotels = renderHotels;
 
 /**
  * Отрисовывает список достопримечательностей
  */
-export function renderPlaces(places) {
+function renderPlaces(places) {
   const container = document.getElementById("placesResult");
   container.innerHTML = "";
 
@@ -188,3 +189,4 @@ export function renderPlaces(places) {
     container.appendChild(card);
   });
 }
+window.renderPlaces = renderPlaces;
