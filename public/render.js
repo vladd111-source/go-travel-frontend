@@ -19,10 +19,7 @@ async function getCityName(iata, lang = "ru") {
   }
 }
 
-/**
- * Генерирует корректную ссылку на Aviasales
- */
-export function generateAviasalesLink(flight) {
+function generateAviasalesLink(flight) {
   if (!flight || typeof flight.departure_at !== "string") {
     console.warn("⚠️ Невалидный рейс для ссылки:", flight);
     return "#";
@@ -41,13 +38,11 @@ export function generateAviasalesLink(flight) {
 
   return `https://www.aviasales.ru/search/${fromCode}${formattedDate}${toCode}1?marker=618281`;
 }
+window.generateAviasalesLink = generateAviasalesLink;
 
-/**
- * Отрисовывает список рейсов на странице
- */
-export async function renderFlights(flights, fromCity = "—", toCity = "—", title = "", containerId = "hotDeals") {
+async function renderFlights(flights, fromCity = "—", toCity = "—", title = "", containerId = "hotDeals") {
   const container = document.getElementById(containerId);
-  container.innerHTML = ""; // Всегда очищаем
+  container.innerHTML = "";
 
   if (title) {
     const heading = document.createElement("h3");
@@ -82,7 +77,6 @@ export async function renderFlights(flights, fromCity = "—", toCity = "—", t
     const price = parseFloat(rawPrice);
 
     const link = generateAviasalesLink(flight);
-
     const dealData = { from, to, date, price };
     const dealId = encodeURIComponent(JSON.stringify(dealData));
 
@@ -98,46 +92,43 @@ export async function renderFlights(flights, fromCity = "—", toCity = "—", t
       ${isHot ? 'bg-yellow-100 border-yellow-300' : 'bg-white'}
     `.trim();
 
-card.innerHTML = `
-  <h3 class="text-lg font-semibold mb-1">${airline}</h3>
-  <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
-  <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
-  <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
-  ${isHot ? `<div class="text-xs text-orange-600 mt-1">🔥 Горячее предложение</div>` : ""}
-  <div class="flex flex-col sm:flex-row gap-2 mt-2">
-    <a href="${link}" target="_blank"
-       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition w-full text-center">
-       Перейти к бронированию
-    </a>
-    <button 
-      onclick="toggleFavoriteFlight('${dealId}', this)" 
-      class="text-2xl text-center text-gray-600 hover:text-blue-600 transition"
-      data-flight-id="${dealId}">
-      ${isFav ? "💙" : "🤍"}
-    </button>
-  </div>
-`;
+    card.innerHTML = `
+      <h3 class="text-lg font-semibold mb-1">${airline}</h3>
+      <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
+      <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
+      <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
+      ${isHot ? `<div class="text-xs text-orange-600 mt-1">🔥 Горячее предложение</div>` : ""}
+      <div class="flex flex-col sm:flex-row gap-2 mt-2">
+        <a href="${link}" target="_blank"
+           class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition w-full text-center">
+           Перейти к бронированию
+        </a>
+        <button 
+          onclick="toggleFavoriteFlight('${dealId}', this)" 
+          class="text-2xl text-center text-gray-600 hover:text-blue-600 transition"
+          data-flight-id="${dealId}">
+          ${isFav ? "💙" : "🤍"}
+        </button>
+      </div>
+    `;
 
-// Добавляем карточку в контейнер
-container.appendChild(card);
+    container.appendChild(card);
 
-// ✅ Только для вкладки "Избранное" добавляем кнопку "Подробнее"
-if (container.id === "favContent-flights") {
-  const moreBtn = document.createElement("button");
-  moreBtn.textContent = "Подробнее";
-  moreBtn.className = "btn bg-gray-200 hover:bg-gray-300 text-black text-sm py-2 px-4 rounded transition w-full mt-2";
-  moreBtn.onclick = () => window.showFlightModal(flight);
-  card.appendChild(moreBtn);
+    if (container.id === "favContent-flights") {
+      const moreBtn = document.createElement("button");
+      moreBtn.textContent = "Подробнее";
+      moreBtn.className = "btn bg-gray-200 hover:bg-gray-300 text-black text-sm py-2 px-4 rounded transition w-full mt-2";
+      moreBtn.onclick = () => window.showFlightModal(flight);
+      card.appendChild(moreBtn);
+    }
+  }
+
+  if (typeof animateCards === "function") {
+    animateCards(`#${container.id} .card`);
+  }
 }
+window.renderFlights = renderFlights;
 
-// ✅ Анимация карточек
-if (typeof animateCards === "function") {
-  animateCards(`#${container.id} .card`);
-}
-} // ← ВОТ ЭТА СКОБКА ЗДЕСЬ ОБЯЗАТЕЛЬНА!
-/**
- * Отрисовывает список отелей
- */
 function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
@@ -163,9 +154,6 @@ function renderHotels(hotels) {
 }
 window.renderHotels = renderHotels;
 
-/**
- * Отрисовывает список достопримечательностей
- */
 function renderPlaces(places) {
   const container = document.getElementById("placesResult");
   container.innerHTML = "";
