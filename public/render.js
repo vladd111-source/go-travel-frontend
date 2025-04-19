@@ -129,7 +129,6 @@ export async function renderFlights(flights, fromCity = "—", toCity = "—", t
   if (typeof animateCards === "function") {
     animateCards(`#${container.id} .card`);
   }
-}
 
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
