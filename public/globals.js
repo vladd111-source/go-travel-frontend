@@ -353,7 +353,7 @@ window.renderCard = function(type, item, index) {
   const details = formatDetails(type, item);
 
   // Генерация ссылки для перелётов
- const hasValidDate = item.date && item.date.includes("-");
+const hasValidDate = item?.date && /^\d{4}-\d{2}-\d{2}$/.test(item.date);
 const aviaLink = (type === "flights" && hasValidDate)
   ? window.generateAviasalesLink({ ...item, departure_at: `${item.date}T00:00:00` })
   : "#";
