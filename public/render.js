@@ -125,8 +125,9 @@ if (container.id === "favContent-flights") {
   const moreBtn = document.createElement("a");
   moreBtn.href = directLink;
   moreBtn.target = "_blank";
+  moreBtn.rel = "noopener noreferrer";
   moreBtn.textContent = "Перейти к бронированию";
-  moreBtn.className = "btn bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-4 rounded transition w-full text-center";
+  moreBtn.className = "btn bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-4 rounded transition w-full text-center mt-2";
   card.appendChild(moreBtn);
 }
     
