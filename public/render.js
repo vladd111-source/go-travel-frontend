@@ -84,12 +84,7 @@ export async function renderFlights(flights, fromCity = "—", toCity = "—", t
 
     const link = generateAviasalesLink(flight);
 
-    const dealData = { 
-  from: fromCode, // 👈 это IATA
-  to: toCode,     // 👈 это IATA
-  date, 
-  price 
-};
+    const dealData = { from, to, date, price };
     const dealId = encodeURIComponent(JSON.stringify(dealData));
 
     const isFav = favorites.some(f =>
