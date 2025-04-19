@@ -353,7 +353,7 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
 
   const encode = str => encodeURIComponent(str.trim());
 
- try {
+try {
   // ✈️ Запрос рейсов туда
   const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${encode(from)}&to=${encode(to)}&date=${departureDate}`;
   const resOut = await retryFetch(urlOut);
@@ -371,29 +371,26 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     flightsBack = await resBack.json();
     await renderFlights(flightsBack, to, from, "Рейсы обратно", "hotDeals", false); // НЕ очищаем
   }
+
+  // 📲 Telegram WebApp аналитика
+  if (Array.isArray(flightsOut) && flightsOut.length > 0) {
+    const top = flightsOut[0];
+    const msg = `✈️ Нашли рейс\n🛫 ${top.origin || top.from || "?"} → 🛬 ${top.destination || top.to || "?"}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value || "?"}`;
+    Telegram.WebApp?.sendData?.(msg);
+    trackEvent("Поиск рейса", msg);
+  } else {
+    Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
+    trackEvent("Поиск рейса", "Ничего не найдено");
+  }
+
 } catch (err) {
   console.error("❌ Ошибка при загрузке рейсов:", err);
-}
+  Telegram.WebApp?.sendData?.("❌ Ошибка загрузки рейсов.");
+  trackEvent("Ошибка загрузки рейсов", err.message);
 
-    // 📲 Telegram WebApp аналитика
- if (Array.isArray(flightsOut) && flightsOut.length > 0) {
-  const top = flightsOut[0];
-  const msg = `✈️ Нашли рейс\n🛫 ${top.origin || top.from || "?"} → 🛬 ${top.destination || top.to || "?"}\n📅 ${top.date || top.departure_at?.split("T")[0] || "?"}\n💰 $${top.price || top.value || "?"}`;
-  Telegram.WebApp?.sendData?.(msg);
-  trackEvent("Поиск рейса", msg);
-} else {
-  Telegram.WebApp?.sendData?.("😢 Рейсы не найдены.");
-  trackEvent("Поиск рейса", "Ничего не найдено");
+} finally {
+  hideLoading();
 }
-
-  } catch (err) {
-    console.error("❌ Ошибка при загрузке рейсов:", err);
-    Telegram.WebApp.sendData?.("❌ Ошибка загрузки рейсов.");
-    trackEvent("Ошибка загрузки рейсов", err.message);
-  } finally {
-    hideLoading();
-  }
-});
 
 // ✅ Горячие предложения (по умолчанию из MOW или другого города)
 document.getElementById("loadHotDeals")?.addEventListener("click", async () => {
