@@ -114,10 +114,10 @@ export async function renderFlights(flights, fromCity = "—", toCity = "—", t
 
     container.appendChild(card);
 
-  if (container.id === "favContent-flights") {
-  // 🔧 Подстраховка: если нет departure_at, подставим date
-  if (!flight.departure_at) {
-    flight.departure_at = flight.date || "";
+if (container.id === "favContent-flights") {
+  // 🔧 Подстраховка: если нет departure_at, подставим date + время
+  if (!flight.departure_at && flight.date) {
+    flight.departure_at = flight.date + "T00:00:00"; // ← добавляем фиктивное время
   }
 
   const moreBtn = document.createElement("button");
