@@ -20,19 +20,24 @@ export async function getCityName(iata, lang = "ru") {
 }
 
 export function generateAviasalesLink(flight) {
-  if (!flight || typeof flight.departure_at !== "string") {
-    console.warn("⚠️ Невалидный рейс для ссылки:", flight);
+  const rawDate = flight.departure_at || flight.date || "";
+  if (!rawDate) {
+    console.warn("❌ Нет даты у рейса:", flight);
     return "#";
   }
 
-  const [date] = flight.departure_at.split("T");
-  const [year, month, day] = date.split("-");
+  const [year, month, day] = rawDate.split("T")[0].split("-");
+  if (!year || !month || !day) {
+    console.warn("❌ Невалидная дата:", rawDate);
+    return "#";
+  }
+
   const formattedDate = `${day}${month}`;
   const fromCode = flight.from || flight.origin;
   const toCode = flight.to || flight.destination;
 
-  if (!fromCode || !toCode) {
-    console.warn("⚠️ Невалидные IATA коды:", flight);
+  if (!fromCode || !toCode || fromCode.length !== 3 || toCode.length !== 3) {
+    console.warn("❌ Невалидные IATA коды:", { fromCode, toCode });
     return "#";
   }
 
