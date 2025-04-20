@@ -5,8 +5,8 @@ const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// ✅ Переводы
-const translations = {
+// ✅ Глобальные переводы
+window.translations = {
   ru: {
     flights: "✈️ Билеты",
     hotels: "🏨 Отели",
@@ -24,12 +24,14 @@ const translations = {
     checkIn: "Дата заезда",
     checkOut: "Дата выезда",
     priceFrom: "Цена от",
-    category: "Категория",
     priceTo: "Цена",
     ratingMin: "Рейтинг",
     findHotel: "Найти отель",
     findSights: "Показать места",
-    bookNow: "Забронировать"
+    bookNow: "Забронировать",
+    time: "Время",
+    duration: "В пути",
+    hotDeal: "Горячее предложение"
   },
   en: {
     flights: "✈️ Flights",
@@ -53,7 +55,10 @@ const translations = {
     ratingMin: "Rating",
     findHotel: "Find Hotel",
     findSights: "Show Places",
-    bookNow: "Book Now"
+    bookNow: "Book Now",
+    time: "Time",
+    duration: "Duration",
+    hotDeal: "Hot Deal"
   }
 };
 
