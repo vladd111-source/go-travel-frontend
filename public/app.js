@@ -91,7 +91,7 @@ async function fetchPlaces(city, category) {
     category: category,
     lat: p.geometry.coordinates[1],
     lon: p.geometry.coordinates[0],
-    image: `https://source.unsplash.com/300x180/?${category},${city}`
+   image: `https://source.unsplash.com/300x180/?${encodeURIComponent(category)},${encodeURIComponent(city)}`
   }));
 }
 
