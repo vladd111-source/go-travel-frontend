@@ -1,3 +1,18 @@
+// ✅ Переводы (перенесено из app.js сюда)
+window.translations = {
+  ru: {
+    time: "Время",
+    duration: "В пути",
+    hotDeal: "Горячее предложение",
+    bookNow: "Перейти к бронированию"
+  },
+  en: {
+    time: "Time",
+    duration: "Duration",
+    hotDeal: "Hot deal",
+    bookNow: "Book now"
+  }
+};
 const lang = localStorage.getItem("lang") || "ru";
 const t = window.translations[lang] || window.translations["ru"];
 
