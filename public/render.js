@@ -127,7 +127,9 @@ export async function renderFlights(
       card border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300
       ${isHot ? 'bg-yellow-100 border-yellow-300' : 'bg-white'}
     `.trim();
-
+    
+const t = window.translations[lang];
+    
    card.innerHTML = `
   <h3 class="text-lg font-semibold mb-1">${airline}</h3>
   <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
