@@ -61,7 +61,7 @@ function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
 }
 
 //АПИ мест
-async function fetchPlaces(city, category, limit = 10) {
+async function fetchPlaces(city, category, limit = 20) {
   const geoapifyKey = "2ec78e694f604853bff3e7cea375dec0";
   const pixabayKey = "49840344-8acca614a34eebb85f73e5ef4";
 
