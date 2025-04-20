@@ -69,9 +69,18 @@ export function showFlightModal(flight) {
   const price = flight.price || flight.value || "—";
   const airline = flight.airline || "Авиакомпания";
 
+  // 🕒 Время вылета
   const departureTime = formatTime(flight.departure_at);
-  const rawArrival = flight.arrival_at || flight.return_at;
-  const arrivalTime = rawArrival ? formatTime(rawArrival) : "—";
+
+  // ⏱ Длительность (в минутах)
+  const duration = parseInt(flight.duration || flight.flight_duration || 0, 10);
+
+  // 🛬 Время прибытия = Вылет + Длительность
+  let arrivalTime = "—";
+  if (!isNaN(duration) && flight.departure_at) {
+    const arrival = new Date(new Date(flight.departure_at).getTime() + duration * 60000);
+    arrivalTime = formatTime(arrival);
+  }
 
   const link = generateAviasalesLink(flight);
 
@@ -79,7 +88,8 @@ export function showFlightModal(flight) {
     <h2 class="text-xl font-semibold mb-2">${from} → ${to}</h2>
     <p class="mb-1 text-gray-700">📅 Дата: ${date}</p>
     <p class="mb-1 text-gray-700">🕒 Вылет: ${departureTime}</p>
-    <p class="mb-1 text-gray-700">🛬 Прилёт: ${arrivalTime}</p>
+    <p class="mb-1 text-gray-700">⏱ В пути: ${formatDuration(duration)}</p>
+    <p class="mb-1 text-gray-700">🛬 Прибытие: ${arrivalTime}</p>
     <p class="mb-1 text-gray-700">💺 Авиакомпания: ${airline}</p>
     <p class="mb-3 text-gray-700">💰 Цена: $${price}</p>
     ${link && link !== "#" ? `
