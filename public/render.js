@@ -145,16 +145,16 @@ export async function renderFlights(
     
 const t = window.translations[lang];
     
-   card.innerHTML = `
-  <h3 class="text-lg font-semibold mb-1 flex items-center gap-2">
-    ${airline}
-    ${isHot ? `<span class="text-xs text-orange-600 font-medium">🔥 ${t.hotDeal || "Горячее предложение"}</span>` : ""}
-  </h3>
-  <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
+  card.innerHTML = `
+  <div class="flex items-center gap-2 mb-1">
+    <h3 class="text-xl font-bold">${airline}</h3>
+    ${isHot ? `<span class="text-lg font-bold text-orange-600">🔥 ${t.hotDeal || "Горячее предложение"}</span>` : ""}
+  </div>
+  <div class="text-sm font-semibold text-gray-700 mb-1">🛫 ${from} → 🛬 ${to}</div>
   <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
   <div class="text-sm text-gray-600 mb-1">⏰ ${t.time || "Время"}: ${departureTime} — ${arrivalTime}</div>
   <div class="text-sm text-gray-600 mb-1">🕒 ${t.duration || "В пути"}: ${durationText}</div>
-  <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
+  <div class="text-lg font-bold text-gray-800 mb-1">💰 $${price}</div>
   <div class="flex justify-between items-center gap-2 mt-2">
     <a href="${link}" target="_blank"
        class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition text-center">
