@@ -76,25 +76,31 @@ export async function renderFlights(
     .sort((a, b) => (a.price || a.value || 0) - (b.price || b.value || 0))
     .slice(0, 10);
 
-  for (const flight of topDeals) {
-    const fromCode = flight.from || flight.origin || "—";
-    const toCode = flight.to || flight.destination || "—";
+ for (const flight of topDeals) {
+  const fromCode = flight.from || flight.origin || "—";
+  const toCode = flight.to || flight.destination || "—";
 
-    const from = await getCityName(fromCode, lang);
-    const to = await getCityName(toCode, lang);
+  const from = await getCityName(fromCode, lang);
+  const to = await getCityName(toCode, lang);
 
-    const rawDate = flight.date || flight.departure_at || "";
-    const date = rawDate.split("T")[0] || "—";
-    const departureTime = window.formatTime(flight.departure_at);
+  const rawDate = flight.date || flight.departure_at || "";
+  const date = rawDate.split("T")[0] || "—";
+  const departureTime = window.formatTime(flight.departure_at);
 
-    // 🔧 Расчёт времени прибытия
-    let arrivalTime = "—";
-    if (flight.departure_at && flight.duration) {
-      const departure = new Date(flight.departure_at);
-      const arrival = new Date(departure.getTime() + flight.duration * 60000);
-      arrivalTime = window.formatTime(arrival.toISOString());
-    }
+  // ✅ Добавь это: если duration не задан, но есть return_at и departure_at — рассчитай
+  if (!flight.duration && flight.return_at && flight.departure_at) {
+    const dep = new Date(flight.departure_at);
+    const ret = new Date(flight.return_at);
+    flight.duration = Math.round((ret - dep) / 60000); // в минутах
+  }
 
+  // 🔧 Расчёт времени прибытия
+  let arrivalTime = "—";
+  if (flight.departure_at && flight.duration) {
+    const departure = new Date(flight.departure_at);
+    const arrival = new Date(departure.getTime() + flight.duration * 60000);
+    arrivalTime = window.formatTime(arrival.toISOString());
+  }
     const durationText = window.formatDuration(flight.duration || flight.duration_to || flight.duration_minutes);
     const airline = flight.airline || "Авиакомпания";
     const rawPrice = flight.price || flight.value || 0;
