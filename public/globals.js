@@ -123,7 +123,11 @@ function formatDuration(minutes) {
   if (!minutes || isNaN(minutes)) return "—";
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  return `${h}ч ${m}м`;
+  const lang = localStorage.getItem("lang") || "ru";
+
+  return lang === "ru"
+    ? `${h}ч ${m}м`
+    : `${h}h ${m}m`;
 }
 
 // 👇 Сделаем глобальными
