@@ -151,7 +151,7 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
     const show = roundTripCheckbox.checked;
 
     // Показываем/скрываем безопасно
-    returnDateWrapper.style.display = show ? "block" : "none";
+    returnDateWrapper.classList.toggle("hidden", !show);
 
     if (show) {
       returnDateInput.removeAttribute("disabled");
