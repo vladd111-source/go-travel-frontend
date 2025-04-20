@@ -100,7 +100,7 @@ async function fetchPlaces(city, category, limit = 10) {
         return `https://picsum.photos/300/180?random=${Math.floor(Math.random() * 1000)}`;
       }
     } catch (err) {
-      console.error("Ошибка загрузки фото:", err);
+      console.error("❌ Ошибка загрузки фото с Pixabay:", err);
       return `https://picsum.photos/300/180?random=${Math.floor(Math.random() * 1000)}`;
     }
   }
@@ -559,6 +559,7 @@ placeCityInput.setAttribute("autofocus", "autofocus");
 document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  document.getElementById("placesLoading")?.classList.remove("hidden");
   const city = placeCityInput.value.trim().toLowerCase();
   const category = placeCategorySelect.value;
 
@@ -580,6 +581,7 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
     resultBlock.innerHTML = renderPlacesHTML(firstBatch);
     updateHearts("places");
     animateCards("#placesResult .card");
+    document.getElementById("placesLoading")?.classList.add("hidden");
     resultBlock.classList.add("visible");
 
     // Кнопка "Показать ещё"
