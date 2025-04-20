@@ -109,10 +109,12 @@ export async function renderFlights(
       ${isHot ? 'bg-yellow-100 border-yellow-300' : 'bg-white'}
     `.trim();
 
-   card.innerHTML = `
+card.innerHTML = `
   <h3 class="text-lg font-semibold mb-1">${airline}</h3>
   <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
   <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
+  <div class="text-sm text-gray-600 mb-1">⏰ Время: ${departureTime} — ${arrivalTime}</div>
+  <div class="text-sm text-gray-600 mb-1">🕒 В пути: ${durationText}</div>
   <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
   ${isHot ? `<div class="text-xs text-orange-600 mt-1">🔥 Горячее предложение</div>` : ""}
   <div class="flex justify-between items-center gap-2 mt-2">
