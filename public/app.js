@@ -64,6 +64,7 @@ function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
 async function fetchPlaces(city, category) {
   const apiKey = "2ec78e694f604853bff3e7cea375dec0";
 
+  // Получаем координаты города
   const geoRes = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(city)}&limit=1&lang=ru&apiKey=${apiKey}`);
   const geoData = await geoRes.json();
   const location = geoData.features?.[0]?.geometry?.coordinates;
@@ -71,6 +72,7 @@ async function fetchPlaces(city, category) {
 
   const [lon, lat] = location;
 
+  // Категории
   const categoryMap = {
     culture: "entertainment.culture",
     nature: "natural",
@@ -80,21 +82,21 @@ async function fetchPlaces(city, category) {
   };
   const categoryCode = categoryMap[category] || "tourism.sights";
 
+  // Получаем места
   const placesRes = await fetch(`https://api.geoapify.com/v2/places?categories=${categoryCode}&filter=circle:${lon},${lat},10000&limit=10&lang=ru&apiKey=${apiKey}`);
   const placesData = await placesRes.json();
 
   return placesData.features.map(p => ({
     name: p.properties.name || "Без названия",
     description: p.properties.details || p.properties.address_line2 || "",
-    address: p.properties.address_line2 || "",  // 🆕 адрес
+    address: p.properties.address_line2 || "",
     city: city.toLowerCase(),
     category: category,
     lat: p.geometry.coordinates[1],
     lon: p.geometry.coordinates[0],
-   image: `https://source.unsplash.com/300x180/?${encodeURIComponent(category)},${encodeURIComponent(city)}`
+    image: `https://source.unsplash.com/300x180/?travel,${encodeURIComponent(category)}`
   }));
 }
-
 
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
@@ -554,7 +556,12 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
         const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
         return `
           <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-            <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
+           <img 
+  src="${p.image}" 
+  alt="${p.name}" 
+  class="w-full h-40 object-cover rounded-md mb-3"
+  onerror="this.onerror=null; this.src='https://source.unsplash.com/300x180/?travel'" 
+/>
             <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
        <p class="text-sm text-gray-600 mb-1">${p.description}</p>
 <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
@@ -590,7 +597,12 @@ ${p.address ? `<p class="text-sm text-gray-400 mb-1">📍 ${p.address}</p>` : ""
             const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
             return `
               <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-                <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
+                <img 
+  src="${p.image}" 
+  alt="${p.name}" 
+  class="w-full h-40 object-cover rounded-md mb-3"
+  onerror="this.onerror=null; this.src='https://source.unsplash.com/300x180/?travel'" 
+/>
                 <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
                <p class="text-sm text-gray-600 mb-1">${p.description}</p>
 <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
