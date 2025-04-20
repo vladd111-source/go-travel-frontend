@@ -86,7 +86,8 @@ export async function renderFlights(
     const rawDate = flight.date || flight.departure_at || "";
     const date = rawDate.split("T")[0] || "—";
     const departureTime = window.formatTime(flight.departure_at);
-    const arrivalTime = window.formatTime(flight.return_at || flight.arrival_at);
+    const rawArrival = flight.return_at || flight.arrival_at;
+    const arrivalTime = rawArrival ? window.formatTime(rawArrival) : "—";
     const durationText = window.formatDuration(flight.duration || flight.duration_to || flight.duration_minutes);
     const airline = flight.airline || "Авиакомпания";
     const rawPrice = flight.price || flight.value || 0;
