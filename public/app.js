@@ -61,7 +61,7 @@ function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
 }
 
 //АПИ мест
-async function fetchPlaces(city, category) {
+async function fetchPlaces(city, category, limit = 10) {
   const geoapifyKey = "2ec78e694f604853bff3e7cea375dec0";
   const pixabayKey = "49840344-8acca614a34eebb85f73e5ef4";
 
@@ -84,7 +84,7 @@ async function fetchPlaces(city, category) {
   const categoryCode = categoryMap[category] || "tourism.sights";
 
   // Получаем места
-  const placesRes = await fetch(`https://api.geoapify.com/v2/places?categories=${categoryCode}&filter=circle:${lon},${lat},10000&limit=10&lang=ru&apiKey=${geoapifyKey}`);
+  const placesRes = await fetch(`https://api.geoapify.com/v2/places?categories=${categoryCode}&filter=circle:${lon},${lat},10000&limit=${limit}&lang=ru&apiKey=${geoapifyKey}`);
   const placesData = await placesRes.json();
 
   // Функция для получения фото
@@ -556,7 +556,7 @@ placeCityInput.setAttribute("autofocus", "autofocus");
 
 
 //метса
-document.getElementById("placeForm")?.addEventListener("submit", (e) => {
+document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const city = placeCityInput.value.trim().toLowerCase();
@@ -566,118 +566,91 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   localStorage.setItem("placeCategory", category);
 
   resultBlock.classList.remove("visible");
-  resultBlock.innerHTML = "";
+  resultBlock.innerHTML = `<p class="text-sm text-gray-400 text-center my-4">Загрузка...</p>`;
 
-  fetchPlaces(city, category)
-    .then(places => {
-      if (!places.length) {
-        resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
-        return;
-      }
+  try {
+    // Загружаем только 3 места
+    const firstBatch = await fetchPlaces(city, category, 3);
 
-      const firstBatch = places.slice(0, 3);
-      const remaining = places.slice(3);
+    if (!firstBatch.length) {
+      resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
+      return;
+    }
 
-      resultBlock.innerHTML = firstBatch.map(p => {
-        const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-        const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
-        return `
-          <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-           <img 
-  src="${p.image}" 
-  alt="${p.name}" 
-  class="w-full h-40 object-cover rounded-md mb-3"
-  onerror="this.onerror=null; this.src='https://source.unsplash.com/300x180/?travel'" 
-/>
-            <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-       <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-<p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
-${p.address ? `<p class="text-sm text-gray-400 mb-1">📍 ${p.address}</p>` : ""}
-<div class="flex justify-between items-center mt-2">
-  <a href="https://www.google.com/maps?q=${p.lat},${p.lon}" 
-     target="_blank" 
-     class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
-     📍 На карте
-  </a>
-  <button 
-    onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
-    class="text-xl ml-2"
-    data-place-id="${encodeURIComponent(JSON.stringify(p))}"
-  >
-    ${isFav ? "💙" : "🤍"}
-              </button>
-            </div>
-          </div>
-        `;
-      }).join("");
+    resultBlock.innerHTML = renderPlacesHTML(firstBatch);
+    updateHearts("places");
+    animateCards("#placesResult .card");
+    resultBlock.classList.add("visible");
 
-      updateHearts("places");
+    // Кнопка "Показать ещё"
+    const moreBtn = document.createElement("button");
+    moreBtn.textContent = "Показать ещё";
+    moreBtn.className = "btn w-full mt-4 bg-blue-500 text-white text-sm rounded py-2 px-4";
+
+    moreBtn.addEventListener("click", async () => {
+      moreBtn.disabled = true;
+      moreBtn.textContent = "Загрузка...";
+
+      const allPlaces = await fetchPlaces(city, category, 10);
+      const remaining = allPlaces.slice(3);
 
       if (remaining.length > 0) {
-        const moreBtn = document.createElement("button");
-        moreBtn.textContent = "Показать ещё";
-        moreBtn.className = "btn w-full mt-4 bg-blue-500 text-white text-sm rounded py-2 px-4";
-
-        moreBtn.addEventListener("click", () => {
-          const remainingCards = remaining.map(p => {
-            const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-            const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
-            return `
-              <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-                <img 
-  src="${p.image}" 
-  alt="${p.name}" 
-  class="w-full h-40 object-cover rounded-md mb-3"
-  onerror="this.onerror=null; this.src='https://source.unsplash.com/300x180/?travel'" 
-/>
-                <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-               <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-<p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
-${p.address ? `<p class="text-sm text-gray-400 mb-1">📍 ${p.address}</p>` : ""}
-<div class="flex justify-between items-center mt-2">
-  <a href="https://www.google.com/maps?q=${p.lat},${p.lon}" 
-     target="_blank" 
-     class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
-     📍 На карте
-  </a>
-  <button 
-    onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
-    class="text-xl ml-2"
-    data-place-id="${encodeURIComponent(JSON.stringify(p))}"
-  >
-    ${isFav ? "💙" : "🤍"}
-                  </button>
-                </div>
-              </div>
-            `;
-          }).join("");
-
-          resultBlock.insertAdjacentHTML("beforeend", remainingCards);
-          animateCards("#placesResult .card");
-          updateHearts("places");
-
-          setTimeout(() => {
-            const cards = resultBlock.querySelectorAll(".card");
-            cards[3]?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }, 100);
-
-          moreBtn.remove();
-        });
-
-        resultBlock.appendChild(moreBtn);
+        resultBlock.insertAdjacentHTML("beforeend", renderPlacesHTML(remaining));
+        animateCards("#placesResult .card");
+        updateHearts("places");
+        setTimeout(() => {
+          const cards = resultBlock.querySelectorAll(".card");
+          cards[3]?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
       }
 
-      resultBlock.classList.add("visible");
-      animateCards("#placesResult .card");
-      trackEvent("Поиск мест", { city, category });
-    })
-    .catch(err => {
-      console.error("❌ Ошибка загрузки мест:", err);
-      resultBlock.innerHTML = `<p class="text-sm text-red-500">Ошибка загрузки мест.</p>`;
+      moreBtn.remove();
     });
+
+    resultBlock.appendChild(moreBtn);
+    trackEvent("Поиск мест", { city, category });
+
+  } catch (err) {
+    console.error("❌ Ошибка загрузки мест:", err);
+    resultBlock.innerHTML = `<p class="text-sm text-red-500">Ошибка загрузки мест.</p>`;
+  }
 });
 
+function renderPlacesHTML(places) {
+  return places.map(p => {
+    const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+    const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
 
+    return `
+      <div class="card w-full max-w-full overflow-hidden bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+        <img 
+          src="${p.image}" 
+          alt="${p.name}" 
+          class="w-full h-40 object-cover rounded-md mb-3"
+          onerror="this.onerror=null; this.src='https://source.unsplash.com/300x180/?travel'" 
+        />
+        <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+        <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+        <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+        ${p.address ? `<p class="text-sm text-gray-400 mb-1">📍 ${p.address}</p>` : ""}
+        <div class="flex justify-between items-center mt-2">
+          <a href="https://www.google.com/maps?q=${p.lat},${p.lon}" 
+             target="_blank" 
+             class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
+             📍 На карте
+          </a>
+          <button 
+            onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
+            class="text-xl ml-2"
+            data-place-id="${encodeURIComponent(JSON.stringify(p))}"
+          >
+            ${isFav ? "💙" : "🤍"}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
 
 
 // ✅ Сохранение длительности сессии
