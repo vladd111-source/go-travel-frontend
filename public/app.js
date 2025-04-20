@@ -556,20 +556,21 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
           <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
             <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
             <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-            <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-            <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
-            <div class="flex justify-between items-center mt-2">
-             <a href="https://www.google.com/maps?q=${p.lat},${p.lon}" 
-   target="_blank" 
-   class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
-   📍 На карте
-</a>
-              <button 
-                onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
-                class="text-xl ml-2"
-                data-place-id="${encodeURIComponent(JSON.stringify(p))}"
-              >
-                ${isFav ? "💙" : "🤍"}
+       <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+<p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+${p.address ? `<p class="text-sm text-gray-400 mb-1">📍 ${p.address}</p>` : ""}
+<div class="flex justify-between items-center mt-2">
+  <a href="https://www.google.com/maps?q=${p.lat},${p.lon}" 
+     target="_blank" 
+     class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
+     📍 На карте
+  </a>
+  <button 
+    onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
+    class="text-xl ml-2"
+    data-place-id="${encodeURIComponent(JSON.stringify(p))}"
+  >
+    ${isFav ? "💙" : "🤍"}
               </button>
             </div>
           </div>
@@ -591,20 +592,21 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
               <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
                 <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
                 <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-                <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-                <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
-                <div class="flex justify-between items-center mt-2">
-                 <a href="https://www.google.com/maps?q=${p.lat},${p.lon}" 
-   target="_blank" 
-   class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
-   📍 На карте
-</a>
-                  <button 
-                    onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
-                    class="text-xl ml-2"
-                    data-place-id="${encodeURIComponent(JSON.stringify(p))}"
-                  >
-                    ${isFav ? "💙" : "🤍"}
+               <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+<p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+${p.address ? `<p class="text-sm text-gray-400 mb-1">📍 ${p.address}</p>` : ""}
+<div class="flex justify-between items-center mt-2">
+  <a href="https://www.google.com/maps?q=${p.lat},${p.lon}" 
+     target="_blank" 
+     class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
+     📍 На карте
+  </a>
+  <button 
+    onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
+    class="text-xl ml-2"
+    data-place-id="${encodeURIComponent(JSON.stringify(p))}"
+  >
+    ${isFav ? "💙" : "🤍"}
                   </button>
                 </div>
               </div>
