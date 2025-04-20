@@ -62,10 +62,11 @@ function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
 
 //АПИ мест
 async function fetchPlaces(city, category) {
-  const apiKey = "2ec78e694f604853bff3e7cea375dec0";
+  const geoapifyKey = "2ec78e694f604853bff3e7cea375dec0";
+  const pixabayKey = "49840344-8acca614a34eebb85f73e5ef4";
 
   // Получаем координаты города
-  const geoRes = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(city)}&limit=1&lang=ru&apiKey=${apiKey}`);
+  const geoRes = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(city)}&limit=1&lang=ru&apiKey=${geoapifyKey}`);
   const geoData = await geoRes.json();
   const location = geoData.features?.[0]?.geometry?.coordinates;
   if (!location) throw new Error("Город не найден");
@@ -83,19 +84,45 @@ async function fetchPlaces(city, category) {
   const categoryCode = categoryMap[category] || "tourism.sights";
 
   // Получаем места
-  const placesRes = await fetch(`https://api.geoapify.com/v2/places?categories=${categoryCode}&filter=circle:${lon},${lat},10000&limit=10&lang=ru&apiKey=${apiKey}`);
+  const placesRes = await fetch(`https://api.geoapify.com/v2/places?categories=${categoryCode}&filter=circle:${lon},${lat},10000&limit=10&lang=ru&apiKey=${geoapifyKey}`);
   const placesData = await placesRes.json();
 
-  return placesData.features.map(p => ({
-    name: p.properties.name || "Без названия",
-    description: p.properties.details || p.properties.address_line2 || "",
-    address: p.properties.address_line2 || "",
-    city: city.toLowerCase(),
-    category: category,
-    lat: p.geometry.coordinates[1],
-    lon: p.geometry.coordinates[0],
-    image: `https://source.unsplash.com/300x180/?travel,${encodeURIComponent(category)}`
+  // Функция для получения фото
+  async function fetchImage(query) {
+    const url = `https://pixabay.com/api/?key=${pixabayKey}&q=${encodeURIComponent(query)}&image_type=photo&orientation=horizontal&per_page=3`;
+
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.hits && data.hits.length > 0) {
+        return data.hits[0].webformatURL;
+      } else {
+        return `https://picsum.photos/300/180?random=${Math.floor(Math.random() * 1000)}`;
+      }
+    } catch (err) {
+      console.error("Ошибка загрузки фото:", err);
+      return `https://picsum.photos/300/180?random=${Math.floor(Math.random() * 1000)}`;
+    }
+  }
+
+  // Собираем карточки с фото
+  const placesWithImages = await Promise.all(placesData.features.map(async p => {
+    const name = p.properties.name || "Достопримечательность";
+    const image = await fetchImage(`${name} ${city}`);
+
+    return {
+      name,
+      description: p.properties.details || p.properties.address_line2 || "",
+      address: p.properties.address_line2 || "",
+      city: city.toLowerCase(),
+      category: category,
+      lat: p.geometry.coordinates[1],
+      lon: p.geometry.coordinates[0],
+      image
+    };
   }));
+
+  return placesWithImages;
 }
 
 // ✅ DOMContentLoaded и инициализация приложения
