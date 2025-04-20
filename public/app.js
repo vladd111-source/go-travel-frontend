@@ -60,6 +60,42 @@ function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
   });
 }
 
+//АПИ мест
+async function fetchPlaces(city, category) {
+  const apiKey = "2ec78e694f604853bff3e7cea375dec0";
+
+  // 1. Получаем координаты города
+  const geoRes = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(city)}&limit=1&lang=ru&apiKey=${apiKey}`);
+  const geoData = await geoRes.json();
+  const location = geoData.features?.[0]?.geometry?.coordinates;
+  if (!location) throw new Error("Город не найден");
+
+  const [lon, lat] = location;
+
+  // 2. Маппинг категорий (как в селекте)
+  const categoryMap = {
+    culture: "entertainment.culture",
+    nature: "natural",
+    fun: "entertainment",
+    shopping: "commercial.shopping",
+    food: "catering"
+  };
+
+  const categoryCode = categoryMap[category] || "tourism.sights";
+
+  // 3. Получаем места рядом
+  const placesRes = await fetch(`https://api.geoapify.com/v2/places?categories=${categoryCode}&filter=circle:${lon},${lat},10000&limit=10&lang=ru&apiKey=${apiKey}`);
+  const placesData = await placesRes.json();
+
+  return placesData.features.map(p => ({
+    name: p.properties.name || "Без названия",
+    description: p.properties.details || p.properties.address_line2 || "",
+    city: city.toLowerCase(),
+    category: category,
+    image: `https://source.unsplash.com/300x180/?${category},${city}`
+  }));
+}
+
 
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
@@ -490,6 +526,8 @@ if (placeCategorySelect) {
 
 placeCityInput.setAttribute("autofocus", "autofocus");
 
+
+//метса
 document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -499,63 +537,20 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
   localStorage.setItem("placeCity", city);
   localStorage.setItem("placeCategory", category);
 
-  const dummyPlaces = [
-    { name: "Castelo de São Jorge", description: "Древняя крепость с видом на Лиссабон", city: "лиссабон", category: "culture", image: "https://picsum.photos/300/180?random=1" },
-    { name: "Miradouro da Senhora do Monte", description: "Лучший панорамный вид на город", city: "лиссабон", category: "nature", image: "https://picsum.photos/300/180?random=2" },
-    { name: "Oceanário de Lisboa", description: "Современный океанариум", city: "лиссабон", category: "fun", image: "https://picsum.photos/300/180?random=3" },
-    { name: "Time Out Market", description: "Фудкорт и рынок в центре города", city: "лиссабон", category: "food", image: "https://picsum.photos/300/180?random=4" },
-    { name: "Centro Colombo", description: "Крупный торговый центр", city: "лиссабон", category: "shopping", image: "https://picsum.photos/300/180?random=5" }
-  ];
-
   resultBlock.classList.remove("visible");
   resultBlock.innerHTML = "";
 
-  const filtered = dummyPlaces.filter(p =>
-    (!city || p.city.includes(city)) &&
-    (!category || p.category === category)
-  );
+  fetchPlaces(city, category)
+    .then(places => {
+      if (!places.length) {
+        resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
+        return;
+      }
 
-  if (filtered.length === 0) {
-    resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
-    return;
-  }
+      const firstBatch = places.slice(0, 3);
+      const remaining = places.slice(3);
 
-  const firstBatch = filtered.slice(0, 3);
-  const remaining = filtered.slice(3);
-
-  resultBlock.innerHTML = firstBatch.map(p => {
-    const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-    const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
-    const placeId = `${p.name}-${p.city}`;
-    return `
-      <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-        <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
-        <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-        <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-        <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
-          <button 
-            onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
-            class="text-xl ml-2"
-            data-place-id="${encodeURIComponent(JSON.stringify(p))}"
-          >
-            ${isFav ? "💙" : "🤍"}
-          </button>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  updateHearts("places");
-
-  if (remaining.length > 0) {
-    const moreBtn = document.createElement("button");
-    moreBtn.textContent = "Показать ещё";
-    moreBtn.className = "btn w-full mt-4 bg-blue-500 text-white text-sm rounded py-2 px-4";
-
-    moreBtn.addEventListener("click", () => {
-      const remainingCards = remaining.map(p => {
+      resultBlock.innerHTML = firstBatch.map(p => {
         const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
         const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
         return `
@@ -578,26 +573,64 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
         `;
       }).join("");
 
-      resultBlock.insertAdjacentHTML("beforeend", remainingCards);
-      animateCards("#placesResult .card");
       updateHearts("places");
 
-      setTimeout(() => {
-        const cards = resultBlock.querySelectorAll(".card");
-        cards[3]?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
+      if (remaining.length > 0) {
+        const moreBtn = document.createElement("button");
+        moreBtn.textContent = "Показать ещё";
+        moreBtn.className = "btn w-full mt-4 bg-blue-500 text-white text-sm rounded py-2 px-4";
 
-      moreBtn.remove();
+        moreBtn.addEventListener("click", () => {
+          const remainingCards = remaining.map(p => {
+            const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+            const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
+            return `
+              <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+                <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
+                <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+                <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+                <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+                <div class="flex justify-between items-center mt-2">
+                  <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
+                  <button 
+                    onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
+                    class="text-xl ml-2"
+                    data-place-id="${encodeURIComponent(JSON.stringify(p))}"
+                  >
+                    ${isFav ? "💙" : "🤍"}
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join("");
+
+          resultBlock.insertAdjacentHTML("beforeend", remainingCards);
+          animateCards("#placesResult .card");
+          updateHearts("places");
+
+          setTimeout(() => {
+            const cards = resultBlock.querySelectorAll(".card");
+            cards[3]?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 100);
+
+          moreBtn.remove();
+        });
+
+        resultBlock.appendChild(moreBtn);
+      }
+
+      resultBlock.classList.add("visible");
+      animateCards("#placesResult .card");
+      trackEvent("Поиск мест", { city, category });
+    })
+    .catch(err => {
+      console.error("❌ Ошибка загрузки мест:", err);
+      resultBlock.innerHTML = `<p class="text-sm text-red-500">Ошибка загрузки мест.</p>`;
     });
-
-    resultBlock.appendChild(moreBtn);
-  }
-
-  resultBlock.classList.add("visible");
-  animateCards("#placesResult .card");
-
-  trackEvent("Поиск мест", { city, category });
 });
+
+
+
 
 // ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
