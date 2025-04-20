@@ -150,8 +150,8 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
   function updateReturnDateVisibility() {
     const show = roundTripCheckbox.checked;
 
-    // Показываем или скрываем обёртку
-    returnDateWrapper.classList.toggle("hidden", !show);
+    // Показываем/скрываем безопасно
+    returnDateWrapper.style.display = show ? "block" : "none";
 
     if (show) {
       returnDateInput.removeAttribute("disabled");
@@ -624,4 +624,3 @@ document.getElementById("hotOnly")?.addEventListener("change", (e) => {
     departureInput?.setAttribute("required", "true");
   }
 });
-window.updateReturnDateVisibility = updateReturnDateVisibility;
