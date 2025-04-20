@@ -1,5 +1,6 @@
 const lang = localStorage.getItem("lang") || "ru";
-const t = window.translations?.[lang] || {};
+const t = window.translations[lang] || window.translations["ru"];
+
 const cityNameCache = {};
 
 export async function getCityName(iata, lang = "ru") {
