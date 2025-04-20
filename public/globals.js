@@ -88,6 +88,27 @@ export function showFlightModal(flight) {
   document.getElementById("detailsModal").classList.remove("hidden");
 }
 
+// ✅ Формат времени и длительности
+function formatTime(datetimeStr) {
+  if (!datetimeStr) return "—";
+  const date = new Date(datetimeStr);
+  return date.toLocaleTimeString("ru-RU", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function formatDuration(minutes) {
+  if (!minutes || isNaN(minutes)) return "—";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h}ч ${m}м`;
+}
+
+// 👇 Сделаем глобальными
+window.formatTime = formatTime;
+window.formatDuration = formatDuration;
+
 // 👇 Сделать глобально доступной, если вызываешь из HTML
 window.showFlightModal = showFlightModal;
 
