@@ -69,11 +69,17 @@ export function showFlightModal(flight) {
   const price = flight.price || flight.value || "—";
   const airline = flight.airline || "Авиакомпания";
 
+  const departureTime = formatTime(flight.departure_at);
+  const rawArrival = flight.arrival_at || flight.return_at;
+  const arrivalTime = rawArrival ? formatTime(rawArrival) : "—";
+
   const link = generateAviasalesLink(flight);
 
   const html = `
     <h2 class="text-xl font-semibold mb-2">${from} → ${to}</h2>
     <p class="mb-1 text-gray-700">📅 Дата: ${date}</p>
+    <p class="mb-1 text-gray-700">🕒 Вылет: ${departureTime}</p>
+    <p class="mb-1 text-gray-700">🛬 Прилёт: ${arrivalTime}</p>
     <p class="mb-1 text-gray-700">💺 Авиакомпания: ${airline}</p>
     <p class="mb-3 text-gray-700">💰 Цена: $${price}</p>
     ${link && link !== "#" ? `
