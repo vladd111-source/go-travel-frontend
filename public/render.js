@@ -52,10 +52,10 @@ export async function renderFlights(
   toCity = "—",
   title = "",
   containerId = "hotDeals",
-  clear = true // ← добавили флаг
+  clear = true
 ) {
   const container = document.getElementById(containerId);
-  if (clear) container.innerHTML = ""; // ← очищаем ТОЛЬКО если нужно
+  if (clear) container.innerHTML = "";
 
   if (title) {
     const heading = document.createElement("h3");
@@ -86,8 +86,15 @@ export async function renderFlights(
     const rawDate = flight.date || flight.departure_at || "";
     const date = rawDate.split("T")[0] || "—";
     const departureTime = window.formatTime(flight.departure_at);
-    const rawArrival = flight.return_at || flight.arrival_at;
-    const arrivalTime = rawArrival ? window.formatTime(rawArrival) : "—";
+
+    // 🔧 Расчёт времени прибытия
+    let arrivalTime = "—";
+    if (flight.departure_at && flight.duration) {
+      const departure = new Date(flight.departure_at);
+      const arrival = new Date(departure.getTime() + flight.duration * 60000);
+      arrivalTime = window.formatTime(arrival.toISOString());
+    }
+
     const durationText = window.formatDuration(flight.duration || flight.duration_to || flight.duration_minutes);
     const airline = flight.airline || "Авиакомпания";
     const rawPrice = flight.price || flight.value || 0;
@@ -95,7 +102,7 @@ export async function renderFlights(
 
     const link = generateAviasalesLink(flight);
 
-    const dealData = { from: fromCode, to: toCode, date, price }; // ✅ сохраняем IATA коды
+    const dealData = { from: fromCode, to: toCode, date, price };
     const dealId = encodeURIComponent(JSON.stringify(dealData));
 
     const isFav = favorites.some(f =>
@@ -110,52 +117,53 @@ export async function renderFlights(
       ${isHot ? 'bg-yellow-100 border-yellow-300' : 'bg-white'}
     `.trim();
 
-card.innerHTML = `
-  <h3 class="text-lg font-semibold mb-1">${airline}</h3>
-  <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
-  <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
-  <div class="text-sm text-gray-600 mb-1">⏰ Время: ${departureTime} — ${arrivalTime}</div>
-  <div class="text-sm text-gray-600 mb-1">🕒 В пути: ${durationText}</div>
-  <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
-  ${isHot ? `<div class="text-xs text-orange-600 mt-1">🔥 Горячее предложение</div>` : ""}
-  <div class="flex justify-between items-center gap-2 mt-2">
-    <a href="${link}" target="_blank"
-       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition text-center">
-       Перейти к бронированию
-    </a>
-    <button 
-      onclick="toggleFavoriteFlight('${dealId}', this)" 
-      class="text-2xl text-center text-gray-600 hover:text-blue-600 transition"
-      data-flight-id="${dealId}">
-      ${isFav ? "💙" : "🤍"}
-    </button>
-  </div>
-`;
+    card.innerHTML = `
+      <h3 class="text-lg font-semibold mb-1">${airline}</h3>
+      <div class="text-sm text-gray-600 mb-1">🛫 ${from} → 🛬 ${to}</div>
+      <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
+      <div class="text-sm text-gray-600 mb-1">⏰ Время: ${departureTime} — ${arrivalTime}</div>
+      <div class="text-sm text-gray-600 mb-1">🕒 В пути: ${durationText}</div>
+      <div class="text-sm text-gray-600 mb-1">💰 $${price}</div>
+      ${isHot ? `<div class="text-xs text-orange-600 mt-1">🔥 Горячее предложение</div>` : ""}
+      <div class="flex justify-between items-center gap-2 mt-2">
+        <a href="${link}" target="_blank"
+           class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition text-center">
+           Перейти к бронированию
+        </a>
+        <button 
+          onclick="toggleFavoriteFlight('${dealId}', this)" 
+          class="text-2xl text-center text-gray-600 hover:text-blue-600 transition"
+          data-flight-id="${dealId}">
+          ${isFav ? "💙" : "🤍"}
+        </button>
+      </div>
+    `;
 
     container.appendChild(card);
 
-if (container.id === "favContent-flights") {
-  // 🔧 Подстраховка: если нет departure_at, подставим date
-  if (!flight.departure_at) {
-    flight.departure_at = flight.date || "";
-  }
+    // ❤️ Добавляем кнопку "Подробнее" в избранном
+    if (container.id === "favContent-flights") {
+      if (!flight.departure_at) {
+        flight.departure_at = flight.date || "";
+      }
 
-  const aviaLink = generateAviasalesLink(flight);
+      const aviaLink = generateAviasalesLink(flight);
 
-  const moreBtn = document.createElement("a");
-  moreBtn.textContent = "Подробнее";
-  moreBtn.href = aviaLink;
-  moreBtn.target = "_blank";
-  moreBtn.className = "btn bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-4 rounded transition w-full text-center block mt-2";
-  
-  card.appendChild(moreBtn);
-}
-    
-  if (typeof animateCards === "function") {
-    animateCards(`#${container.id} .card`);
+      const moreBtn = document.createElement("a");
+      moreBtn.textContent = "Подробнее";
+      moreBtn.href = aviaLink;
+      moreBtn.target = "_blank";
+      moreBtn.className = "btn bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-4 rounded transition w-full text-center block mt-2";
+
+      card.appendChild(moreBtn);
+    }
+
+    if (typeof animateCards === "function") {
+      animateCards(`#${container.id} .card`);
     }
   }
 }
+
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
