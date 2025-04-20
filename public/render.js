@@ -76,32 +76,34 @@ export async function renderFlights(
     .sort((a, b) => (a.price || a.value || 0) - (b.price || b.value || 0))
     .slice(0, 10);
 
- for (const flight of topDeals) {
-  const fromCode = flight.from || flight.origin || "—";
-  const toCode = flight.to || flight.destination || "—";
+  for (const flight of topDeals) {
+    const fromCode = flight.from || flight.origin || "—";
+    const toCode = flight.to || flight.destination || "—";
 
-  const from = await getCityName(fromCode, lang);
-  const to = await getCityName(toCode, lang);
+    const from = await getCityName(fromCode, lang);
+    const to = await getCityName(toCode, lang);
 
-  const rawDate = flight.date || flight.departure_at || "";
-  const date = rawDate.split("T")[0] || "—";
-  const departureTime = window.formatTime(flight.departure_at);
+    const rawDate = flight.date || flight.departure_at || "";
+    const date = rawDate.split("T")[0] || "—";
+    const departureTime = window.formatTime(flight.departure_at);
 
-  // ✅ Добавь это: если duration не задан, но есть return_at и departure_at — рассчитай
-  if (!flight.duration && flight.return_at && flight.departure_at) {
-    const dep = new Date(flight.departure_at);
-    const ret = new Date(flight.return_at);
-    flight.duration = Math.round((ret - dep) / 60000); // в минутах
-  }
+    // ✅ Унифицированный duration (из API или вручную)
+    let duration = flight.duration || flight.duration_to || flight.duration_minutes;
+    if (!duration && flight.return_at && flight.departure_at) {
+      const dep = new Date(flight.departure_at);
+      const ret = new Date(flight.return_at);
+      duration = Math.round((ret - dep) / 60000);
+    }
 
-  // 🔧 Расчёт времени прибытия
-  let arrivalTime = "—";
-  if (flight.departure_at && flight.duration) {
-    const departure = new Date(flight.departure_at);
-    const arrival = new Date(departure.getTime() + flight.duration * 60000);
-    arrivalTime = window.formatTime(arrival.toISOString());
-  }
-    const durationText = window.formatDuration(flight.duration || flight.duration_to || flight.duration_minutes);
+    // 🔧 Расчет времени прибытия вручную
+    let arrivalTime = "—";
+    if (flight.departure_at && duration) {
+      const departure = new Date(flight.departure_at);
+      const arrival = new Date(departure.getTime() + duration * 60000);
+      arrivalTime = window.formatTime(arrival.toISOString());
+    }
+
+    const durationText = window.formatDuration(duration);
     const airline = flight.airline || "Авиакомпания";
     const rawPrice = flight.price || flight.value || 0;
     const price = parseFloat(rawPrice);
@@ -147,20 +149,12 @@ export async function renderFlights(
 
     container.appendChild(card);
 
-    // ❤️ Добавляем кнопку "Подробнее" в избранном
     if (container.id === "favContent-flights") {
-      if (!flight.departure_at) {
-        flight.departure_at = flight.date || "";
-      }
-
-      const aviaLink = generateAviasalesLink(flight);
-
       const moreBtn = document.createElement("a");
       moreBtn.textContent = "Подробнее";
-      moreBtn.href = aviaLink;
+      moreBtn.href = link;
       moreBtn.target = "_blank";
       moreBtn.className = "btn bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-4 rounded transition w-full text-center block mt-2";
-
       card.appendChild(moreBtn);
     }
 
