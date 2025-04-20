@@ -64,7 +64,6 @@ function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
 async function fetchPlaces(city, category) {
   const apiKey = "2ec78e694f604853bff3e7cea375dec0";
 
-  // 1. Получаем координаты города
   const geoRes = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(city)}&limit=1&lang=ru&apiKey=${apiKey}`);
   const geoData = await geoRes.json();
   const location = geoData.features?.[0]?.geometry?.coordinates;
@@ -72,7 +71,6 @@ async function fetchPlaces(city, category) {
 
   const [lon, lat] = location;
 
-  // 2. Маппинг категорий (как в селекте)
   const categoryMap = {
     culture: "entertainment.culture",
     nature: "natural",
@@ -80,22 +78,21 @@ async function fetchPlaces(city, category) {
     shopping: "commercial.shopping",
     food: "catering"
   };
-
   const categoryCode = categoryMap[category] || "tourism.sights";
 
-  // 3. Получаем места рядом
   const placesRes = await fetch(`https://api.geoapify.com/v2/places?categories=${categoryCode}&filter=circle:${lon},${lat},10000&limit=10&lang=ru&apiKey=${apiKey}`);
   const placesData = await placesRes.json();
 
-return placesData.features.map(p => ({
-  name: p.properties.name || "Без названия",
-  description: p.properties.details || p.properties.address_line2 || "",
-  city: city.toLowerCase(),
-  category: category,
-  image: `https://source.unsplash.com/300x180/?${category},${city}`,
-  lat: p.geometry.coordinates[1],
-  lon: p.geometry.coordinates[0]
-}));
+  return placesData.features.map(p => ({
+    name: p.properties.name || "Без названия",
+    description: p.properties.details || p.properties.address_line2 || "",
+    address: p.properties.address_line2 || "",  // 🆕 адрес
+    city: city.toLowerCase(),
+    category: category,
+    lat: p.geometry.coordinates[1],
+    lon: p.geometry.coordinates[0],
+    image: `https://source.unsplash.com/300x180/?${category},${city}`
+  }));
 }
 
 
