@@ -174,6 +174,20 @@ if (roundTripCheckbox && returnDateWrapper && returnDateInput) {
 
   updateReturnDateVisibility(); // инициализация при загрузке
 
+  // ✅ Ограничение: дата возврата не может быть раньше даты вылета
+  const departureDateInput = document.getElementById("departureDate");
+  if (departureDateInput && returnDateInput) {
+    departureDateInput.addEventListener("change", () => {
+      const depValue = departureDateInput.value;
+      if (depValue) {
+        returnDateInput.setAttribute("min", depValue);
+        if (returnDateInput.value && returnDateInput.value < depValue) {
+          returnDateInput.value = "";
+        }
+      }
+    });
+  }
+
   roundTripCheckbox.addEventListener("change", () => {
     updateReturnDateVisibility();
     localStorage.setItem("roundTripChecked", roundTripCheckbox.checked ? "1" : "0");
