@@ -84,7 +84,7 @@ async function fetchPlaces(city, category, limit = 10) {
   const categoryCode = categoryMap[category] || "tourism.sights";
 
   // Получаем места
-  const placesRes = await fetch(`https://api.geoapify.com/v2/places?categories=${categoryCode}&bias=proximity:${lon},${lat}&limit=${limit}&lang=ru&apiKey=${geoapifyKey}`);
+ const placesRes = await fetch(`https://api.geoapify.com/v2/places?categories=${categoryCode}&filter=circle:${lon},${lat},5000&limit=${limit}&lang=ru&apiKey=${geoapifyKey}`);
   const placesData = await placesRes.json();
 
   // Функция для получения фото
