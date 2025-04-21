@@ -62,25 +62,6 @@ window.translations = {
   }
 };
 
-async function fetchImage(query) {
-  const apiKey = "49840344-8acca614a34eebb85f73e5ef4";
-  const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&orientation=horizontal&per_page=3`;
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (data.hits && data.hits.length > 0) {
-      return data.hits[0].webformatURL;
-    } else {
-      return "https://picsum.photos/300/180?random=" + Math.floor(Math.random() * 1000);
-    }
-  } catch (err) {
-    console.error("Ошибка загрузки фото:", err);
-    return "https://picsum.photos/300/180?random=" + Math.floor(Math.random() * 1000);
-  }
-}
-
 export function showFlightModal(flight) {
   // 🔧 Подстраховка: если нет departure_at, подставим date
   if (!flight.departure_at) {
