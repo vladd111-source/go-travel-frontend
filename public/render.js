@@ -1,7 +1,7 @@
 // 📦 ВСТАВЬ В САМЫЙ ВЕРХ ФАЙЛА render.js (до любого кода)
 const TP_MARKER = '618281';
 
-function generateTripLink(hotel) {
+export function generateTripLink(hotel) {
   if (!hotel) return '#';
 
   if (hotel.partner === 'trip.com' || hotel.source === 'trip.com') {
