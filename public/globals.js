@@ -621,7 +621,4 @@ function trackHotelClick(url, name, city, price, source) {
   });
 }
 window.trackHotelClick = trackHotelClick;
-// Открываем доступ к этим функциям глобально
-window.showLoading = showLoading;
-window.hideLoading = hideLoading;
-window.trackEvent = trackEvent;
+
