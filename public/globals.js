@@ -607,3 +607,17 @@ window.addEventListener("DOMContentLoaded", async () => {
     localStorage.setItem("hotDealsShown", "1");
   }
 });
+function trackHotelClick(url, name, city, price, source) {
+  const telegramId = window.initDataUnsafe?.user?.id || 'unknown';
+
+  trackEvent('click_hotel_booking', {
+    telegram_id: telegramId,
+    hotel_name: name,
+    city: city,
+    price: price,
+    source: source,
+    url: url,
+    timestamp: new Date().toISOString()
+  });
+}
+window.trackHotelClick = trackHotelClick;
