@@ -322,9 +322,8 @@ export function renderFavoriteHotels() {
 
 // Сделать функции глобально доступными
 window.generateAviasalesLink = generateAviasalesLink;
-//window.generateTripLink = generateTripLink;
 
-window.trackHotelClick = function(url, name, city, price, source) {
+export function trackHotelClick(url, name, city, price, source) {
   const telegramId = window.initDataUnsafe?.user?.id || 'unknown';
 
   trackEvent('click_hotel_booking', {
@@ -336,4 +335,6 @@ window.trackHotelClick = function(url, name, city, price, source) {
     url: url,
     timestamp: new Date().toISOString()
   });
-};
+}
+window.trackHotelClick = trackHotelClick;
+
