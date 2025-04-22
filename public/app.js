@@ -1,3 +1,4 @@
+const translations = window.translations;
 import {
   renderHotels,
   renderFlights,
