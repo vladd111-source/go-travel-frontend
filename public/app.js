@@ -10,9 +10,9 @@ import {
 const iataCache = {};
 
 async function getIataCode(city) {
-  const lang = localStorage.getItem("lang") || "ru"; // ← язык из локалки
+  const lang = localStorage.getItem("lang") || "ru";
   const normalized = city.trim().toLowerCase();
-  const cacheKey = `${normalized}_${lang}`; // ← язык добавлен в ключ кэша
+  const cacheKey = `${normalized}_${lang}`;
 
   if (iataCache[cacheKey]) return iataCache[cacheKey];
 
@@ -38,7 +38,6 @@ async function getIataCode(city) {
 
 let lastSearchTime = 0;
 
-// 🔁 Повтор при 429 (без async/await)
 function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
   return new Promise((resolve, reject) => {
     function attempt(tryIndex, currentDelay) {
@@ -66,6 +65,8 @@ function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
     attempt(0, backoff);
   });
 }
+
+window.translations = window.translations || {};
 
 
 // ✅ DOMContentLoaded и инициализация приложения
