@@ -1,14 +1,17 @@
 // 📦 ВСТАВЬ В САМЫЙ ВЕРХ ФАЙЛА render.js (до любого кода)
 const TP_MARKER = '618281';
 
-// ✨ ДОБАВЬ ЭТУ ФУНКЦИЮ ВНИЗУ render.js или рядом с renderHotels
 function generateTripLink(hotel) {
+  if (!hotel) return '#';
+
   if (hotel.partner === 'trip.com' || hotel.source === 'trip.com') {
-    const encoded = encodeURIComponent(hotel.link);
+    const encoded = encodeURIComponent(hotel.link || '');
     return `https://tp.media/r?marker=${TP_MARKER}&url=${encoded}`;
   }
+
   return hotel.deep_link || '#';
 }
+
 // ✅ Переводы (перенесено из app.js сюда)
 window.translations = {
   ru: {
@@ -226,7 +229,12 @@ export function renderHotels(hotels) {
       <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
       <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price}</p>
       <div class="flex justify-between items-center mt-2">
-        <a href="${bookingUrl}" target="_blank" class="btn btn-blue text-sm">${t.bookNow || 'Забронировать'}</a>
+        <a href="${bookingUrl}" 
+   target="_blank" 
+   class="btn btn-blue text-sm"
+   onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source}')">
+  ${t.bookNow || 'Забронировать'}
+</a>
         <button 
           onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" 
           class="text-xl ml-2"
@@ -266,5 +274,52 @@ export function renderPlaces(places) {
     container.appendChild(card);
   });
 }
+
+export function renderFavoriteHotels() {
+  const container = document.getElementById("favContent-hotels");
+  container.innerHTML = "";
+
+  const favorites = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  if (!favorites.length) {
+    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Нет избранных отелей</div>`;
+    return;
+  }
+
+  favorites.forEach((hotel) => {
+    const card = document.createElement("div");
+    card.className =
+      "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300";
+
+    const bookingUrl = generateTripLink(hotel);
+    const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
+
+    card.innerHTML = `
+      <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
+      <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
+      <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price}</p>
+      <div class="flex justify-between items-center mt-2">
+       <a href="${bookingUrl}" 
+   target="_blank" 
+   class="btn btn-blue text-sm"
+   onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source}')">
+  ${t.bookNow || 'Забронировать'}
+</a>
+        <button 
+          onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" 
+          class="text-xl ml-2"
+          data-hotel-id="${encodedHotel}">
+          💙
+        </button>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+
+  animateCards("#favContent-hotels .card");
+}
+
 // Сделать функции глобально доступными
 window.generateAviasalesLink = generateAviasalesLink;
+window.generateTripLink = generateTripLink;
