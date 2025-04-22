@@ -1,4 +1,3 @@
-const TP_MARKER = '618281';
 import { renderFlights, renderHotels, renderPlaces } from './render.js';
 
 const iataCache = {};
