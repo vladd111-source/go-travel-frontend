@@ -621,4 +621,4 @@ function trackHotelClick(url, name, city, price, source) {
   });
 }
 window.trackHotelClick = trackHotelClick;
-
+export { showLoading, hideLoading };
