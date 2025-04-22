@@ -67,6 +67,18 @@ function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
 }
 
 window.translations = window.translations || {};
+window.translations = {
+  ru: {
+    hotelResults: "Результаты отелей",
+    noHotelsFound: "Отели не найдены.",
+    bookNow: "Забронировать"
+  },
+  en: {
+    hotelResults: "Hotel Results",
+    noHotelsFound: "No hotels found.",
+    bookNow: "Book Now"
+  }
+};
 
 
 // ✅ DOMContentLoaded и инициализация приложения
