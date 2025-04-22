@@ -257,7 +257,7 @@ if (hotelCityInput) {
           (!city || h.city.toLowerCase().includes(city.toLowerCase()))
         );
 
-        const t = translations[window._appLang];
+       const t = window.translations?.[window._appLang] || {};
         const resultBlock = document.getElementById("hotelsResult");
         resultBlock.classList.remove("visible");
 
