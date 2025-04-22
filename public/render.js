@@ -197,6 +197,7 @@ const t = window.translations[lang];
   }
 }
 
+// 🔄 ОБНОВЛЕННАЯ renderHotels()
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
