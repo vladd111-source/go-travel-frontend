@@ -1,4 +1,4 @@
-const translations = window.translations;
+
 import {
   renderHotels,
   renderFlights,
@@ -72,6 +72,7 @@ function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
   try {
+    const translations = window.translations;
     // ✅ Telegram init
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
