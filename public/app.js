@@ -1,4 +1,11 @@
-import { renderFlights, renderHotels, renderPlaces } from './render.js';
+import {
+  renderHotels,
+  renderFlights,
+  renderPlaces,
+  renderFavoriteHotels,
+  trackHotelClick,
+  generateTripLink,
+} from './render.js';
 
 const iataCache = {};
 
