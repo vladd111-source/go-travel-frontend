@@ -323,3 +323,17 @@ export function renderFavoriteHotels() {
 // Сделать функции глобально доступными
 window.generateAviasalesLink = generateAviasalesLink;
 window.generateTripLink = generateTripLink;
+
+window.trackHotelClick = function(url, name, city, price, source) {
+  const telegramId = window.initDataUnsafe?.user?.id || 'unknown';
+
+  trackEvent('click_hotel_booking', {
+    telegram_id: telegramId,
+    hotel_name: name,
+    city: city,
+    price: price,
+    source: source,
+    url: url,
+    timestamp: new Date().toISOString()
+  });
+};
