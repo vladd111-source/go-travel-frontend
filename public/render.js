@@ -1,3 +1,14 @@
+// 📦 ВСТАВЬ В САМЫЙ ВЕРХ ФАЙЛА render.js (до любого кода)
+const TP_MARKER = '618281';
+
+// ✨ ДОБАВЬ ЭТУ ФУНКЦИЮ ВНИЗУ render.js или рядом с renderHotels
+function generateTripLink(hotel) {
+  if (hotel.partner === 'trip.com' || hotel.source === 'trip.com') {
+    const encoded = encodeURIComponent(hotel.link);
+    return `https://tp.media/r?marker=${TP_MARKER}&url=${encoded}`;
+  }
+  return hotel.deep_link || '#';
+}
 // ✅ Переводы (перенесено из app.js сюда)
 window.translations = {
   ru: {
@@ -195,21 +206,42 @@ export function renderHotels(hotels) {
     return;
   }
 
-  hotels.forEach(hotel => {
+  const lang = localStorage.getItem("lang") || "ru";
+  const t = window.translations?.[lang] || {};
+
+  hotels.forEach((hotel) => {
     const card = document.createElement("div");
-    card.className = "card bg-white p-4 rounded-xl shadow mb-4";
+    card.className =
+      "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300";
+
+    const bookingUrl = generateTripLink(hotel);
+    const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
+    const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+    const isFav = favHotels.some(f => f.name === hotel.name && f.city === hotel.city);
 
     card.innerHTML = `
       <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
       <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
       <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price}</p>
+      <div class="flex justify-between items-center mt-2">
+        <a href="${bookingUrl}" target="_blank" class="btn btn-blue text-sm">${t.bookNow || 'Забронировать'}</a>
+        <button 
+          onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" 
+          class="text-xl ml-2"
+          data-hotel-id="${encodedHotel}">
+          ${isFav ? '💙' : '🤍'}
+        </button>
+      </div>
     `;
 
     container.appendChild(card);
   });
+
+  animateCards("#hotelsResult .card");
 }
 
+//Места
 export function renderPlaces(places) {
   const container = document.getElementById("placesResult");
   container.innerHTML = "";
