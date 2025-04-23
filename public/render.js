@@ -218,13 +218,14 @@ export function renderHotels(hotels) {
     card.className =
       "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300";
 
-    const bookingUrl = generateTripLink(hotel);
+    const bookingUrl = generateTripLink(hotel) || "#";
+    const imageUrl = hotel.image || `https://photo.hotellook.com/image_v2/limit/${hotel.id}/800/520.auto`;
     const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
     const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
     const isFav = favHotels.some(f => f.name === hotel.name && f.city === hotel.city);
 
     card.innerHTML = `
-      ${hotel.image ? `<img src="${hotel.image}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover" />` : ""}
+      <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover" />
       <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
       <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
@@ -233,7 +234,7 @@ export function renderHotels(hotels) {
         <a href="${bookingUrl}" 
            target="_blank" 
            class="btn btn-blue text-sm"
-           onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source}')">
+           onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')">
           ${t.bookNow || 'Забронировать'}
         </a>
         <button 
