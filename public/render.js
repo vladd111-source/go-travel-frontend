@@ -182,10 +182,11 @@ const t = window.translations[lang];
   <div class="text-sm text-gray-600 mb-1">🕒 ${t.duration || "В пути"}: ${durationText}</div>
   <div class="text-lg font-bold text-gray-800 mb-1">💰 $${price}</div>
   <div class="flex justify-between items-center gap-2 mt-2">
-    <a href="${link}" target="_blank"
-       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition text-center">
-       ${t.bookNow || "Перейти к бронированию"}
-    </a>
+   <button 
+  onclick="openHotelLink('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')" 
+  class="btn btn-blue text-sm w-full rounded-xl">
+  ${t.bookNow || 'Забронировать'}
+</button>
     <button 
       onclick="toggleFavoriteFlight('${dealId}', this)" 
       class="text-2xl text-center text-gray-600 hover:text-blue-600 transition"
