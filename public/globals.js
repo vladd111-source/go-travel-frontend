@@ -362,11 +362,15 @@ window.toggleFavoriteFlight = function (encodedDeal, btn) {
   });
 };
 
+
+
+
 export function toggleFavoriteHotel(hotel, btn) {
   const key = "favorites_hotels";
   let favorites = JSON.parse(localStorage.getItem(key) || "[]");
 
   const exists = favorites.some(h => h.name === hotel.name && h.city === hotel.city && h.price === hotel.price);
+
   if (exists) {
     favorites = favorites.filter(h => !(h.name === hotel.name && h.city === hotel.city && h.price === hotel.price));
     btn.textContent = "🤍";
@@ -380,10 +384,11 @@ export function toggleFavoriteHotel(hotel, btn) {
     action: exists ? "удалено" : "добавлено",
     name: hotel.name,
     city: hotel.city,
-    price: hotel.price,
+    price: hotel.price
   });
-};
+}
 
+window.toggleFavoriteHotel = toggleFavoriteHotel;
 
 
 
