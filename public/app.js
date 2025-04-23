@@ -298,7 +298,8 @@ if (hotelCityInput) {
           }).join("") : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
         );
 
-        updateHotelHearts();
+        updateHearts("hotels");
+        
         resultBlock.classList.add("visible");
         animateCards("#hotelsResult .card");
 
