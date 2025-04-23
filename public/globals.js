@@ -62,6 +62,14 @@ window.translations = {
   }
 };
 
+export function generateTripLink(hotel) {
+  const base = "https://www.hotellook.com";
+  const query = `?location=${encodeURIComponent(hotel.city)}&name=${encodeURIComponent(hotel.name)}`;
+  const encodedUrl = encodeURIComponent(base + query);
+
+  return `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodedUrl}&campaign_id=101`;
+}
+
 export function showFlightModal(flight) {
   // 🔧 Подстраховка: если нет departure_at, подставим date
   if (!flight.departure_at) {
