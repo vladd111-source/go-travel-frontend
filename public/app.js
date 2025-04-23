@@ -303,9 +303,9 @@ if (hotelCityInput) {
                     Рейтинг: ${h.rating}
                     <div class="flex justify-between items-center mt-2">
                       <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
-                      <button 
+                     <button 
   class="text-xl ml-2"
-  data-hotel='${encodeURIComponent(JSON.stringify(h))}' 
+  data-hotel='${JSON.stringify(h).replace(/'/g, "&apos;")}' 
   data-hotel-id="${hotelId}"
   onclick="toggleFavoriteHotelFromAttr(this)">
   ${isFav ? "💙" : "🤍"}
