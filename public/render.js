@@ -222,10 +222,13 @@ export function renderHotels(hotels) {
     return;
   }
 
+  const lang = localStorage.getItem("lang") || "ru";
+  const t = window.translations?.[lang] || {};
+
   hotels.forEach((hotel) => {
     const card = document.createElement("div");
     card.className =
-      "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300";
+      "card bg-white p-4 rounded-2xl shadow-lg mb-5 opacity-0 scale-95 transform transition-all duration-300";
 
     const bookingUrl = generateTripLink(hotel);
     const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
@@ -239,27 +242,29 @@ export function renderHotels(hotels) {
     );
 
     card.innerHTML = `
-      <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover" />
-      <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
-      <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
-      <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
-      <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price}</p>
-      <div class="flex justify-between items-center mt-2">
-        <a 
-          href="${bookingUrl}" 
-          target="_blank" 
-          class="btn btn-blue text-sm"
-          onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')"
-        >
-          ${t.bookNow || 'Забронировать'}
-        </a>
+      <img src="${imageUrl}" alt="${hotel.name}" class="rounded-xl mb-3 w-full h-48 object-cover shadow-sm" />
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-1">${hotel.name}</h3>
+          <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
+          <p class="text-sm text-gray-600 mb-1">💰 $${hotel.price} / ночь</p>
+          <p class="text-sm text-yellow-500 font-medium">⭐ Рейтинг: ${hotel.rating}</p>
+        </div>
         <button 
           onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" 
-          class="text-xl ml-2"
+          class="text-2xl ml-2"
           data-hotel-id="${encodedHotel}">
           ${isFav ? '💙' : '🤍'}
         </button>
       </div>
+      <a 
+        href="${bookingUrl}" 
+        target="_blank" 
+        class="mt-3 block text-center btn btn-blue text-sm w-full rounded-xl"
+        onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')"
+      >
+        ${t.bookNow || 'Забронировать'}
+      </a>
     `;
 
     container.appendChild(card);
