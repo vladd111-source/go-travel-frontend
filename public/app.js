@@ -1,4 +1,4 @@
-import { showLoading, hideLoading } from './globals.js';
+import { showLoading, hideLoading, toggleFavoriteHotel } from './globals.js';
 import {
   renderHotels,
   renderFlights,
