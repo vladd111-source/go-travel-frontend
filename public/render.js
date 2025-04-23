@@ -259,13 +259,14 @@ export function renderHotels(hotels) {
         </button>
       </div>
       <a 
-        href="${bookingUrl}" 
-        target="_blank" 
-        class="mt-3 block text-center btn btn-blue text-sm w-full rounded-xl"
-        onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')"
-      >
-        ${t.bookNow || 'Забронировать'}
-      </a>
+  href="${bookingUrl}" 
+  target="_blank" 
+  class="btn btn-blue text-sm w-full rounded-xl mt-2"
+  onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')"
+  type="button"  <!-- 🔥 ДОБАВЬ ЭТО -->
+>
+  ${t.bookNow || 'Забронировать'}
+</a>
     `;
 
     container.appendChild(card);
