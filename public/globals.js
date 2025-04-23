@@ -393,13 +393,14 @@ window.toggleFavoriteHotel = toggleFavoriteHotel;
 // ✅ Обёртка для кнопок с data-hotel, безопасная с encodeURIComponent
 window.toggleFavoriteHotelFromAttr = function (btn) {
   try {
-    const hotel = JSON.parse(decodeURIComponent(btn.dataset.hotel));
+    const raw = decodeURIComponent(btn.dataset.hotel);
+    console.log("🧩 Раскодированный hotel:", raw); // ← ВОТ ТУТ
+    const hotel = JSON.parse(raw);
     toggleFavoriteHotel(hotel, btn);
   } catch (err) {
     console.error("❌ Ошибка обновления сердечка [hotels]:", err);
   }
 };
-
 
 // 👉 Форматирование деталей
 window.formatDetails = function(type, item) {
