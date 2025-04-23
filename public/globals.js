@@ -362,6 +362,33 @@ window.toggleFavoriteFlight = function (encodedDeal, btn) {
   });
 };
 
+window.toggleFavoriteHotel = function (hotel, btn) {
+  const key = "favorites_hotels";
+  let favorites = JSON.parse(localStorage.getItem(key) || "[]");
+
+  const exists = favorites.some(h => h.name === hotel.name && h.city === hotel.city && h.price === hotel.price);
+  if (exists) {
+    favorites = favorites.filter(h => !(h.name === hotel.name && h.city === hotel.city && h.price === hotel.price));
+    btn.textContent = "🤍";
+  } else {
+    favorites.push(hotel);
+    btn.textContent = "💙";
+  }
+
+  localStorage.setItem(key, JSON.stringify(favorites));
+  trackEvent?.("Избранное: отель", {
+    action: exists ? "удалено" : "добавлено",
+    name: hotel.name,
+    city: hotel.city,
+    price: hotel.price,
+  });
+};
+
+
+
+
+
+
 // 👉 Форматирование деталей
 window.formatDetails = function(type, item) {
   const t = translations?.[window._appLang] || {};
