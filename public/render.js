@@ -1,4 +1,4 @@
-// 📦 ВСТАВЬ В САМЫЙ ВЕРХ ФАЙЛА render.js (до любого кода)
+import { generateTripLink } from "./globals.js";
 const TP_MARKER = '618281';
 
 export function generateTripLink(hotel) {
