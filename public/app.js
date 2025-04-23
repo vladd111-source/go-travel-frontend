@@ -260,7 +260,7 @@ if (hotelCityInput) {
     const maxPrice = parseFloat(priceRange.value) || Infinity;
     const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
-    fetch("https://go-travel-backend.vercel.app/api/hotels")
+    fetch(`https://go-travel-backend.vercel.app/api/hotels?city=${encodeURIComponent(city)}`)
       .then(res => res.json())
       .then(hotels => {
         const filtered = hotels.filter(h =>
