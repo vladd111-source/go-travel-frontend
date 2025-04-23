@@ -62,6 +62,16 @@ window.translations = {
   }
 };
 
+window.openHotelLink = function(url, name, city, price, source) {
+  if (Telegram?.WebApp?.openLink) {
+    Telegram.WebApp.openLink(url);
+  } else {
+    window.open(url, "_blank");
+  }
+
+  trackHotelClick(url, name, city, price, source);
+};
+
 export function generateTripLink(hotel) {
   const base = "https://www.hotellook.com";
   const query = `?location=${encodeURIComponent(hotel.city)}&name=${encodeURIComponent(hotel.name)}`;
