@@ -255,27 +255,35 @@ if (hotelCityInput) {
     showLoading();
 
     const city = hotelCityInput.value.trim();
-    localStorage.setItem("lastHotelCity", city);
-
+    const checkIn = document.getElementById("checkIn")?.value || "";
+    const checkOut = document.getElementById("checkOut")?.value || "";
     const maxPrice = parseFloat(priceRange.value) || Infinity;
     const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
-    fetch(`https://go-travel-backend.vercel.app/api/hotels?city=${encodeURIComponent(city)}`)
-    .then(res => res.json())
-.then(data => {
-  console.log("🧾 Ответ от API:", data);
+    localStorage.setItem("lastHotelCity", city);
 
-  if (!Array.isArray(data)) {
-    throw new Error("API вернул не массив отелей");
-  }
+    const query = new URLSearchParams({
+      city,
+      checkIn,
+      checkOut
+    }).toString();
 
-  const filtered = data.filter(h =>
-    h.price <= maxPrice &&
-    h.rating >= minRating &&
-    (!city || h.city.toLowerCase().includes(city.toLowerCase()))
-  );
+    fetch(`https://go-travel-backend.vercel.app/api/hotels?${query}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("🧾 Ответ от API:", data);
 
-       const t = window.translations?.[window._appLang] || {};
+        if (!Array.isArray(data)) {
+          throw new Error("API вернул не массив отелей");
+        }
+
+        const filtered = data.filter(h =>
+          h.price <= maxPrice &&
+          h.rating >= minRating &&
+          (!city || h.city.toLowerCase().includes(city.toLowerCase()))
+        );
+
+        const t = window.translations?.[window._appLang] || {};
         const resultBlock = document.getElementById("hotelsResult");
         resultBlock.classList.remove("visible");
 
@@ -305,12 +313,13 @@ if (hotelCityInput) {
         );
 
         updateHearts("hotels");
-        
         resultBlock.classList.add("visible");
         animateCards("#hotelsResult .card");
 
         trackEvent("Поиск отеля", {
           city,
+          checkIn,
+          checkOut,
           maxPrice,
           minRating,
           resultCount: filtered.length
