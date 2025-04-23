@@ -200,7 +200,7 @@ const t = window.translations[lang];
   }
 }
 
-// 🔄 ОБНОВЛЕННАЯ renderHotels()
+// 🔄 ОБНОВЛЕННАЯ renderHotels() с изображениями
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
@@ -224,17 +224,18 @@ export function renderHotels(hotels) {
     const isFav = favHotels.some(f => f.name === hotel.name && f.city === hotel.city);
 
     card.innerHTML = `
+      ${hotel.image ? `<img src="${hotel.image}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover" />` : ""}
       <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
       <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
       <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price}</p>
       <div class="flex justify-between items-center mt-2">
         <a href="${bookingUrl}" 
-   target="_blank" 
-   class="btn btn-blue text-sm"
-   onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source}')">
-  ${t.bookNow || 'Забронировать'}
-</a>
+           target="_blank" 
+           class="btn btn-blue text-sm"
+           onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source}')">
+          ${t.bookNow || 'Забронировать'}
+        </a>
         <button 
           onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" 
           class="text-xl ml-2"
