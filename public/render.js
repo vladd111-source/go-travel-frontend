@@ -213,8 +213,8 @@ const t = window.translations[lang];
   }
 }
 
-// 🔄 ОБНОВЛЕННАЯ renderHotels() с изображениями и ссылками
-export function renderHotels(hotels) {
+// 🔄 ОБНОВЛЕННАЯ renderHotels() с полной ценой и адаптивностью
+export function renderHotels(hotels, checkIn, checkOut) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
 
@@ -223,13 +223,17 @@ export function renderHotels(hotels) {
     return;
   }
 
-  const lang = localStorage.getItem("lang") || "ru";
-  const t = window.translations?.[lang] || {};
+  const nights = (() => {
+    const inDate = new Date(checkIn);
+    const outDate = new Date(checkOut);
+    const diff = (outDate - inDate) / (1000 * 60 * 60 * 24);
+    return Math.max(1, diff);
+  })();
 
   hotels.forEach((hotel) => {
     const card = document.createElement("div");
     card.className =
-      "card bg-white p-4 rounded-2xl shadow-lg mb-5 opacity-0 scale-95 transform transition-all duration-300";
+      "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300 sm:flex sm:items-start sm:gap-4";
 
     const bookingUrl = generateTripLink(hotel);
     const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
@@ -242,31 +246,33 @@ export function renderHotels(hotels) {
         : "https://via.placeholder.com/800x520?text=Hotel"
     );
 
+    const totalPrice = hotel.price * nights;
+
     card.innerHTML = `
-      <img src="${imageUrl}" alt="${hotel.name}" class="rounded-xl mb-3 w-full h-48 object-cover shadow-sm" />
-      <div class="flex justify-between items-start">
-        <div>
-          <h3 class="text-lg font-semibold text-gray-800 mb-1">${hotel.name}</h3>
-          <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
-          <p class="text-sm text-gray-600 mb-1">💰 $${hotel.price} / ночь</p>
-          <p class="text-sm text-yellow-500 font-medium">⭐ Рейтинг: ${hotel.rating}</p>
+      <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover sm:w-64 sm:h-auto" />
+      <div class="flex-1">
+        <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
+        <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
+        <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
+        <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price} / ночь</p>
+        <p class="text-xs text-gray-400 italic mb-2">Итого за ${nights} ноч${nights === 1 ? 'ь' : nights < 5 ? 'и' : 'ей'} — $${totalPrice.toFixed(2)}</p>
+        <div class="flex justify-between items-center mt-2">
+          <a 
+            href="${bookingUrl}" 
+            target="_blank" 
+            class="btn btn-blue text-sm"
+            onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')"
+          >
+            ${t.bookNow || 'Забронировать'}
+          </a>
+          <button 
+            onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" 
+            class="text-xl ml-2"
+            data-hotel-id="${encodedHotel}">
+            ${isFav ? '💙' : '🤍'}
+          </button>
         </div>
-        <button 
-          onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" 
-          class="text-2xl ml-2"
-          data-hotel-id="${encodedHotel}">
-          ${isFav ? '💙' : '🤍'}
-        </button>
       </div>
-      <a 
-  href="${bookingUrl}" 
-  target="_blank" 
-  class="btn btn-blue text-sm w-full rounded-xl mt-2"
-  onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')"
-  type="button"  <!-- 🔥 ДОБАВЬ ЭТО -->
->
-  ${t.bookNow || 'Забронировать'}
-</a>
     `;
 
     container.appendChild(card);
@@ -274,6 +280,7 @@ export function renderHotels(hotels) {
 
   animateCards("#hotelsResult .card");
 }
+
 
 //Места
 export function renderPlaces(places) {
