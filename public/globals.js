@@ -393,7 +393,8 @@ window.toggleFavoriteHotel = toggleFavoriteHotel;
 // ✅ Обёртка для кнопок с data-hotel
 window.toggleFavoriteHotelFromAttr = function (btn) {
   try {
-    const hotel = JSON.parse(decodeURIComponent(btn.dataset.hotel));
+    const hotelRaw = btn.dataset.hotel.replace(/&apos;/g, "'");
+    const hotel = JSON.parse(hotelRaw);
     toggleFavoriteHotel(hotel, btn);
   } catch (err) {
     console.error("❌ Ошибка обновления сердечка [hotels]:", err);
