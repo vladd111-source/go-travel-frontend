@@ -1,39 +1,43 @@
-import { generateTripLink as baseGenerateTripLink } from "./globals.js";
+import { generateTripLink } from "./globals.js";
 const TP_MARKER = '618281';
 
-// ✅ Обновлённая функция генерации партнёрской ссылки
 export function generateTripLink(hotel) {
   if (!hotel) return '#';
 
-  // Если есть прямой партнёр Trip.com — приоритизируем его ссылку
-  if (hotel.partner === 'trip.com' || hotel.source === 'trip.com') {
-    const encoded = encodeURIComponent(hotel.link || 'https://hotellook.com');
+  if (hotel.link) {
+    const encoded = encodeURIComponent(hotel.link);
     return `https://tp.media/r?marker=${TP_MARKER}&url=${encoded}`;
   }
 
-  // По умолчанию — ссылка на hotellook или #
+  if (hotel.partner === 'trip.com' || hotel.source === 'trip.com') {
+    const encoded = encodeURIComponent(hotel.deep_link || '');
+    return `https://tp.media/r?marker=${TP_MARKER}&url=${encoded}`;
+  }
+
   return hotel.deep_link || '#';
 }
 
-// ✅ Переводы (перенесено из app.js сюда с защитой от конфликтов)
-window.translations = window.translations || {};
-window.translations.ru = {
-  time: "Время",
-  duration: "В пути",
-  hotDeal: "Горячее предложение",
-  bookNow: "Перейти к бронированию"
-};
-window.translations.en = {
-  time: "Time",
-  duration: "Duration",
-  hotDeal: "Hot deal",
-  bookNow: "Book now"
-};
+// ✅ Переводы (перенесено из app.js сюда)
+if (!window.translations) {
+  window.translations = {
+    ru: {
+      time: "Время",
+      duration: "В пути",
+      hotDeal: "Горячее предложение",
+      bookNow: "Перейти к бронированию"
+    },
+    en: {
+      time: "Time",
+      duration: "Duration",
+      hotDeal: "Hot deal",
+      bookNow: "Book now"
+    }
+  };
+}
 
 const lang = localStorage.getItem("lang") || "ru";
 const t = window.translations[lang] || window.translations["ru"];
 
-// Кеш для IATA-городов
 const cityNameCache = {};
 
 export async function getCityName(iata, lang = "ru") {
