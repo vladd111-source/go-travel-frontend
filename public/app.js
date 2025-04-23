@@ -280,36 +280,44 @@ document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
       const resultBlock = document.getElementById("hotelsResult");
       resultBlock.classList.remove("visible");
 
-      resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-        data.length
-          ? data.map(h => {
-              const hotelId = `${h.name}-${h.city}-${h.price}`;
-              const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-              const isFav = favHotels.some(fav => fav.name === h.name && fav.city === h.city && fav.price === h.price);
+    resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+  data.length
+    ? data.map(h => {
+        const hotelId = `${h.name}-${h.city}-${h.price}`;
+        const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+        const isFav = favHotels.some(fav => fav.name === h.name && fav.city === h.city && fav.price === h.price);
+        const bookingUrl = generateTripLink(h);
 
-              return `
-                <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
-                  <strong>${h.name}</strong> (${h.city})<br>
-                  Цена: $${h.price} / ночь<br>
-                  Рейтинг: ${h.rating}
-                  <div class="flex justify-between items-center mt-2">
-                    <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
-                    <button 
-                      class="text-xl ml-2"
-                      onclick='toggleFavoriteHotel({
-                        name: "${h.name}",
-                        city: "${h.city}",
-                        price: ${h.price},
-                        rating: ${h.rating}
-                      }, this)'>
-                      ${isFav ? "💙" : "🤍"}
-                    </button>
-                  </div>
-                </div>
-              `;
-            }).join("")
-          : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-      );
+        return `
+          <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
+            <strong>${h.name}</strong> (${h.city})<br>
+            Цена: $${h.price} / ночь<br>
+            Рейтинг: ${h.rating}
+            <div class="flex justify-between items-center mt-2">
+              <a 
+                href="${bookingUrl}" 
+                target="_blank" 
+                class="btn text-sm bg-blue-600 text-white rounded px-3 py-1"
+                onclick="trackHotelClick('${bookingUrl}', '${h.name}', '${h.city}', '${h.price}', '${h.partner || h.source || 'N/A'}')"
+              >
+                ${t.bookNow}
+              </a>
+              <button 
+                class="text-xl ml-2"
+                onclick='toggleFavoriteHotel({
+                  name: "${h.name}",
+                  city: "${h.city}",
+                  price: ${h.price},
+                  rating: ${h.rating}
+                }, this)'>
+                ${isFav ? "💙" : "🤍"}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("")
+    : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+);
 
       updateHearts("hotels");
       resultBlock.classList.add("visible");
