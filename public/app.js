@@ -245,7 +245,8 @@ if (priceRange) {
 document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
   e.preventDefault();
   showLoading();
-
+  
+  const hotelCityInput = document.getElementById("hotelCity");
   const city = hotelCityInput.value.trim();
   const checkIn = document.getElementById("checkIn")?.value || "";
   const checkOut = document.getElementById("checkOut")?.value || "";
