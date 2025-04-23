@@ -1,23 +1,25 @@
-import { generateTripLink } from "./globals.js";
 const TP_MARKER = '618281';
 
 export function generateTripLink(hotel) {
   if (!hotel) return '#';
 
+  // Приоритет — явная ссылка
   if (hotel.link) {
     const encoded = encodeURIComponent(hotel.link);
     return `https://tp.media/r?marker=${TP_MARKER}&url=${encoded}`;
   }
 
+  // Альтернатива — partner trip.com
   if (hotel.partner === 'trip.com' || hotel.source === 'trip.com') {
     const encoded = encodeURIComponent(hotel.deep_link || '');
     return `https://tp.media/r?marker=${TP_MARKER}&url=${encoded}`;
   }
 
+  // Fallback
   return hotel.deep_link || '#';
 }
 
-// ✅ Переводы (перенесено из app.js сюда)
+// ✅ Переводы (если не определены)
 if (!window.translations) {
   window.translations = {
     ru: {
@@ -35,9 +37,11 @@ if (!window.translations) {
   };
 }
 
-const lang = localStorage.getItem("lang") || "ru";
-const t = window.translations[lang] || window.translations["ru"];
+// Текущий язык
+export const lang = localStorage.getItem("lang") || "ru";
+export const t = window.translations[lang] || window.translations["ru"];
 
+// Кэш IATA-городов
 const cityNameCache = {};
 
 export async function getCityName(iata, lang = "ru") {
