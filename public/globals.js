@@ -390,17 +390,6 @@ export function toggleFavoriteHotel(hotel, btn) {
 
 window.toggleFavoriteHotel = toggleFavoriteHotel;
 
-// ✅ Обёртка для кнопок с data-hotel, безопасная с encodeURIComponent
-window.toggleFavoriteHotelFromAttr = function (btn) {
-  try {
-    const hotelRaw = btn.dataset.hotel.replace(/&quot;/g, '"');
-    const hotel = JSON.parse(hotelRaw);
-    toggleFavoriteHotel(hotel, btn);
-  } catch (err) {
-    console.error("❌ Ошибка парсинга data-hotel:", err);
-  }
-};
-
 // 👉 Форматирование деталей
 window.formatDetails = function(type, item) {
   const t = translations?.[window._appLang] || {};
