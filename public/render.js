@@ -213,7 +213,6 @@ const t = window.translations[lang];
   }
 }
 
-// 🔄 ОБНОВЛЕННАЯ renderHotels() с полной ценой и адаптивностью
 export function renderHotels(hotels, checkIn, checkOut) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
@@ -223,12 +222,11 @@ export function renderHotels(hotels, checkIn, checkOut) {
     return;
   }
 
-  const nights = (() => {
-    const inDate = new Date(checkIn);
-    const outDate = new Date(checkOut);
-    const diff = (outDate - inDate) / (1000 * 60 * 60 * 24);
-    return Math.max(1, diff);
-  })();
+  const inDate = new Date(checkIn || document.getElementById("checkIn")?.value);
+  const outDate = new Date(checkOut || document.getElementById("checkOut")?.value);
+  const nights = Math.max(1, Math.ceil((outDate - inDate) / (1000 * 60 * 60 * 24)));
+
+  const t = window.translations?.[window._appLang] || {};
 
   hotels.forEach((hotel) => {
     const card = document.createElement("div");
@@ -280,7 +278,6 @@ export function renderHotels(hotels, checkIn, checkOut) {
 
   animateCards("#hotelsResult .card");
 }
-
 
 //Места
 export function renderPlaces(places) {
