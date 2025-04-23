@@ -84,6 +84,7 @@ window.translations = {
 
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
+  const hotelCityInput = document.getElementById("hotelCity");
   try {
     // ✅ Telegram init
     if (window.Telegram && Telegram.WebApp) {
