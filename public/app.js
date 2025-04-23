@@ -241,108 +241,96 @@ if (priceRange) {
   window.addEventListener("load", updatePriceTooltip);
 }
 
-// ✅ Поиск отелей
-const hotelCityInput = document.getElementById("hotelCity");
+document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  showLoading();
 
-if (hotelCityInput) {
-  const cachedCity = localStorage.getItem("lastHotelCity");
-  if (cachedCity) hotelCityInput.value = cachedCity;
+  const city = hotelCityInput.value.trim();
+  const checkIn = document.getElementById("checkIn")?.value || "";
+  const checkOut = document.getElementById("checkOut")?.value || "";
+  const useFilters = document.getElementById("toggleFilters")?.checked;
 
-  hotelCityInput.setAttribute("autofocus", "autofocus");
+  const maxPrice = parseFloat(priceRange.value) || Infinity;
+  const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
-  document.getElementById("hotelForm")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    showLoading();
+  localStorage.setItem("lastHotelCity", city);
 
-    const city = hotelCityInput.value.trim();
-    const checkIn = document.getElementById("checkIn")?.value || "";
-    const checkOut = document.getElementById("checkOut")?.value || "";
-    const useFilters = document.getElementById("toggleFilters")?.checked;
+  const query = new URLSearchParams({
+    city,
+    checkIn,
+    checkOut,
+    ...(useFilters ? {
+      minRating: String(minRating),
+      priceTo: String(maxPrice)
+    } : {})
+  }).toString();
 
-    const maxPrice = parseFloat(priceRange.value) || Infinity;
-    const minRating = parseFloat(document.getElementById("minRating").value) || 0;
+  fetch(`https://go-travel-backend.vercel.app/api/hotels?${query}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log("🧾 Ответ от API:", data);
 
-    localStorage.setItem("lastHotelCity", city);
+      if (!Array.isArray(data)) {
+        throw new Error("API вернул не массив отелей");
+      }
 
-    const query = new URLSearchParams({ city, checkIn, checkOut }).toString();
+      const t = window.translations?.[window._appLang] || {};
+      const resultBlock = document.getElementById("hotelsResult");
+      resultBlock.classList.remove("visible");
 
-    fetch(`https://go-travel-backend.vercel.app/api/hotels?${query}`)
-      .then(res => res.json())
-      .then(data => {
-        console.log("🧾 Ответ от API:", data);
+      resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
+        data.length
+          ? data.map(h => {
+              const hotelId = `${h.name}-${h.city}-${h.price}`;
+              const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+              const isFav = favHotels.some(fav => fav.name === h.name && fav.city === h.city && fav.price === h.price);
 
-        if (!Array.isArray(data)) {
-          throw new Error("API вернул не массив отелей");
-        }
-
-        const filtered = data.filter(h => {
-          if (!useFilters) return true; // 🔓 если фильтры отключены — не фильтруем
-
-          return (
-            h.price <= maxPrice &&
-            h.rating >= minRating &&
-            (!city || h.city.toLowerCase().includes(city.toLowerCase()))
-          );
-        });
-
-        const t = window.translations?.[window._appLang] || {};
-        const resultBlock = document.getElementById("hotelsResult");
-        resultBlock.classList.remove("visible");
-
-        resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-          filtered.length
-            ? filtered.map(h => {
-                const hotelId = `${h.name}-${h.city}-${h.price}`;
-                const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-                const isFav = favHotels.some(fav => fav.name === h.name && fav.city === h.city && fav.price === h.price);
-
-                return `
-                  <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
-                    <strong>${h.name}</strong> (${h.city})<br>
-                    Цена: $${h.price} / ночь<br>
-                    Рейтинг: ${h.rating}
-                    <div class="flex justify-between items-center mt-2">
-                      <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
-                     <button 
-  class="text-xl ml-2"
-  onclick='toggleFavoriteHotel({
-    name: "${h.name}",
-    city: "${h.city}",
-    price: ${h.price},
-    rating: ${h.rating}
-  }, this)'>
-  ${isFav ? "💙" : "🤍"}
-</button>
-                    </div>
+              return `
+                <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
+                  <strong>${h.name}</strong> (${h.city})<br>
+                  Цена: $${h.price} / ночь<br>
+                  Рейтинг: ${h.rating}
+                  <div class="flex justify-between items-center mt-2">
+                    <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
+                    <button 
+                      class="text-xl ml-2"
+                      onclick='toggleFavoriteHotel({
+                        name: "${h.name}",
+                        city: "${h.city}",
+                        price: ${h.price},
+                        rating: ${h.rating}
+                      }, this)'>
+                      ${isFav ? "💙" : "🤍"}
+                    </button>
                   </div>
-                `;
-              }).join("")
-            : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
-        );
+                </div>
+              `;
+            }).join("")
+          : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+      );
 
-        updateHearts("hotels");
-        resultBlock.classList.add("visible");
-        animateCards("#hotelsResult .card");
+      updateHearts("hotels");
+      resultBlock.classList.add("visible");
+      animateCards("#hotelsResult .card");
 
-        trackEvent("Поиск отеля", {
-          city,
-          checkIn,
-          checkOut,
-          maxPrice,
-          minRating,
-          filtersUsed: useFilters,
-          resultCount: filtered.length
-        });
-
-        hideLoading();
-      })
-      .catch(err => {
-        console.error("❌ Ошибка загрузки отелей:", err);
-        document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
-        hideLoading();
+      trackEvent("Поиск отеля", {
+        city,
+        checkIn,
+        checkOut,
+        maxPrice,
+        minRating,
+        filtersUsed: useFilters,
+        resultCount: data.length
       });
-  });
-}
+
+      hideLoading();
+    })
+    .catch(err => {
+      console.error("❌ Ошибка загрузки отелей:", err);
+      document.getElementById("hotelsResult").innerHTML = "<p class='text-sm text-red-500'>Ошибка загрузки отелей.</p>";
+      hideLoading();
+    });
+});
 
 lastSearchTime = 0;
 
