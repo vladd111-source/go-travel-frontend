@@ -362,7 +362,7 @@ window.toggleFavoriteFlight = function (encodedDeal, btn) {
   });
 };
 
-window.toggleFavoriteHotel = function (hotel, btn) {
+export function toggleFavoriteHotel(hotel, btn) {
   const key = "favorites_hotels";
   let favorites = JSON.parse(localStorage.getItem(key) || "[]");
 
