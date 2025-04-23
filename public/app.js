@@ -261,13 +261,19 @@ if (hotelCityInput) {
     const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
     fetch(`https://go-travel-backend.vercel.app/api/hotels?city=${encodeURIComponent(city)}`)
-      .then(res => res.json())
-      .then(hotels => {
-        const filtered = hotels.filter(h =>
-          h.price <= maxPrice &&
-          h.rating >= minRating &&
-          (!city || h.city.toLowerCase().includes(city.toLowerCase()))
-        );
+    .then(res => res.json())
+.then(data => {
+  console.log("🧾 Ответ от API:", data);
+
+  if (!Array.isArray(data)) {
+    throw new Error("API вернул не массив отелей");
+  }
+
+  const filtered = data.filter(h =>
+    h.price <= maxPrice &&
+    h.rating >= minRating &&
+    (!city || h.city.toLowerCase().includes(city.toLowerCase()))
+  );
 
        const t = window.translations?.[window._appLang] || {};
         const resultBlock = document.getElementById("hotelsResult");
