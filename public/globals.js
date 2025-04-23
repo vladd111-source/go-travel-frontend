@@ -390,7 +390,15 @@ export function toggleFavoriteHotel(hotel, btn) {
 
 window.toggleFavoriteHotel = toggleFavoriteHotel;
 
-
+// ✅ Обёртка для кнопок с data-hotel
+window.toggleFavoriteHotelFromAttr = function (btn) {
+  try {
+    const hotel = JSON.parse(decodeURIComponent(btn.dataset.hotel));
+    toggleFavoriteHotel(hotel, btn);
+  } catch (err) {
+    console.error("❌ Ошибка обновления сердечка [hotels]:", err);
+  }
+};
 
 
 
