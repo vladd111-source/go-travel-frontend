@@ -305,9 +305,12 @@ if (hotelCityInput) {
                       <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
                      <button 
   class="text-xl ml-2"
-  data-hotel="${JSON.stringify(h).replace(/"/g, '&quot;')}"
-  data-hotel-id="${hotelId}"
-  onclick="toggleFavoriteHotelFromAttr(this)">
+  onclick='toggleFavoriteHotel({
+    name: "${h.name}",
+    city: "${h.city}",
+    price: ${h.price},
+    rating: ${h.rating}
+  }, this)'>
   ${isFav ? "💙" : "🤍"}
 </button>
                     </div>
