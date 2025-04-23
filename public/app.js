@@ -257,16 +257,14 @@ if (hotelCityInput) {
     const city = hotelCityInput.value.trim();
     const checkIn = document.getElementById("checkIn")?.value || "";
     const checkOut = document.getElementById("checkOut")?.value || "";
+    const useFilters = document.getElementById("toggleFilters")?.checked;
+
     const maxPrice = parseFloat(priceRange.value) || Infinity;
     const minRating = parseFloat(document.getElementById("minRating").value) || 0;
 
     localStorage.setItem("lastHotelCity", city);
 
-    const query = new URLSearchParams({
-      city,
-      checkIn,
-      checkOut
-    }).toString();
+    const query = new URLSearchParams({ city, checkIn, checkOut }).toString();
 
     fetch(`https://go-travel-backend.vercel.app/api/hotels?${query}`)
       .then(res => res.json())
@@ -277,39 +275,45 @@ if (hotelCityInput) {
           throw new Error("API вернул не массив отелей");
         }
 
-        const filtered = data.filter(h =>
-          h.price <= maxPrice &&
-          h.rating >= minRating &&
-          (!city || h.city.toLowerCase().includes(city.toLowerCase()))
-        );
+        const filtered = data.filter(h => {
+          if (!useFilters) return true; // 🔓 если фильтры отключены — не фильтруем
+
+          return (
+            h.price <= maxPrice &&
+            h.rating >= minRating &&
+            (!city || h.city.toLowerCase().includes(city.toLowerCase()))
+          );
+        });
 
         const t = window.translations?.[window._appLang] || {};
         const resultBlock = document.getElementById("hotelsResult");
         resultBlock.classList.remove("visible");
 
         resultBlock.innerHTML = `<h3 class='font-semibold mb-2'>${t.hotelResults}</h3>` + (
-          filtered.length ? filtered.map(h => {
-            const hotelId = `${h.name}-${h.city}-${h.price}`;
-            const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-            const isFav = favHotels.some(fav => fav.name === h.name && fav.city === h.city && fav.price === h.price);
+          filtered.length
+            ? filtered.map(h => {
+                const hotelId = `${h.name}-${h.city}-${h.price}`;
+                const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+                const isFav = favHotels.some(fav => fav.name === h.name && fav.city === h.city && fav.price === h.price);
 
-            return `
-              <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
-                <strong>${h.name}</strong> (${h.city})<br>
-                Цена: $${h.price} / ночь<br>
-                Рейтинг: ${h.rating}
-                <div class="flex justify-between items-center mt-2">
-                  <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
-                  <button 
-                    onclick='toggleFavoriteHotel(${JSON.stringify(h)}, this)' 
-                    class="text-xl ml-2"
-                    data-hotel-id="${hotelId}">
-                    ${isFav ? "💙" : "🤍"}
-                  </button>
-                </div>
-              </div>
-            `;
-          }).join("") : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
+                return `
+                  <div class="card bg-white border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300">
+                    <strong>${h.name}</strong> (${h.city})<br>
+                    Цена: $${h.price} / ночь<br>
+                    Рейтинг: ${h.rating}
+                    <div class="flex justify-between items-center mt-2">
+                      <button class="btn text-sm bg-blue-600 text-white rounded px-3 py-1" onclick="bookHotel('${h.name}', '${h.city}', ${h.price}, ${h.rating})">${t.bookNow}</button>
+                      <button 
+                        onclick='toggleFavoriteHotel(${JSON.stringify(h)}, this)' 
+                        class="text-xl ml-2"
+                        data-hotel-id="${hotelId}">
+                        ${isFav ? "💙" : "🤍"}
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join("")
+            : `<p class='text-sm text-gray-500'>${t.noHotelsFound}</p>`
         );
 
         updateHearts("hotels");
@@ -322,6 +326,7 @@ if (hotelCityInput) {
           checkOut,
           maxPrice,
           minRating,
+          filtersUsed: useFilters,
           resultCount: filtered.length
         });
 
