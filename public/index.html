@@ -137,17 +137,17 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
-        <label class="label" for="checkIn" data-i18n="checkIn"></label>
+        <label for="checkIn" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="checkIn">Дата заезда</label>
         <input type="date" id="checkIn" class="input" />
       </div>
       <div>
-        <label class="label" for="checkOut" data-i18n="checkOut"></label>
+        <label for="checkOut" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="checkOut">Дата выезда</label>
         <input type="date" id="checkOut" class="input" />
       </div>
     </div>
 
     <div class="mt-4">
-      <label for="toggleFilters" class="label flex items-center gap-2">
+      <label for="toggleFilters" class="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
         <input type="checkbox" id="toggleFilters" class="checkbox" />
         <span>Фильтры</span>
       </label>
@@ -156,36 +156,38 @@
     <div id="hotelFilters" class="hidden mt-2">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       
-<!-- 💰 Ползунок с tooltip -->
-<div class="col-span-2 mt-4">
-  <label for="priceRange" class="label block mb-1" data-i18n="priceTo">Цена</label>
- <div class="relative w-full pt-10"> <!-- добавили pt-10 -->
-  <input
-    type="range"
-    id="priceRange"
-    min="0"
-    max="500"
-    step="10"
-    value="250"
-    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500 slider-thumb" />
-  <div id="priceTooltip"
-    class="absolute -top-11 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow transition-all pointer-events-none">
-    $250
-  </div>
-</div>
-</div>
-        <!-- ⭐️ Рейтинг -->
-        <div class="col-span-2">
-          <label for="minRating" class="label" data-i18n="ratingMin">Рейтинг</label>
+      <!-- 💰 Ползунок с tooltip -->
+      <div class="col-span-2 mt-4">
+        <label for="priceRange" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="priceTo">Цена</label>
+        <div class="relative w-full pt-10">
           <input
-            type="number"
-            id="minRating"
-            class="input"
+            type="range"
+            id="priceRange"
             min="0"
-            max="10"
-            step="1"
-            placeholder="от 0 до 10" />
+            max="500"
+            step="10"
+            value="250"
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500 slider-thumb" />
+          <div id="priceTooltip"
+            class="absolute -top-11 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow transition-all pointer-events-none">
+            $250
+          </div>
         </div>
+      </div>
+
+      <!-- ⭐️ Рейтинг -->
+      <div class="col-span-2">
+        <label for="minRating" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="ratingMin">Рейтинг</label>
+        <input
+          type="number"
+          id="minRating"
+          class="input"
+          min="0"
+          max="10"
+          step="1"
+          placeholder="от 0 до 10" />
+      </div>
+
       </div>
     </div>
 
@@ -194,6 +196,7 @@
       🔍 Найти отель
     </button>
   </form>
+
   <div id="hotelsResult"></div>
 </div> <!-- ✅ Закрытие блока отелей -->
   
