@@ -279,14 +279,17 @@ export function renderHotels(hotels, checkIn, checkOut) {
 }
 
 // Travelpayouts партнёрская ссылка:
-function generateTripLink(hotel) {
+function generateTripLink(hotel, checkIn, checkOut) {
   const base = "https://tp.media/r";
   const marker = "618281";
   const trs = "402148";
   const p = "4115";
   const campaign = "101";
-  const encodedURL = encodeURIComponent(`https://hotellook.com/?hotelId=${hotel.id}`);
-  
+
+  // Ссылка на конкретный отель с параметрами дат
+  const targetUrl = `https://hotellook.com/?hotelId=${hotel.id}&checkIn=${checkIn}&checkOut=${checkOut}`;
+  const encodedURL = encodeURIComponent(targetUrl);
+
   return `${base}?marker=${marker}&trs=${trs}&p=${p}&u=${encodedURL}&campaign_id=${campaign}`;
 }
 
