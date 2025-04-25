@@ -193,9 +193,9 @@ input[type="range"].slider-thumb::-webkit-slider-thumb {
 }
 
 .label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
+  font-size: 1rem;           /* такой же, как у чекбоксов */
+  font-weight: 600;          /* чуть жирнее, как у чекбоксов */
+  color: #111827;            /* тёмно-серый, как основной текст */
   margin-bottom: 0.5rem;
   display: block;
 }
