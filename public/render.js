@@ -229,6 +229,8 @@ export function renderHotels(hotels, checkIn, checkOut) {
   const t = window.translations?.[window._appLang] || {};
 
   hotels.forEach((hotel) => {
+    if (!hotel.id) return; // ⛔️ Без ID не рендерим
+
     const card = document.createElement("div");
     card.className =
       "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300 sm:flex sm:items-start sm:gap-4";
@@ -238,13 +240,9 @@ export function renderHotels(hotels, checkIn, checkOut) {
     const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
     const isFav = favHotels.some(f => f.name === hotel.name && f.city === hotel.city);
 
-    const imageUrl = hotel.image || (
-      hotel.id
-        ? `https://photo.hotellook.com/image_v2/limit/${hotel.id}/800/520.auto`
-        : "https://via.placeholder.com/800x520?text=Hotel"
-    );
-
+    const imageUrl = hotel.image || `https://photo.hotellook.com/image_v2/limit/${hotel.id}/800/520.auto`;
     const totalPrice = hotel.price * nights;
+    const bookingPrice = (totalPrice * (1 + (Math.random() * 0.02 + 0.02))).toFixed(2); // +2-4%
 
     card.innerHTML = `
       <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover sm:w-64 sm:h-auto" />
@@ -253,7 +251,8 @@ export function renderHotels(hotels, checkIn, checkOut) {
         <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
         <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
         <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price} / ночь</p>
-        <p class="text-xs text-gray-400 italic mb-2">Итого за ${nights} ноч${nights === 1 ? 'ь' : nights < 5 ? 'и' : 'ей'} — $${totalPrice.toFixed(2)}</p>
+        <p class="text-xs text-gray-400 italic mb-1">Итого за ${nights} ноч${nights === 1 ? 'ь' : nights < 5 ? 'и' : 'ей'} — $${totalPrice.toFixed(2)}</p>
+        <p class="text-xs text-gray-400 italic mb-2">Цена на Букинге: $${bookingPrice}</p>
         <div class="flex justify-between items-center mt-2">
           <a 
             href="${bookingUrl}" 
@@ -278,6 +277,15 @@ export function renderHotels(hotels, checkIn, checkOut) {
 
   animateCards("#hotelsResult .card");
 }
+
+// Travelpayouts партнёрская ссылка:
+function generateTripLink(hotel) {
+  const marker = "618281"; // ← вставь свой маркер, если другой
+  return hotel.id 
+    ? `https://tp.media/r?marker=${marker}&type=hotel&id=${hotel.id}&locale=ru&currency=usd`
+    : "#";
+}
+
 
 //Места
 export function renderPlaces(places) {
