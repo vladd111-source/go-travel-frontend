@@ -286,10 +286,11 @@ function generateTripLink(hotel, checkIn, checkOut) {
   const p = "4115";
   const campaign = "101";
 
-  // Поисковая ссылка по городу
-  const targetUrl = `https://hotellook.com/search?location=${encodeURIComponent(hotel.city)}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
-
+  // Проверка: если нет города — fallback
+  const city = encodeURIComponent(hotel.city || "Paris");
+  const targetUrl = `https://search.hotellook.com/?location=${city}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
   const encodedURL = encodeURIComponent(targetUrl);
+
   return `${base}?marker=${marker}&trs=${trs}&p=${p}&u=${encodedURL}&campaign_id=${campaign}`;
 }
 
