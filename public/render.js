@@ -235,7 +235,7 @@ export function renderHotels(hotels, checkIn, checkOut) {
     card.className =
       "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300 sm:flex sm:items-start sm:gap-4";
 
-    const bookingUrl = generateTripLink(hotel);
+    const bookingUrl = generateTripLink(hotel, checkIn, checkOut);
     const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
     const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
     const isFav = favHotels.some(f => f.name === hotel.name && f.city === hotel.city);
@@ -334,7 +334,7 @@ export function renderFavoriteHotels() {
     card.className =
       "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300";
 
-    const bookingUrl = generateTripLink(hotel);
+    const bookingUrl = generateTripLink(hotel, checkIn, checkOut);
     const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
 
     card.innerHTML = `
