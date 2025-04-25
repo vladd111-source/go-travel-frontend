@@ -30,6 +30,15 @@
         padding: 0.4rem 0.75rem !important;
       }
     }
+    label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #111827;
+      margin-bottom: 0.5rem;
+    }
   </style>
 </head>
 <body class="opacity-0 bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4 font-[Inter]">
@@ -49,13 +58,10 @@
 
   <!-- Вкладки -->
   <div class="flex justify-center mb-4 gap-2 flex-wrap">
-   <button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('flights')" data-i18n="flights">Билеты</button>
-
-<button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('hotels')" data-i18n="hotels">Отели</button>
-
-<button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('places')" data-i18n="places">🌍 Места</button>
-
-<button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('favorites')">❤️</button>
+    <button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('flights')" data-i18n="flights">Билеты</button>
+    <button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('hotels')" data-i18n="hotels">Отели</button>
+    <button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('places')" data-i18n="places">🌍 Места</button>
+    <button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('favorites')">❤️</button>
   </div>
 
 <!-- ✈️ Перелёты -->
