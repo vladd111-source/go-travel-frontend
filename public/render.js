@@ -280,10 +280,14 @@ export function renderHotels(hotels, checkIn, checkOut) {
 
 // Travelpayouts партнёрская ссылка:
 function generateTripLink(hotel) {
-  const marker = "618281"; // ← замени на свой, если другой
-  return hotel.id 
-    ? `https://tp.media/r?marker=${marker}&type=hotel&p=${hotel.id}&locale=ru&currency=usd`
-    : "#";
+  const base = "https://tp.media/r";
+  const marker = "618281";
+  const trs = "402148";
+  const p = "4115";
+  const campaign = "101";
+  const encodedURL = encodeURIComponent(`https://hotellook.com/?hotelId=${hotel.id}`);
+  
+  return `${base}?marker=${marker}&trs=${trs}&p=${p}&u=${encodedURL}&campaign_id=${campaign}`;
 }
 
 
