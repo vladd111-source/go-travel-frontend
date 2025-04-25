@@ -286,10 +286,10 @@ function generateTripLink(hotel, checkIn, checkOut) {
   const p = "4115";
   const campaign = "101";
 
-  // Ссылка на конкретный отель с параметрами дат
-  const targetUrl = `https://hotellook.com/?hotelId=${hotel.id}&checkIn=${checkIn}&checkOut=${checkOut}`;
-  const encodedURL = encodeURIComponent(targetUrl);
+  // Поисковая ссылка по городу
+  const targetUrl = `https://hotellook.com/search?location=${encodeURIComponent(hotel.city)}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
 
+  const encodedURL = encodeURIComponent(targetUrl);
   return `${base}?marker=${marker}&trs=${trs}&p=${p}&u=${encodedURL}&campaign_id=${campaign}`;
 }
 
