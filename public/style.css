@@ -193,11 +193,13 @@ input[type="range"].slider-thumb::-webkit-slider-thumb {
 }
 
 .label {
-  font-size: 1rem;           /* такой же, как у чекбоксов */
-  font-weight: 600;          /* чуть жирнее, как у чекбоксов */
-  color: #111827;            /* тёмно-серый, как основной текст */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem; /* универсальный размер */
+  font-weight: 500;
+  color: #111827; /* тёмный текст */
   margin-bottom: 0.5rem;
-  display: block;
 }
 
 hr {
