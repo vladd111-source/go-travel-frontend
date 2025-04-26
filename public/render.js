@@ -272,15 +272,10 @@ export function generateTripLink(hotel, checkIn, checkOut) {
     checkOut = tomorrow.toISOString().slice(0, 10);
   }
 
-  let targetUrl;
-  if (hotel.id) {
-    // ❗ Только hotelId без дат
-    targetUrl = `https://search.hotellook.com/?hotelId=${hotel.id}&currency=usd`;
-  } else {
-    // 🔥 Только здесь можно вставить checkIn / checkOut
-    const city = encodeURIComponent(hotel.city || "Paris");
-    targetUrl = `https://search.hotellook.com/hotels?location=${city}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
-  }
+  const city = encodeURIComponent(hotel.city || "Paris");
+  const hotelName = encodeURIComponent(hotel.name || "");
+  
+  const targetUrl = `https://search.hotellook.com/hotels?location=${city}&hotelName=${hotelName}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
 
   const encodedURL = encodeURIComponent(targetUrl);
 
