@@ -391,3 +391,4 @@ export function trackHotelClick(url, name, city, price, source) {
   });
 }
 window.trackHotelClick = trackHotelClick;
+window.generateTripLink = generateTripLink;
