@@ -230,49 +230,47 @@ if (propertyType) {
     container.innerHTML = `<div class="text-center text-gray-500 mt-4">Ничего не найдено по фильтру</div>`;
     return;
   }
-  // 🛠️ Дальше идёт рендер карточек
-  filteredHotels.forEach((hotel) => {
-    if (!hotel.id) return;
+// 🛠️ Дальше идёт рендер карточек
+filteredHotels.forEach((hotel) => {
+  if (!hotel.id) return;
 
+  const card = document.createElement("div");
+  card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300 sm:flex sm:items-start sm:gap-4";
 
-    const card = document.createElement("div");
-    card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300 sm:flex sm:items-start sm:gap-4";
+  const bookingUrl = generateTripLink(hotel, inDate, outDate);
+  const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
+  const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  const isFav = favHotels.some(f => f.name === hotel.name && f.city === hotel.city);
 
-    const bookingUrl = generateTripLink(hotel, inDate, outDate);
-    const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
-    const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-    const isFav = favHotels.some(f => f.name === hotel.name && f.city === hotel.city);
+  const imageUrl = hotel.image || `https://photo.hotellook.com/image_v2/limit/${hotel.id}/800/520.auto`;
+  const nights = Math.max(1, Math.ceil((new Date(outDate) - new Date(inDate)) / (1000 * 60 * 60 * 24)));
+  const totalPrice = hotel.price * nights;
+  const bookingPrice = (totalPrice * (1 + (Math.random() * 0.02 + 0.02))).toFixed(2);
 
-    const imageUrl = hotel.image || `https://photo.hotellook.com/image_v2/limit/${hotel.id}/800/520.auto`;
-    const nights = Math.max(1, Math.ceil((new Date(outDate) - new Date(inDate)) / (1000 * 60 * 60 * 24)));
-    const totalPrice = hotel.price * nights;
-    const bookingPrice = (totalPrice * (1 + (Math.random() * 0.02 + 0.02))).toFixed(2);
-
-    card.innerHTML = `
-      <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover sm:w-64 sm:h-auto" />
-      <div class="flex-1">
-        <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
-        <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
-        <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
-        <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price} / ночь</p>
-        <p class="text-xs text-gray-400 italic mb-1">Итого за ${nights} ноч${nights === 1 ? 'ь' : nights < 5 ? 'и' : 'ей'} — $${totalPrice.toFixed(2)}</p>
-        <p class="text-xs text-gray-400 italic mb-2">Цена на Букинге: $${bookingPrice}</p>
-        <div class="flex justify-between items-center mt-2">
-          <a href="${bookingUrl}" target="_blank" class="btn btn-blue text-sm" onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')">
-            ${t.bookNow || 'Забронировать'}
-          </a>
-          <button onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" class="text-xl ml-2" data-hotel-id="${encodedHotel}">
-            ${isFav ? '💙' : '🤍'}
-          </button>
-        </div>
+  card.innerHTML = `
+    <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover sm:w-64 sm:h-auto" />
+    <div class="flex-1">
+      <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city || '—'}</p>
+      <p class="text-sm text-gray-600 mb-1">⭐ ${hotel.rating !== undefined ? `Рейтинг: ${hotel.rating}` : 'Рейтинг: —'}</p>
+      <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price} / ночь</p>
+      <p class="text-xs text-gray-400 italic mb-1">Итого за ${nights} ноч${nights === 1 ? 'ь' : nights < 5 ? 'и' : 'ей'} — $${totalPrice.toFixed(2)}</p>
+      <p class="text-xs text-gray-400 italic mb-2">Цена на Букинге: $${bookingPrice}</p>
+      <div class="flex justify-between items-center mt-2">
+        <a href="${bookingUrl}" target="_blank" class="btn btn-blue text-sm" onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')">
+          ${t.bookNow || 'Забронировать'}
+        </a>
+        <button onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" class="text-xl ml-2" data-hotel-id="${encodedHotel}">
+          ${isFav ? '💙' : '🤍'}
+        </button>
       </div>
-    `;
+    </div>
+  `;
 
-    container.appendChild(card);
-  });
+  container.appendChild(card);
+});
 
-  animateCards("#hotelsResult .card");
-}
+animateCards("#hotelsResult .card");
 
 // Travelpayouts партнёрская ссылка:
 export function generateTripLink(hotel, checkIn, checkOut) {
