@@ -211,16 +211,21 @@ if (!inDate || !outDate) {
 }
 
 
-const propertyType = document.getElementById("propertyTypeFilter")?.value || "";
-  let filteredHotels = hotels;
-if (propertyType) {
-  filteredHotels = hotels.filter(hotel => {
-    const type = (hotel.property_type || "").toLowerCase();
-    if (propertyType === "hotel") return type.includes("hotel");
-    if (propertyType === "apartment") return type.includes("apartment");
-    return true;
-  });
+let filteredHotels = hotels;
+
+const propertyTypeFilter = document.getElementById("propertyTypeFilter");
+if (propertyTypeFilter) {
+  const propertyType = propertyTypeFilter.value || "";
+  if (propertyType) {
+    filteredHotels = hotels.filter(hotel => {
+      const type = (hotel.property_type || "").toLowerCase();
+      if (propertyType === "hotel") return type.includes("hotel");
+      if (propertyType === "apartment") return type.includes("apartment");
+      return true;
+    });
+  }
 }
+  
   // ❗ Если после фильтра ничего нет — показать сообщение
   if (!filteredHotels.length) {
     container.innerHTML = `<div class="text-center text-gray-500 mt-4">Ничего не найдено по фильтру</div>`;
