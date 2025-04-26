@@ -1,24 +1,3 @@
-const TP_MARKER = '618281';
-
-export function generateTripLink(hotel) {
-  if (!hotel) return '#';
-
-  // Приоритет — явная ссылка
-  if (hotel.link) {
-    const encoded = encodeURIComponent(hotel.link);
-    return `https://tp.media/r?marker=${TP_MARKER}&url=${encoded}`;
-  }
-
-  // Альтернатива — partner trip.com
-  if (hotel.partner === 'trip.com' || hotel.source === 'trip.com') {
-    const encoded = encodeURIComponent(hotel.deep_link || '');
-    return `https://tp.media/r?marker=${TP_MARKER}&url=${encoded}`;
-  }
-
-  // Fallback
-  return hotel.deep_link || '#';
-}
-
 // ✅ Переводы (если не определены)
 if (!window.translations) {
   window.translations = {
@@ -183,7 +162,7 @@ const t = window.translations[lang];
   <div class="text-lg font-bold text-gray-800 mb-1">💰 $${price}</div>
   <div class="flex justify-between items-center gap-2 mt-2">
    <button 
-  onclick="openHotelLink('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')" 
+ onclick="window.open('${link}', '_blank')"
   class="btn btn-blue text-sm w-full rounded-xl">
   ${t.bookNow || 'Забронировать'}
 </button>
@@ -222,18 +201,20 @@ export function renderHotels(hotels, checkIn, checkOut) {
     return;
   }
 
-  const inDate = new Date(checkIn || document.getElementById("checkIn")?.value);
-  const outDate = new Date(checkOut || document.getElementById("checkOut")?.value);
-  const nights = Math.max(1, Math.ceil((outDate - inDate) / (1000 * 60 * 60 * 24)));
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  checkIn = checkIn || document.getElementById("checkIn")?.value || today.toISOString().slice(0, 10);
+  checkOut = checkOut || document.getElementById("checkOut")?.value || tomorrow.toISOString().slice(0, 10);
 
   const t = window.translations?.[window._appLang] || {};
 
   hotels.forEach((hotel) => {
-    if (!hotel.id) return; // ⛔️ Без ID не рендерим
+    if (!hotel.id) return;
 
     const card = document.createElement("div");
-    card.className =
-      "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300 sm:flex sm:items-start sm:gap-4";
+    card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300 sm:flex sm:items-start sm:gap-4";
 
     const bookingUrl = generateTripLink(hotel, checkIn, checkOut);
     const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
@@ -241,8 +222,9 @@ export function renderHotels(hotels, checkIn, checkOut) {
     const isFav = favHotels.some(f => f.name === hotel.name && f.city === hotel.city);
 
     const imageUrl = hotel.image || `https://photo.hotellook.com/image_v2/limit/${hotel.id}/800/520.auto`;
+    const nights = Math.max(1, Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)));
     const totalPrice = hotel.price * nights;
-    const bookingPrice = (totalPrice * (1 + (Math.random() * 0.02 + 0.02))).toFixed(2); // +2-4%
+    const bookingPrice = (totalPrice * (1 + (Math.random() * 0.02 + 0.02))).toFixed(2);
 
     card.innerHTML = `
       <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover sm:w-64 sm:h-auto" />
@@ -254,18 +236,10 @@ export function renderHotels(hotels, checkIn, checkOut) {
         <p class="text-xs text-gray-400 italic mb-1">Итого за ${nights} ноч${nights === 1 ? 'ь' : nights < 5 ? 'и' : 'ей'} — $${totalPrice.toFixed(2)}</p>
         <p class="text-xs text-gray-400 italic mb-2">Цена на Букинге: $${bookingPrice}</p>
         <div class="flex justify-between items-center mt-2">
-          <a 
-            href="${bookingUrl}" 
-            target="_blank" 
-            class="btn btn-blue text-sm"
-            onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')"
-          >
+          <a href="${bookingUrl}" target="_blank" class="btn btn-blue text-sm" onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')">
             ${t.bookNow || 'Забронировать'}
           </a>
-          <button 
-            onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" 
-            class="text-xl ml-2"
-            data-hotel-id="${encodedHotel}">
+          <button onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" class="text-xl ml-2" data-hotel-id="${encodedHotel}">
             ${isFav ? '💙' : '🤍'}
           </button>
         </div>
@@ -279,12 +253,21 @@ export function renderHotels(hotels, checkIn, checkOut) {
 }
 
 // Travelpayouts партнёрская ссылка:
-function generateTripLink(hotel, checkIn, checkOut) {
+export function generateTripLink(hotel, checkIn, checkOut) {
   const base = "https://tp.media/r";
   const marker = "618281";
   const trs = "402148";
   const p = "4115";
   const campaign = "101";
+
+  // ➡️ Проверяем даты в самом начале
+  if (!checkIn || !checkOut) {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    checkIn = today.toISOString().slice(0, 10);
+    checkOut = tomorrow.toISOString().slice(0, 10);
+  }
 
   // Проверка: если нет города — fallback
   const city = encodeURIComponent(hotel.city || "Paris");
@@ -321,6 +304,13 @@ export function renderPlaces(places) {
 }
 
 export function renderFavoriteHotels() {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const checkIn = document.getElementById("checkIn")?.value || today.toISOString().slice(0,10);
+  const checkOut = document.getElementById("checkOut")?.value || tomorrow.toISOString().slice(0,10);
+
   const container = document.getElementById("favContent-hotels");
   container.innerHTML = "";
 
@@ -332,8 +322,7 @@ export function renderFavoriteHotels() {
 
   favorites.forEach((hotel) => {
     const card = document.createElement("div");
-    card.className =
-      "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300";
+    card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300";
 
     const bookingUrl = generateTripLink(hotel, checkIn, checkOut);
     const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
@@ -344,16 +333,10 @@ export function renderFavoriteHotels() {
       <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
       <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price}</p>
       <div class="flex justify-between items-center mt-2">
-       <a href="${bookingUrl}" 
-   target="_blank" 
-   class="btn btn-blue text-sm"
-   onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source}')">
-  ${t.bookNow || 'Забронировать'}
-</a>
-        <button 
-          onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" 
-          class="text-xl ml-2"
-          data-hotel-id="${encodedHotel}">
+        <a href="${bookingUrl}" target="_blank" class="btn btn-blue text-sm" onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source}')">
+          ${t.bookNow || 'Забронировать'}
+        </a>
+        <button onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" class="text-xl ml-2" data-hotel-id="${encodedHotel}">
           💙
         </button>
       </div>
@@ -364,6 +347,7 @@ export function renderFavoriteHotels() {
 
   animateCards("#favContent-hotels .card");
 }
+
 
 // Сделать функции глобально доступными
 window.generateAviasalesLink = generateAviasalesLink;
