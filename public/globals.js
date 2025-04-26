@@ -61,6 +61,19 @@ window.translations = {
     hotDeal: "Hot Deal"
   }
 };
+// 
+window.formatTime = function (isoString) {
+  if (!isoString) return "—";
+  const date = new Date(isoString);
+  return date.toISOString().substr(11, 5); // Часы:Минуты
+};
+
+window.formatDuration = function (minutes) {
+  if (!minutes) return "—";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h}ч ${m}м`;
+};
 
 window.openHotelLink = function(url, name, city, price, source) {
   if (Telegram?.WebApp?.openLink) {
