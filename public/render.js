@@ -390,6 +390,3 @@ export function trackHotelClick(url, name, city, price, source) {
     timestamp: new Date().toISOString()
   });
 }
-window.generateAviasalesLink = generateAviasalesLink;
-window.trackHotelClick = trackHotelClick;
-window.generateTripLink = generateTripLink; // 👉 добавить
