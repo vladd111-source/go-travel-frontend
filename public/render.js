@@ -373,10 +373,6 @@ if (!inDate || !outDate) {
   animateCards("#favContent-hotels .card");
 }
 
-
-// Сделать функции глобально доступными
-window.generateAviasalesLink = generateAviasalesLink;
-
 export function trackHotelClick(url, name, city, price, source) {
   const telegramId = window.initDataUnsafe?.user?.id || 'unknown';
 
