@@ -201,13 +201,17 @@ export function renderHotels(hotels, checkIn, checkOut) {
     return;
   }
 
+let inDate = checkIn || document.getElementById("checkIn")?.value;
+let outDate = checkOut || document.getElementById("checkOut")?.value;
+
+if (!inDate || !outDate) {
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
-
-  checkIn = checkIn || document.getElementById("checkIn")?.value || today.toISOString().slice(0, 10);
-  checkOut = checkOut || document.getElementById("checkOut")?.value || tomorrow.toISOString().slice(0, 10);
-
+  inDate = today.toISOString().slice(0, 10);
+  outDate = tomorrow.toISOString().slice(0, 10);
+}
+  
   const t = window.translations?.[window._appLang] || {};
 
   hotels.forEach((hotel) => {
@@ -216,13 +220,13 @@ export function renderHotels(hotels, checkIn, checkOut) {
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300 sm:flex sm:items-start sm:gap-4";
 
-    const bookingUrl = generateTripLink(hotel, checkIn, checkOut);
+    const bookingUrl = generateTripLink(hotel, inDate, outDate);
     const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
     const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
     const isFav = favHotels.some(f => f.name === hotel.name && f.city === hotel.city);
 
     const imageUrl = hotel.image || `https://photo.hotellook.com/image_v2/limit/${hotel.id}/800/520.auto`;
-    const nights = Math.max(1, Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)));
+    const nights = Math.max(1, Math.ceil((new Date(outDate) - new Date(inDate)) / (1000 * 60 * 60 * 24)));
     const totalPrice = hotel.price * nights;
     const bookingPrice = (totalPrice * (1 + (Math.random() * 0.02 + 0.02))).toFixed(2);
 
@@ -304,12 +308,16 @@ export function renderPlaces(places) {
 }
 
 export function renderFavoriteHotels() {
+ let inDate = document.getElementById("checkIn")?.value;
+let outDate = document.getElementById("checkOut")?.value;
+
+if (!inDate || !outDate) {
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
-
-  const checkIn = document.getElementById("checkIn")?.value || today.toISOString().slice(0,10);
-  const checkOut = document.getElementById("checkOut")?.value || tomorrow.toISOString().slice(0,10);
+  inDate = today.toISOString().slice(0, 10);
+  outDate = tomorrow.toISOString().slice(0, 10);
+}
 
   const container = document.getElementById("favContent-hotels");
   container.innerHTML = "";
@@ -324,7 +332,7 @@ export function renderFavoriteHotels() {
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300";
 
-    const bookingUrl = generateTripLink(hotel, checkIn, checkOut);
+    const bookingUrl = generateTripLink(hotel, inDate, outDate);
     const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
 
     card.innerHTML = `
