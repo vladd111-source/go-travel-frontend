@@ -148,8 +148,6 @@ export async function renderFlights(
       ${isHot ? 'bg-yellow-100 border-yellow-300' : 'bg-white'}
     `.trim();
     
-const t = window.translations[lang];
-    
   card.innerHTML = `
   <div class="flex items-center gap-2 mb-1">
     <h3 class="text-xl font-bold">${airline}</h3>
