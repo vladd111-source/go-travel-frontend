@@ -200,7 +200,7 @@ export function renderHotels(hotels, checkIn, checkOut) {
     container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены</div>`;
     return;
   }
-
+  
 let inDate = checkIn || document.getElementById("checkIn")?.value;
 let outDate = checkOut || document.getElementById("checkOut")?.value;
 
@@ -214,8 +214,26 @@ if (!inDate || !outDate) {
   
   const t = window.translations?.[window._appLang] || {};
 
-  hotels.forEach((hotel) => {
+
+const propertyType = document.getElementById("propertyTypeFilter")?.value || "";
+  let filteredHotels = hotels;
+if (propertyType) {
+  filteredHotels = hotels.filter(hotel => {
+    const type = (hotel.property_type || "").toLowerCase();
+    if (propertyType === "hotel") return type.includes("hotel");
+    if (propertyType === "apartment") return type.includes("apartment");
+    return true;
+  });
+}
+  // ❗ Если после фильтра ничего нет — показать сообщение
+  if (!filteredHotels.length) {
+    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Ничего не найдено по фильтру</div>`;
+    return;
+  }
+  // 🛠️ Дальше идёт рендер карточек
+  filteredHotels.forEach((hotel) => {
     if (!hotel.id) return;
+
 
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300 sm:flex sm:items-start sm:gap-4";
