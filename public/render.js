@@ -274,10 +274,10 @@ export function generateTripLink(hotel, checkIn, checkOut) {
 
   let targetUrl;
   if (hotel.id) {
-    // Если есть ID отеля — строим ссылку на конкретный отель
-    targetUrl = `https://search.hotellook.com/?hotelId=${hotel.id}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
+    // ❗ Только hotelId без дат
+    targetUrl = `https://search.hotellook.com/?hotelId=${hotel.id}&currency=usd`;
   } else {
-    // Иначе — строим ссылку через /hotels + location + даты
+    // 🔥 Только здесь можно вставить checkIn / checkOut
     const city = encodeURIComponent(hotel.city || "Paris");
     targetUrl = `https://search.hotellook.com/hotels?location=${city}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
   }
