@@ -209,8 +209,6 @@ if (!inDate || !outDate) {
   inDate = today.toISOString().slice(0, 10);
   outDate = tomorrow.toISOString().slice(0, 10);
 }
-  
-  const t = window.translations?.[window._appLang] || {};
 
 
 const propertyType = document.getElementById("propertyTypeFilter")?.value || "";
