@@ -273,9 +273,8 @@ export function generateTripLink(hotel, checkIn, checkOut) {
   }
 
   const city = encodeURIComponent(hotel.city || "Paris");
-  const hotelName = encodeURIComponent(hotel.name || "");
-  
-  const targetUrl = `https://search.hotellook.com/hotels?location=${city}&hotelName=${hotelName}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
+
+  const targetUrl = `https://search.hotellook.com/hotels?location=${city}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
 
   const encodedURL = encodeURIComponent(targetUrl);
 
