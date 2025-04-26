@@ -264,7 +264,7 @@ export function generateTripLink(hotel, checkIn, checkOut) {
   const p = "4115";
   const campaign = "101";
 
-  // ➡️ Проверяем даты в самом начале
+  // ➡️ Проверяем даты
   if (!checkIn || !checkOut) {
     const today = new Date();
     const tomorrow = new Date(today);
@@ -273,9 +273,15 @@ export function generateTripLink(hotel, checkIn, checkOut) {
     checkOut = tomorrow.toISOString().slice(0, 10);
   }
 
-  // Проверка: если нет города — fallback
-  const city = encodeURIComponent(hotel.city || "Paris");
-  const targetUrl = `https://search.hotellook.com/?location=${city}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
+  // ✅ Строим ссылку на конкретный отель через hotelId, если он есть
+  let targetUrl;
+  if (hotel.id) {
+    targetUrl = `https://search.hotellook.com/?hotelId=${hotel.id}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
+  } else {
+    const city = encodeURIComponent(hotel.city || "Paris");
+    targetUrl = `https://search.hotellook.com/?location=${city}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
+  }
+
   const encodedURL = encodeURIComponent(targetUrl);
 
   return `${base}?marker=${marker}&trs=${trs}&p=${p}&u=${encodedURL}&campaign_id=${campaign}`;
