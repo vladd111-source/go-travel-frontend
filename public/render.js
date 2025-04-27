@@ -275,7 +275,7 @@ filteredHotels.forEach((hotel) => {
 animateCards("#hotelsResult .card");
 
 // Travelpayouts партнёрская ссылка:
- function generateTripLink(hotel, checkIn, checkOut) {
+  export function generateTripLink(hotel, checkIn, checkOut) {
   const base = "https://tp.media/r";
   const marker = "618281";
   const trs = "402148";
