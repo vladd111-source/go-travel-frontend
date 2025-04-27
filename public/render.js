@@ -1,3 +1,4 @@
+console.log("✅ render.js подключен успешно");
 import { animateCards } from './globals.js';
 // ✅ Переводы (если не определены)
 if (!window.translations) {
