@@ -21,6 +21,37 @@ if (!window.translations) {
 export const lang = localStorage.getItem("lang") || "ru";
 export const t = window.translations[lang] || window.translations["ru"];
 
+// Travelpayouts партнёрская ссылка:
+  export function generateTripLink(hotel, checkIn, checkOut) {
+  const base = "https://tp.media/r";
+  const marker = "618281";
+  const trs = "402148";
+  const p = "4115";
+  const campaign = "101";
+
+  if (!checkIn || !checkOut) {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    checkIn = today.toISOString().slice(0, 10);
+    checkOut = tomorrow.toISOString().slice(0, 10);
+  }
+
+  let targetUrl;
+  if (hotel.id) {
+    // ❗ Только hotelId без дат
+    targetUrl = `https://search.hotellook.com/?hotelId=${hotel.id}&currency=usd`;
+  } else {
+    // 🔥 Только здесь можно вставить checkIn / checkOut
+    const city = encodeURIComponent(hotel.city || "Paris");
+    targetUrl = `https://search.hotellook.com/hotels?location=${city}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
+  }
+
+  const encodedURL = encodeURIComponent(targetUrl);
+
+  return `${base}?marker=${marker}&trs=${trs}&p=${p}&u=${encodedURL}&campaign_id=${campaign}`;
+}
+  
 // Кэш IATA-городов
 const cityNameCache = {};
 
@@ -274,38 +305,6 @@ filteredHotels.forEach((hotel) => {
 
 animateCards("#hotelsResult .card");
 
-// Travelpayouts партнёрская ссылка:
-  export function generateTripLink(hotel, checkIn, checkOut) {
-  const base = "https://tp.media/r";
-  const marker = "618281";
-  const trs = "402148";
-  const p = "4115";
-  const campaign = "101";
-
-  if (!checkIn || !checkOut) {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    checkIn = today.toISOString().slice(0, 10);
-    checkOut = tomorrow.toISOString().slice(0, 10);
-  }
-
-  let targetUrl;
-  if (hotel.id) {
-    // ❗ Только hotelId без дат
-    targetUrl = `https://search.hotellook.com/?hotelId=${hotel.id}&currency=usd`;
-  } else {
-    // 🔥 Только здесь можно вставить checkIn / checkOut
-    const city = encodeURIComponent(hotel.city || "Paris");
-    targetUrl = `https://search.hotellook.com/hotels?location=${city}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
-  }
-
-  const encodedURL = encodeURIComponent(targetUrl);
-
-  return `${base}?marker=${marker}&trs=${trs}&p=${p}&u=${encodedURL}&campaign_id=${campaign}`;
-}
-window.generateTripLink = generateTripLink;
-  
 //Места
 export function renderPlaces(places) {
   const container = document.getElementById("placesResult");
