@@ -611,3 +611,4 @@ document.getElementById("hotOnly")?.addEventListener("change", (e) => {
     departureInput?.setAttribute("required", "true");
   }
 });
+});
