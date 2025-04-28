@@ -263,5 +263,14 @@ export function renderPlaces(places) {
     container.appendChild(card);
   });
 }
+export function animateCards(selector) {
+  const cards = document.querySelectorAll(selector);
+  cards.forEach((card, i) => {
+    setTimeout(() => {
+      card.classList.remove("opacity-0", "scale-95");
+      card.classList.add("opacity-100", "scale-100");
+    }, i * 100);
+  });
+}
 // Сделать функции глобально доступными
 window.generateAviasalesLink = generateAviasalesLink;
