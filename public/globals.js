@@ -297,11 +297,11 @@ function animateCards(selector) {
   }, 50);
 }
 
-function showLoading() {
+export function showLoading() {
   document.getElementById("loadingSpinner")?.classList.remove("hidden");
 }
 
-function hideLoading() {
+export function hideLoading() {
   document.getElementById("loadingSpinner")?.classList.add("hidden");
 }
 
