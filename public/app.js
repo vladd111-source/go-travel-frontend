@@ -4,24 +4,25 @@ import { showLoading, hideLoading } from './globals.js';
 // Добавляешь сюда 👇
 export async function searchHotels(city, checkIn = '', checkOut = '') {
   try {
-    const token = '067df6a5f1de28c8a898bc83744dfdcd';
+    const token = '067df6a5f1de28c8a898bc83744dfdcd'; // твой токен
+    const url = `https://engine.hotellook.com/api/v2/lookup.json?query=${encodeURIComponent(city)}&token=${token}`;
 
-    // 1. Получаем координаты города через OpenStreetMap
-    const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`);
-    const geoData = await geoRes.json();
-    if (!geoData.length) throw new Error("Город не найден");
+    const lookupResponse = await fetch(url);
+    if (!lookupResponse.ok) throw new Error(`Ошибка определения локации: ${lookupResponse.status}`);
+    const lookupData = await lookupResponse.json();
 
-    const { lat, lon } = geoData[0];
+    const locationId = lookupData?.results?.locations?.[0]?.id;
+    if (!locationId) throw new Error('Локация не найдена');
 
-    // 2. Ищем отели по координатам
-   const url = `https://engine.hotellook.com/api/v2/cache.json?lat=${lat}&lon=${lon}&radius=40&limit=20&checkIn=${checkIn}&checkOut=${checkOut}&token=${token}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    const hotelsUrl = `https://engine.hotellook.com/api/v2/cache.json?locationId=${locationId}&checkIn=${checkIn}&checkOut=${checkOut}&token=${token}`;
 
-    const hotels = await response.json();
+    const hotelsResponse = await fetch(hotelsUrl);
+    if (!hotelsResponse.ok) throw new Error(`Ошибка поиска отелей: ${hotelsResponse.status}`);
+
+    const hotels = await hotelsResponse.json();
     return hotels || [];
   } catch (error) {
-    console.error('❌ Ошибка поиска отелей:', error);
+    console.error('❌ Ошибка поиска отелей через Travelpayouts:', error);
     return [];
   }
 }
