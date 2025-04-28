@@ -238,7 +238,6 @@ export function renderHotels(hotels) {
     const hotelName = hotel.name || hotel.hotelName || "Без названия";
     const hotelCity = hotel.city || "Город неизвестен";
     const hotelPrice = hotel.pricePerNight ? `$${hotel.pricePerNight.toFixed(2)}` : "Нет данных";
-    const hotelRating = hotel.rating ? `${hotel.rating} ⭐` : "Без рейтинга";
 
     const imageUrl = hotel.image 
       ? hotel.image 
@@ -250,7 +249,6 @@ export function renderHotels(hotels) {
       <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover" />
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
-      <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotelRating}</p>
       <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
       <a href="${bookingUrl}" target="_blank" 
          class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center mt-2">
@@ -266,7 +264,6 @@ export function renderHotels(hotels) {
   container.classList.add('visible');
   animateCards("#hotelsResult .card");
 }
-
 
 //Места
 export function renderPlaces(places) {
