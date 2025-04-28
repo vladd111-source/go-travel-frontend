@@ -1,4 +1,4 @@
-import { animateCards } from './globals.js';
+import { animateCards, showLoading, hideLoading } from './globals.js';
 // ✅ Переводы (если не определены)
 if (!window.translations) {
   window.translations = {
