@@ -30,15 +30,6 @@
         padding: 0.4rem 0.75rem !important;
       }
     }
-    label {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1rem;
-      font-weight: 500;
-      color: #111827;
-      margin-bottom: 0.5rem;
-    }
   </style>
 </head>
 <body class="opacity-0 bg-gradient-to-r from-sky-100 to-indigo-100 min-h-screen p-4 font-[Inter]">
@@ -58,10 +49,13 @@
 
   <!-- Вкладки -->
   <div class="flex justify-center mb-4 gap-2 flex-wrap">
-    <button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('flights')" data-i18n="flights">Билеты</button>
-    <button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('hotels')" data-i18n="hotels">Отели</button>
-    <button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('places')" data-i18n="places">🌍 Места</button>
-    <button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('favorites')">❤️</button>
+   <button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('flights')" data-i18n="flights">Билеты</button>
+
+<button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('hotels')" data-i18n="hotels">Отели</button>
+
+<button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('places')" data-i18n="places">🌍 Места</button>
+
+<button class="tab-btn px-4 py-2 rounded-xl text-sm font-medium bg-white shadow transition transform duration-200 hover:shadow-md hover:scale-95 active:scale-90 focus:outline-none" onclick="showTab('favorites')">❤️</button>
   </div>
 
 <!-- ✈️ Перелёты -->
@@ -139,76 +133,69 @@
 <div id="hotels" class="tab hidden">
   <form id="hotelForm" class="bg-white p-4 rounded-xl shadow mb-4 space-y-4">
     <h3 class="text-base font-semibold mb-2" data-i18n="hotelFilters"></h3>
+    <input type="text" id="hotelCity" class="input" required data-i18n-placeholder="city" />
 
-    <!-- Город -->
-    <div>
-      <label for="hotelCity" class="block font-medium text-gray-700" data-i18n="city">Город</label>
-      <input type="text" id="hotelCity" class="input" required data-i18n-placeholder="city" />
-    </div>
-
-    <!-- Даты -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
-        <label for="checkIn" class="block font-medium text-gray-700" data-i18n="checkIn">Дата заезда</label>
+        <label class="label" for="checkIn" data-i18n="checkIn"></label>
         <input type="date" id="checkIn" class="input" />
       </div>
       <div>
-        <label for="checkOut" class="block font-medium text-gray-700" data-i18n="checkOut">Дата выезда</label>
+        <label class="label" for="checkOut" data-i18n="checkOut"></label>
         <input type="date" id="checkOut" class="input" />
       </div>
     </div>
 
-    <!-- Фильтры чекбокс -->
     <div class="mt-4">
-      <label for="toggleFilters" class="flex items-center gap-2 font-medium text-gray-700">
+      <label for="toggleFilters" class="label flex items-center gap-2">
         <input type="checkbox" id="toggleFilters" class="checkbox" />
         <span>Фильтры</span>
       </label>
     </div>
 
-    <!-- 🔎 Детали фильтра -->
     <div id="hotelFilters" class="hidden mt-2">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-        <!-- 💰 Цена -->
-        <div class="col-span-2 mt-4">
-          <label for="priceRange" class="block font-medium text-gray-700 mb-1" data-i18n="priceTo">Цена</label>
-          <div class="relative w-full pt-10">
-            <input
-              type="range"
-              id="priceRange"
-              min="0"
-              max="500"
-              step="10"
-              value="250"
-              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500 slider-thumb" />
-            <div id="priceTooltip"
-              class="absolute -top-11 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow transition-all pointer-events-none">
-              $250
-            </div>
-          </div>
-        </div>
- <!--✅Тип жилья-->
+      
+<!-- 💰 Ползунок с tooltip -->
 <div class="col-span-2 mt-4">
-  <label for="propertyTypeFilter" class="block text-sm font-medium text-gray-700 mb-1">Тип жилья:</label>
-  <select id="propertyTypeFilter" class="border p-2 rounded w-full">
-    <option value="">Все типы жилья</option>
-    <option value="hotel">Отели</option>
-    <option value="apartment">Апартаменты</option>
-  </select>
+  <label for="priceRange" class="label block mb-1" data-i18n="priceTo">Цена</label>
+ <div class="relative w-full pt-10"> <!-- добавили pt-10 -->
+  <input
+    type="range"
+    id="priceRange"
+    min="0"
+    max="500"
+    step="10"
+    value="250"
+    class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500 slider-thumb" />
+  <div id="priceTooltip"
+    class="absolute -top-11 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow transition-all pointer-events-none">
+    $250
+  </div>
 </div>
+</div>
+        <!-- ⭐️ Рейтинг -->
+        <div class="col-span-2">
+          <label for="minRating" class="label" data-i18n="ratingMin">Рейтинг</label>
+          <input
+            type="number"
+            id="minRating"
+            class="input"
+            min="0"
+            max="10"
+            step="1"
+            placeholder="от 0 до 10" />
+        </div>
       </div>
     </div>
 
-    <!-- ✅ Кнопка -->
+    <!-- ✅ Кнопка Найти отель -->
     <button type="submit" class="btn btn-blue w-full sm:w-auto" data-i18n="findHotel">
       🔍 Найти отель
     </button>
   </form>
-
-  <!-- Результаты -->
   <div id="hotelsResult"></div>
-</div>
+</div> <!-- ✅ Закрытие блока отелей -->
   
   <!-- 🌍 Места -->
 <div id="places" class="tab hidden">
@@ -267,21 +254,24 @@
   </script>
   
  <!-- 🛟 Safelist классов для Tailwind -->
+<!-- 🛟 Safelist для Tailwind -->
 <div class="hidden">
   <button class="btn btn-blue"></button>
   <button class="btn btn-red"></button>
 </div>
-  
+  <link rel="icon" href="/favicon.ico" />
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <!-- Глобальные функции -->
-<script type="module" src="./globals.js"></script>
+<script type="module" src="globals.js"></script>
 
 <!-- Основной модуль -->
-<script type="module" src="./render.js"></script>
-<script type="module" src="./app.js"></script>
-  
+<script type="module" src="app.js"></script>
+<script type="module" src="render.js"></script>
+
+<!-- Стили -->
+<link href="style.css" rel="stylesheet">
 <!-- 🪟 Универсальное модальное окно -->
 <div id="detailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
   <div class="bg-white rounded-xl p-6 max-w-sm w-full relative shadow-lg">
