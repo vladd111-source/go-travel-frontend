@@ -208,11 +208,27 @@ export function renderHotels(hotels) {
     }
   }
 
-  // 🔥 Фильтрация: цена до $500
-  hotels = hotels.filter(hotel => hotel.price && hotel.price <= 500);
+  // 📅 Расчет количества ночей
+  const checkIn = document.getElementById("checkIn")?.value;
+  const checkOut = document.getElementById("checkOut")?.value;
+  let nights = 1;
+  if (checkIn && checkOut) {
+    const dateIn = new Date(checkIn);
+    const dateOut = new Date(checkOut);
+    const diffMs = dateOut - dateIn;
+    nights = Math.max(1, diffMs / (1000 * 60 * 60 * 24));
+  }
 
-  // 🔥 Сортировка: цена по возрастанию
-  hotels.sort((a, b) => (a.price || 0) - (b.price || 0));
+  // 🔥 Пересчёт цены за ночь
+  hotels.forEach(hotel => {
+    hotel.pricePerNight = hotel.price && nights ? (hotel.price / nights) : 0;
+  });
+
+  // 🔥 Фильтрация: цена за ночь до $500
+  hotels = hotels.filter(hotel => hotel.pricePerNight && hotel.pricePerNight <= 500);
+
+  // 🔥 Сортировка по цене за ночь (по возрастанию)
+  hotels.sort((a, b) => (a.pricePerNight || 0) - (b.pricePerNight || 0));
 
   hotels.forEach(hotel => {
     const card = document.createElement("div");
@@ -221,7 +237,7 @@ export function renderHotels(hotels) {
     const hotelId = hotel.hotelId || hotel.id;
     const hotelName = hotel.name || hotel.hotelName || "Без названия";
     const hotelCity = hotel.city || "Город неизвестен";
-    const hotelPrice = hotel.price ? `$${hotel.price}` : "Нет данных";
+    const hotelPrice = hotel.pricePerNight ? `$${hotel.pricePerNight.toFixed(2)}` : "Нет данных";
     const hotelRating = hotel.rating ? `${hotel.rating} ⭐` : "Без рейтинга";
 
     const imageUrl = hotel.image 
@@ -235,7 +251,7 @@ export function renderHotels(hotels) {
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
       <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotelRating}</p>
-      <p class="text-sm text-gray-600 mb-1">💰 Цена: ${hotelPrice}</p>
+      <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
       <a href="${bookingUrl}" target="_blank" 
          class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center mt-2">
          🔗 Забронировать
@@ -250,6 +266,7 @@ export function renderHotels(hotels) {
   container.classList.add('visible');
   animateCards("#hotelsResult .card");
 }
+
 
 //Места
 export function renderPlaces(places) {
