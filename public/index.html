@@ -174,18 +174,16 @@
   </div>
 </div>
 </div>
-        <!-- ⭐️ Рейтинг -->
-        <div class="col-span-2">
-          <label for="minRating" class="label" data-i18n="ratingMin">Рейтинг</label>
-          <input
-            type="number"
-            id="minRating"
-            class="input"
-            min="0"
-            max="10"
-            step="1"
-            placeholder="от 0 до 10" />
-        </div>
+        <!-- 🏨 Тип жилья -->
+<div class="col-span-2 mt-4">
+  <label for="propertyTypeFilter" class="label block mb-1">Тип жилья</label>
+  <select id="propertyTypeFilter"
+    class="input w-full bg-sky-100 text-black border border-gray-300 rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+    <option value="">Все</option>
+    <option value="hotel">🏨 Отель</option>
+    <option value="apartment">🏢 Квартира</option>
+  </select>
+</div>
       </div>
     </div>
 
