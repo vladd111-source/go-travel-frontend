@@ -208,6 +208,12 @@ export function renderHotels(hotels) {
     }
   }
 
+  // 🔥 Фильтрация: цена до $500
+  hotels = hotels.filter(hotel => hotel.price && hotel.price <= 500);
+
+  // 🔥 Сортировка: цена по возрастанию
+  hotels.sort((a, b) => (a.price || 0) - (b.price || 0));
+
   hotels.forEach(hotel => {
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
@@ -236,7 +242,7 @@ export function renderHotels(hotels) {
       </a>
     `;
 
-    console.log('✅ Карточка добавлена:', card);
+    console.log('✅ Карточка добавлена:', hotelName);
 
     container.appendChild(card);
   });
