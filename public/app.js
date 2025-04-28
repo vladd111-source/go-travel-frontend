@@ -4,8 +4,17 @@ import { showLoading, hideLoading } from './globals.js';
 // Добавляешь сюда 👇
 export async function searchHotels(city, checkIn = '', checkOut = '') {
   try {
-    const token = '067df6a5f1de28c8a898bc83744dfdcd'; // твой Hotellook API token
-    const url = `https://engine.hotellook.com/api/v2/cache.json?city=${encodeURIComponent(city)}&checkIn=${checkIn}&checkOut=${checkOut}&token=${token}`;
+    const token = '067df6a5f1de28c8a898bc83744dfdcd';
+
+    // 1. Получаем координаты города через OpenStreetMap
+    const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`);
+    const geoData = await geoRes.json();
+    if (!geoData.length) throw new Error("Город не найден");
+
+    const { lat, lon } = geoData[0];
+
+    // 2. Ищем отели по координатам
+    const url = `https://engine.hotellook.com/api/v2/cache.json?lat=${lat}&lon=${lon}&checkIn=${checkIn}&checkOut=${checkOut}&token=${token}`;
 
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
