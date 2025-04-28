@@ -291,9 +291,8 @@ function formatCategory(code) {
 export function animateCards(selector) {
   setTimeout(() => {
     document.querySelectorAll(selector).forEach(card => {
-      card.classList.add("visible"); // ✨ добавляем .visible для fadeInUp
-      card.classList.remove("opacity-0", "scale-95"); // на всякий случай
-      card.classList.add("opacity-100", "scale-100"); // на всякий случай
+      card.classList.add("visible", "opacity-100", "scale-100");
+      card.classList.remove("opacity-0", "scale-95");
     });
   }, 50);
 }
