@@ -186,6 +186,7 @@ const t = window.translations[lang];
   }
 }
 
+console.log("Отели для рендера:", hotels);
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
