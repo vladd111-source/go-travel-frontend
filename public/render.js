@@ -195,7 +195,6 @@ export function renderHotels(hotels) {
     return;
   }
 
-  // 🔥 Новый код: фильтрация по типу жилья
   const propertyTypeFilter = document.getElementById("propertyTypeFilter");
   if (propertyTypeFilter) {
     const propertyType = propertyTypeFilter.value;
@@ -209,12 +208,14 @@ export function renderHotels(hotels) {
     }
   }
 
-  // 🏨 Дальше идёт отрисовка карточек
   hotels.forEach(hotel => {
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4";
 
+    const imageUrl = hotel.image || `https://photo.hotellook.com/image_v2/limit/${hotel.id}/800/520.auto`;
+
     card.innerHTML = `
+      <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover" />
       <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
       <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price}</p>
