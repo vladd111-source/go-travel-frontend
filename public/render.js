@@ -1,58 +1,21 @@
-import { animateCards, showLoading, hideLoading } from './globals.js';
-// ✅ Переводы (если не определены)
-if (!window.translations) {
-  window.translations = {
-    ru: {
-      time: "Время",
-      duration: "В пути",
-      hotDeal: "Горячее предложение",
-      bookNow: "Перейти к бронированию"
-    },
-    en: {
-      time: "Time",
-      duration: "Duration",
-      hotDeal: "Hot deal",
-      bookNow: "Book now"
-    }
-  };
-}
-
-// Текущий язык
-export const lang = localStorage.getItem("lang") || "ru";
-export const t = window.translations[lang] || window.translations["ru"];
-
-// Travelpayouts партнёрская ссылка:
-  export function generateTripLink(hotel, checkIn, checkOut) {
-  const base = "https://tp.media/r";
-  const marker = "618281";
-  const trs = "402148";
-  const p = "4115";
-  const campaign = "101";
-
-  if (!checkIn || !checkOut) {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    checkIn = today.toISOString().slice(0, 10);
-    checkOut = tomorrow.toISOString().slice(0, 10);
+// ✅ Переводы (перенесено из app.js сюда)
+window.translations = {
+  ru: {
+    time: "Время",
+    duration: "В пути",
+    hotDeal: "Горячее предложение",
+    bookNow: "Перейти к бронированию"
+  },
+  en: {
+    time: "Time",
+    duration: "Duration",
+    hotDeal: "Hot deal",
+    bookNow: "Book now"
   }
+};
+const lang = localStorage.getItem("lang") || "ru";
+const t = window.translations[lang] || window.translations["ru"];
 
-  let targetUrl;
-  if (hotel.id) {
-    // ❗ Только hotelId без дат
-    targetUrl = `https://search.hotellook.com/?hotelId=${hotel.id}&currency=usd`;
-  } else {
-    // 🔥 Только здесь можно вставить checkIn / checkOut
-    const city = encodeURIComponent(hotel.city || "Paris");
-    targetUrl = `https://search.hotellook.com/hotels?location=${city}&checkIn=${checkIn}&checkOut=${checkOut}&currency=usd`;
-  }
-
-  const encodedURL = encodeURIComponent(targetUrl);
-
-  return `${base}?marker=${marker}&trs=${trs}&p=${p}&u=${encodedURL}&campaign_id=${campaign}`;
-}
-  
-// Кэш IATA-городов
 const cityNameCache = {};
 
 export async function getCityName(iata, lang = "ru") {
@@ -180,6 +143,8 @@ export async function renderFlights(
       ${isHot ? 'bg-yellow-100 border-yellow-300' : 'bg-white'}
     `.trim();
     
+const t = window.translations[lang];
+    
   card.innerHTML = `
   <div class="flex items-center gap-2 mb-1">
     <h3 class="text-xl font-bold">${airline}</h3>
@@ -191,11 +156,10 @@ export async function renderFlights(
   <div class="text-sm text-gray-600 mb-1">🕒 ${t.duration || "В пути"}: ${durationText}</div>
   <div class="text-lg font-bold text-gray-800 mb-1">💰 $${price}</div>
   <div class="flex justify-between items-center gap-2 mt-2">
-   <button 
- onclick="window.open('${link}', '_blank')"
-  class="btn btn-blue text-sm w-full rounded-xl">
-  ${t.bookNow || 'Забронировать'}
-</button>
+    <a href="${link}" target="_blank"
+       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition text-center">
+       ${t.bookNow || "Перейти к бронированию"}
+    </a>
     <button 
       onclick="toggleFavoriteFlight('${dealId}', this)" 
       class="text-2xl text-center text-gray-600 hover:text-blue-600 transition"
@@ -222,7 +186,7 @@ export async function renderFlights(
   }
 }
 
-export function renderHotels(hotels, checkIn, checkOut) {
+export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
 
@@ -230,82 +194,22 @@ export function renderHotels(hotels, checkIn, checkOut) {
     container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены</div>`;
     return;
   }
-  
-let inDate = checkIn || document.getElementById("checkIn")?.value;
-let outDate = checkOut || document.getElementById("checkOut")?.value;
 
-if (!inDate || !outDate) {
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  inDate = today.toISOString().slice(0, 10);
-  outDate = tomorrow.toISOString().slice(0, 10);
-}
+  hotels.forEach(hotel => {
+    const card = document.createElement("div");
+    card.className = "card bg-white p-4 rounded-xl shadow mb-4";
 
-
-let filteredHotels = hotels;
-
-const propertyTypeFilter = document.getElementById("propertyTypeFilter");
-if (propertyTypeFilter) {
-  const propertyType = propertyTypeFilter.value || "";
-  if (propertyType) {
-    filteredHotels = hotels.filter(hotel => {
-      const type = (hotel.property_type || "").toLowerCase();
-      if (propertyType === "hotel") return type.includes("hotel");
-      if (propertyType === "apartment") return type.includes("apartment");
-      return true;
-    });
-  }
-}
-  
-  // ❗ Если после фильтра ничего нет — показать сообщение
-  if (!filteredHotels.length) {
-    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Ничего не найдено по фильтру</div>`;
-    return;
-  }
-// 🛠️ Дальше идёт рендер карточек
-filteredHotels.forEach((hotel) => {
-  if (!hotel.id) return;
-
-  const card = document.createElement("div");
-  card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300 sm:flex sm:items-start sm:gap-4";
-
-  const bookingUrl = generateTripLink(hotel, inDate, outDate);
-  const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
-  const favHotels = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-  const isFav = favHotels.some(f => f.name === hotel.name && f.city === hotel.city);
-
-  const imageUrl = hotel.image || `https://photo.hotellook.com/image_v2/limit/${hotel.id}/800/520.auto`;
-  const nights = Math.max(1, Math.ceil((new Date(outDate) - new Date(inDate)) / (1000 * 60 * 60 * 24)));
-  const totalPrice = hotel.price * nights;
-  const bookingPrice = (totalPrice * (1 + (Math.random() * 0.02 + 0.02))).toFixed(2);
-
-  card.innerHTML = `
-    <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover sm:w-64 sm:h-auto" />
-    <div class="flex-1">
+    card.innerHTML = `
       <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
-      <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city || '—'}</p>
-      <p class="text-sm text-gray-600 mb-1">⭐ ${hotel.rating !== undefined ? `Рейтинг: ${hotel.rating}` : 'Рейтинг: —'}</p>
-      <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price} / ночь</p>
-      <p class="text-xs text-gray-400 italic mb-1">Итого за ${nights} ноч${nights === 1 ? 'ь' : nights < 5 ? 'и' : 'ей'} — $${totalPrice.toFixed(2)}</p>
-      <p class="text-xs text-gray-400 italic mb-2">Цена на Букинге: $${bookingPrice}</p>
-      <div class="flex justify-between items-center mt-2">
-        <a href="${bookingUrl}" target="_blank" class="btn btn-blue text-sm" onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source || 'N/A'}')">
-          ${t.bookNow || 'Забронировать'}
-        </a>
-        <button onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" class="text-xl ml-2" data-hotel-id="${encodedHotel}">
-          ${isFav ? '💙' : '🤍'}
-        </button>
-      </div>
-    </div>
-  `;
+      <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
+      <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
+      <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price}</p>
+    `;
 
-  container.appendChild(card);
-});
+    container.appendChild(card);
+  });
+}
 
-animateCards("#hotelsResult .card");
-
-//Места
 export function renderPlaces(places) {
   const container = document.getElementById("placesResult");
   container.innerHTML = "";
@@ -329,66 +233,5 @@ export function renderPlaces(places) {
     container.appendChild(card);
   });
 }
-
-export function renderFavoriteHotels() {
- let inDate = document.getElementById("checkIn")?.value;
-let outDate = document.getElementById("checkOut")?.value;
-
-if (!inDate || !outDate) {
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  inDate = today.toISOString().slice(0, 10);
-  outDate = tomorrow.toISOString().slice(0, 10);
-}
-
-  const container = document.getElementById("favContent-hotels");
-  container.innerHTML = "";
-
-  const favorites = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-  if (!favorites.length) {
-    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Нет избранных отелей</div>`;
-    return;
-  }
-
-  favorites.forEach((hotel) => {
-    const card = document.createElement("div");
-    card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transform transition-all duration-300";
-
-    const bookingUrl = generateTripLink(hotel, inDate, outDate);
-    const encodedHotel = encodeURIComponent(JSON.stringify(hotel));
-
-    card.innerHTML = `
-      <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
-      <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
-      <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
-      <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price}</p>
-      <div class="flex justify-between items-center mt-2">
-        <a href="${bookingUrl}" target="_blank" class="btn btn-blue text-sm" onclick="trackHotelClick('${bookingUrl}', '${hotel.name}', '${hotel.city}', '${hotel.price}', '${hotel.partner || hotel.source}')">
-          ${t.bookNow || 'Забронировать'}
-        </a>
-        <button onclick="toggleFavoriteHotelFromEncoded('${encodedHotel}', this)" class="text-xl ml-2" data-hotel-id="${encodedHotel}">
-          💙
-        </button>
-      </div>
-    `;
-
-    container.appendChild(card);
-  });
-
-  animateCards("#favContent-hotels .card");
-}
-
-export function trackHotelClick(url, name, city, price, source) {
-  const telegramId = window.initDataUnsafe?.user?.id || 'unknown';
-
-  trackEvent('click_hotel_booking', {
-    telegram_id: telegramId,
-    hotel_name: name,
-    city: city,
-    price: price,
-    source: source,
-    url: url,
-    timestamp: new Date().toISOString()
-  });
-}
+// Сделать функции глобально доступными
+window.generateAviasalesLink = generateAviasalesLink;
