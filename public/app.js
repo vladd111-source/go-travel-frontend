@@ -14,8 +14,7 @@ export async function searchHotels(city, checkIn = '', checkOut = '') {
     const { lat, lon } = geoData[0];
 
     // 2. Ищем отели по координатам
-    const url = `https://engine.hotellook.com/api/v2/cache.json?lat=${lat}&lon=${lon}&checkIn=${checkIn}&checkOut=${checkOut}&token=${token}`;
-
+   const url = `https://engine.hotellook.com/api/v2/cache.json?lat=${lat}&lon=${lon}&radius=40&limit=20&checkIn=${checkIn}&checkOut=${checkOut}&token=${token}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
