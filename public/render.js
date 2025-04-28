@@ -208,30 +208,32 @@ export function renderHotels(hotels) {
     }
   }
 
-  hotels.forEach(hotel => {
-    const card = document.createElement("div");
-    card.className = "card bg-white p-4 rounded-xl shadow mb-4";
+ hotels.forEach(hotel => {
+  const card = document.createElement("div");
+  card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 transform scale-95 transition-all duration-300";
 
-    const hotelId = hotel.hotelId || hotel.id;
-    const imageUrl = hotel.image 
-      ? hotel.image 
-      : (hotelId ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.auto` : `https://via.placeholder.com/800x520?text=No+Image`);
+  const hotelId = hotel.hotelId || hotel.id;
+  const imageUrl = hotel.image 
+    ? hotel.image 
+    : (hotelId ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.auto` : `https://via.placeholder.com/800x520?text=No+Image`);
 
-    const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent('https://search.hotellook.com/?location=' + encodeURIComponent(hotel.city) + '&name=' + encodeURIComponent(hotel.name))}&campaign_id=101`;
+  const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent('https://search.hotellook.com/?location=' + encodeURIComponent(hotel.city) + '&name=' + encodeURIComponent(hotel.name))}&campaign_id=101`;
 
-    card.innerHTML = `
-      <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover" />
-      <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
-      <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city || 'Город неизвестен'}</p>
-      <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price || 'Нет данных'}</p>
-      <a href="${bookingUrl}" target="_blank" 
-         class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center mt-2">
-         🔗 Забронировать
-      </a>
-    `;
+  card.innerHTML = `
+    <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover" />
+    <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
+    <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city || 'Город неизвестен'}</p>
+    <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price || 'Нет данных'}</p>
+    <a href="${bookingUrl}" target="_blank" 
+       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center mt-2">
+       🔗 Забронировать
+    </a>
+  `;
 
-    container.appendChild(card);
-  });
+  console.log('✅ Карточка добавлена:', card); // ← СЮДА ВНУТРЬ
+
+  container.appendChild(card);
+});
 
   // ✨ После создания всех карточек анимируем
   animateCards("#hotelsResult .card");
