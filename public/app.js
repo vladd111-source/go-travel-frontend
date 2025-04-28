@@ -14,7 +14,7 @@ export async function searchHotels(city, checkIn = '', checkOut = '') {
     const locationId = lookupData?.results?.locations?.[0]?.id;
     if (!locationId) throw new Error('Локация не найдена');
 
-  const hotelsUrl = `https://engine.hotellook.com/api/v2/cache.json?locationId=${locationId}&checkIn=${checkIn}&checkOut=${checkOut}&token=${token}&marker=618281`;
+  const hotelsUrl = `https://engine.hotellook.com/api/v2/cache.json?locationId=${locationId}&checkIn=${checkIn}&checkOut=${checkOut}&limit=100&token=${token}&marker=618281`;
     const hotelsResponse = await fetch(hotelsUrl);
     if (!hotelsResponse.ok) throw new Error(`Ошибка поиска отелей: ${hotelsResponse.status}`);
 
