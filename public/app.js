@@ -1,4 +1,22 @@
-import { renderFlights, renderHotels, renderPlaces } from './render.js';
+import { renderHotels, renderFlights, renderPlaces } from './render.js';
+import { showLoading, hideLoading } from './globals.js';
+
+// Добавляешь сюда 👇
+export async function searchHotels(city, checkIn = '', checkOut = '') {
+  try {
+    const token = '067df6a5f1de28c8a898bc83744dfdcd'; // твой Hotellook API token
+    const url = `https://engine.hotellook.com/api/v2/cache.json?city=${encodeURIComponent(city)}&checkIn=${checkIn}&checkOut=${checkOut}&token=${token}`;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+    const hotels = await response.json();
+    return hotels || [];
+  } catch (error) {
+    console.error('❌ Ошибка поиска отелей:', error);
+    return [];
+  }
+}
 
 const iataCache = {};
 
