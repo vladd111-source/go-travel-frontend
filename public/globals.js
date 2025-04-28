@@ -1,5 +1,5 @@
 // ❌ ничего не импортируем — просто используем window.generateAviasalesLink()
-import { animateCards } from './globals.js';
+import { renderFlights, renderHotels, renderPlaces, generateAviasalesLink } from './render.js';
 // ✅ Supabase init
 const supabaseUrl = 'https://hubrgeitdvodttderspj.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YnJnZWl0ZHZvZHR0ZGVyc3BqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMxNzY0OTEsImV4cCI6MjA1ODc1MjQ5MX0.K44XhDzjOodHzgl_cx80taX8Vgg_thFAVEesZUvKNnA';
@@ -61,37 +61,6 @@ window.translations = {
     hotDeal: "Hot Deal"
   }
 };
-// 
-window.formatTime = function (isoString) {
-  if (!isoString) return "—";
-  const date = new Date(isoString);
-  return date.toISOString().substr(11, 5); // Часы:Минуты
-};
-
-window.formatDuration = function (minutes) {
-  if (!minutes) return "—";
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${h}ч ${m}м`;
-};
-
-window.openHotelLink = function(url, name, city, price, source) {
-  if (Telegram?.WebApp?.openLink) {
-    Telegram.WebApp.openLink(url);
-  } else {
-    window.open(url, "_blank");
-  }
-
-  trackHotelClick(url, name, city, price, source);
-};
-
-export function generateTripLink(hotel) {
-  const base = "https://www.hotellook.com";
-  const query = `?location=${encodeURIComponent(hotel.city)}&name=${encodeURIComponent(hotel.name)}`;
-  const encodedUrl = encodeURIComponent(base + query);
-
-  return `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodedUrl}&campaign_id=101`;
-}
 
 export function showFlightModal(flight) {
   // 🔧 Подстраховка: если нет departure_at, подставим date
@@ -319,7 +288,7 @@ function formatCategory(code) {
 }
 
 // ✅ Анимация карточек
-export function animateCards(selector) {
+function animateCards(selector) {
   setTimeout(() => {
     document.querySelectorAll(selector).forEach(card => {
       card.classList.remove("opacity-0", "scale-95");
@@ -339,8 +308,8 @@ function hideLoading() {
 window.capitalize = capitalize;
 window.formatCategory = formatCategory;
 window.animateCards = animateCards;
-//window.showLoading = showLoading;
-//window.hideLoading = hideLoading;
+window.showLoading = showLoading;
+window.hideLoading = hideLoading;
 window.applyTranslations = applyTranslations;
 window.translations = translations;
 window.supabase = supabase;
@@ -392,34 +361,6 @@ window.toggleFavoriteFlight = function (encodedDeal, btn) {
     price
   });
 };
-
-
-
-
-export function toggleFavoriteHotel(hotel, btn) {
-  const key = "favorites_hotels";
-  let favorites = JSON.parse(localStorage.getItem(key) || "[]");
-
-  const exists = favorites.some(h => h.name === hotel.name && h.city === hotel.city && h.price === hotel.price);
-
-  if (exists) {
-    favorites = favorites.filter(h => !(h.name === hotel.name && h.city === hotel.city && h.price === hotel.price));
-    btn.textContent = "🤍";
-  } else {
-    favorites.push(hotel);
-    btn.textContent = "💙";
-  }
-
-  localStorage.setItem(key, JSON.stringify(favorites));
-  trackEvent?.("Избранное: отель", {
-    action: exists ? "удалено" : "добавлено",
-    name: hotel.name,
-    city: hotel.city,
-    price: hotel.price
-  });
-}
-
-window.toggleFavoriteHotel = toggleFavoriteHotel;
 
 // 👉 Форматирование деталей
 window.formatDetails = function(type, item) {
@@ -666,18 +607,3 @@ window.addEventListener("DOMContentLoaded", async () => {
     localStorage.setItem("hotDealsShown", "1");
   }
 });
-function trackHotelClick(url, name, city, price, source) {
-  const telegramId = window.initDataUnsafe?.user?.id || 'unknown';
-
-  trackEvent('click_hotel_booking', {
-    telegram_id: telegramId,
-    hotel_name: name,
-    city: city,
-    price: price,
-    source: source,
-    url: url,
-    timestamp: new Date().toISOString()
-  });
-}
-window.trackHotelClick = trackHotelClick;
-export { showLoading, hideLoading };
