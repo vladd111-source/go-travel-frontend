@@ -208,34 +208,40 @@ export function renderHotels(hotels) {
     }
   }
 
- hotels.forEach(hotel => {
-  const card = document.createElement("div");
-card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
+  hotels.forEach(hotel => {
+    const card = document.createElement("div");
+    card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
 
-  const hotelId = hotel.hotelId || hotel.id;
-  const imageUrl = hotel.image 
-    ? hotel.image 
-    : (hotelId ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.auto` : `https://via.placeholder.com/800x520?text=No+Image`);
+    const hotelId = hotel.hotelId || hotel.id;
+    const hotelName = hotel.name || hotel.hotelName || "Без названия";
+    const hotelCity = hotel.city || "Город неизвестен";
+    const hotelPrice = hotel.price ? `$${hotel.price}` : "Нет данных";
+    const hotelRating = hotel.rating ? `${hotel.rating} ⭐` : "Без рейтинга";
 
-  const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent('https://search.hotellook.com/?location=' + encodeURIComponent(hotel.city) + '&name=' + encodeURIComponent(hotel.name))}&campaign_id=101`;
+    const imageUrl = hotel.image 
+      ? hotel.image 
+      : (hotelId ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.auto` : `https://via.placeholder.com/800x520?text=No+Image`);
 
-  card.innerHTML = `
-    <img src="${imageUrl}" alt="${hotel.name}" class="rounded-lg mb-3 w-full h-48 object-cover" />
-    <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
-    <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city || 'Город неизвестен'}</p>
-    <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price || 'Нет данных'}</p>
-    <a href="${bookingUrl}" target="_blank" 
-       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center mt-2">
-       🔗 Забронировать
-    </a>
-  `;
+    const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent('https://search.hotellook.com/?location=' + encodeURIComponent(hotelCity) + '&name=' + encodeURIComponent(hotelName))}&campaign_id=101`;
 
-  console.log('✅ Карточка добавлена:', card); // ← СЮДА ВНУТРЬ
+    card.innerHTML = `
+      <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover" />
+      <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
+      <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
+      <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotelRating}</p>
+      <p class="text-sm text-gray-600 mb-1">💰 Цена: ${hotelPrice}</p>
+      <a href="${bookingUrl}" target="_blank" 
+         class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center mt-2">
+         🔗 Забронировать
+      </a>
+    `;
 
-  container.appendChild(card);
-});
-container.classList.add('visible');
-  // ✨ После создания всех карточек анимируем
+    console.log('✅ Карточка добавлена:', card);
+
+    container.appendChild(card);
+  });
+
+  container.classList.add('visible');
   animateCards("#hotelsResult .card");
 }
 
