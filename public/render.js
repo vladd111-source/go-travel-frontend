@@ -196,16 +196,12 @@ export function renderHotels(hotels) {
   }
 
   const propertyTypeFilter = document.getElementById("propertyTypeFilter");
-  if (propertyTypeFilter) {
-    const propertyType = propertyTypeFilter.value;
-    if (propertyType) {
-      hotels = hotels.filter(hotel => {
-        const type = (hotel.property_type || "").toLowerCase();
-        if (propertyType === "hotel") return type.includes("hotel");
-        if (propertyType === "apartment") return type.includes("apartment");
-        return true;
-      });
-    }
+  const priceRange = document.getElementById("priceRange"); // 🔥 Добавили ползунок цены
+
+  let maxPrice = 500; // Значение по умолчанию
+  if (priceRange) {
+    const parsed = parseFloat(priceRange.value);
+    if (!isNaN(parsed)) maxPrice = parsed;
   }
 
   // 📅 Расчет количества ночей
@@ -224,8 +220,15 @@ export function renderHotels(hotels) {
     hotel.pricePerNight = hotel.price && nights ? (hotel.price / nights) : 0;
   });
 
-  // 🔥 Фильтрация: цена за ночь до $500
-  hotels = hotels.filter(hotel => hotel.pricePerNight && hotel.pricePerNight <= 500);
+  // 🔥 Фильтрация по типу жилья и цене за ночь
+  hotels = hotels.filter(hotel => {
+    const type = (hotel.property_type || "").toLowerCase();
+    const matchesType = !propertyTypeFilter || !propertyTypeFilter.value ||
+      (propertyTypeFilter.value === "hotel" && type.includes("hotel")) ||
+      (propertyTypeFilter.value === "apartment" && type.includes("apartment"));
+    const matchesPrice = hotel.pricePerNight && hotel.pricePerNight <= maxPrice;
+    return matchesType && matchesPrice;
+  });
 
   // 🔥 Сортировка по цене за ночь (по возрастанию)
   hotels.sort((a, b) => (a.pricePerNight || 0) - (b.pricePerNight || 0));
