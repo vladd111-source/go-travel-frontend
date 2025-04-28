@@ -12,9 +12,6 @@ body.opacity-0 {
 body.opacity-100 {
   opacity: 1;
 }
-#hotDealsFilters {
-  margin-top: 10px;
-}
 
 /* ===== Поля ввода ===== */
 .input {
@@ -60,6 +57,7 @@ select.input {
   cursor: pointer;
 }
 
+/* Эффекты наведения */
 .btn:hover {
   transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -69,6 +67,7 @@ select.input {
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
+/* ===== Синие кнопки (Подробнее) ===== */
 .btn-blue {
   background: linear-gradient(to right, #3b82f6, #6366f1) !important;
 }
@@ -76,13 +75,14 @@ select.input {
   background: linear-gradient(to right, #2563eb, #4f46e5) !important;
 }
 
+/* ===== Красные кнопки (Удалить) ===== */
 .btn-red {
   background-color: #e11d48 !important;
 }
 .btn-red:hover {
   background-color: #be123c !important;
 }
-
+/* ===== Кнопка "Фильтры" как тумблер-кнопка */
 .toggle-btn {
   display: inline-flex;
   align-items: center;
@@ -99,6 +99,7 @@ select.input {
   color: #1e40af;
 }
 
+/* ===== Ползунок рейтинга ===== */
 #ratingRange {
   -webkit-appearance: none;
   appearance: none;
@@ -130,16 +131,17 @@ select.input {
   cursor: pointer;
 }
 
+/* ===== Tooltip для цены ===== */
 #priceTooltip {
   position: absolute;
-  top: -0.5rem;
+  top: -0.5rem; /* подняли выше */
   transform: translateX(-50%);
   white-space: nowrap;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.1rem; /* увеличено на ~15% */
   background-color: #3b82f6;
   color: white;
-  padding: 0.35rem 0.7rem;
+  padding: 0.35rem 0.7rem; /* чуть увеличили отступы */
   border-radius: 0.5rem;
   pointer-events: none;
   transition: left 0.2s ease, transform 0.2s ease;
@@ -148,6 +150,7 @@ select.input {
   left: 50%;
 }
 
+/* ===== Ползунок цены с бегунком по центру ===== */
 input[type="range"].slider-thumb {
   height: 2px;
   background-color: #e5e7eb;
@@ -169,6 +172,7 @@ input[type="range"].slider-thumb::-webkit-slider-thumb {
   z-index: 10;
 }
 
+/* ===== Вкладки ===== */
 .tab {
   display: none;
   opacity: 0;
@@ -193,23 +197,12 @@ input[type="range"].slider-thumb::-webkit-slider-thumb {
 }
 
 .label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1rem; /* нормальный размер текста */
+  font-size: 1rem;
   font-weight: 500;
-  color: #374151; /* темно-серый красивый цвет */
   margin-bottom: 0.5rem;
+  display: block;
 }
 
-input[type="checkbox"] {
-  width: 1rem;
-  height: 1rem;
-  border-radius: 0.25rem;
-  border: 1px solid #d1d5db;
-  accent-color: #3b82f6;
-  cursor: pointer;
-}
 hr {
   border: 0;
   border-top: 1px solid #d1d5db;
@@ -305,8 +298,9 @@ hr {
   display: none !important;
 }
 
+/* ===== Кастомная кнопка удаления (удалена дублирующая запись) ===== */
 .btn-delete {
-  background: #e11d48 !important;
+  background: #e11d48 !important; /* красный цвет */
   color: white;
   font-size: 0.875rem;
   font-weight: 600;
@@ -318,7 +312,7 @@ hr {
   text-align: center;
 }
 .btn-delete:hover {
-  background: #be123c !important;
+  background: #be123c !important; /* чуть темнее */
   transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
@@ -327,6 +321,7 @@ hr {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
+/* ===== Медиазапрос для мобилок ===== */
 @media (max-width: 400px) {
   .text-sm {
     font-size: 0.75rem !important;
