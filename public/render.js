@@ -231,6 +231,8 @@ export function renderHotels(hotels) {
     container.appendChild(card);
   });
 }
+
+//Места
 export function renderPlaces(places) {
   const container = document.getElementById("placesResult");
   container.innerHTML = "";
