@@ -5,7 +5,7 @@ import { showLoading, hideLoading } from './globals.js';
 export async function searchHotels(city, checkIn = '', checkOut = '') {
   try {
     const token = '067df6a5f1de28c8a898bc83744dfdcd'; // твой токен
-    const url = `https://engine.hotellook.com/api/v2/lookup.json?query=${encodeURIComponent(city)}&token=${token}`;
+   const url = `https://engine.hotellook.com/api/v2/lookup.json?query=${encodeURIComponent(city)}&token=${token}&marker=618281`;
 
     const lookupResponse = await fetch(url);
     if (!lookupResponse.ok) throw new Error(`Ошибка определения локации: ${lookupResponse.status}`);
@@ -14,8 +14,7 @@ export async function searchHotels(city, checkIn = '', checkOut = '') {
     const locationId = lookupData?.results?.locations?.[0]?.id;
     if (!locationId) throw new Error('Локация не найдена');
 
-    const hotelsUrl = `https://engine.hotellook.com/api/v2/cache.json?locationId=${locationId}&checkIn=${checkIn}&checkOut=${checkOut}&token=${token}`;
-
+  const hotelsUrl = `https://engine.hotellook.com/api/v2/cache.json?locationId=${locationId}&checkIn=${checkIn}&checkOut=${checkOut}&token=${token}&marker=618281`;
     const hotelsResponse = await fetch(hotelsUrl);
     if (!hotelsResponse.ok) throw new Error(`Ошибка поиска отелей: ${hotelsResponse.status}`);
 
