@@ -271,8 +271,18 @@ document.getElementById('hotelForm').addEventListener('submit', async (e) => {
   showLoading();
 
   try {
-    const hotels = await searchHotels(city, checkIn, checkOut);
-    renderHotels(hotels);
+   const hotelsRaw = await searchHotels(city, checkIn, checkOut);
+
+const hotels = hotelsRaw.map(h => ({
+  id: h.hotelId || h.id || null,
+  name: h.hotelName || h.name || "Без названия",
+  city: h.city || "Город неизвестен",
+  price: h.priceFrom || h.priceAvg || 0,
+  rating: h.rating || (h.stars ? h.stars * 2 : 0),
+  image: h.hotelId ? `https://photo.hotellook.com/image_v2/limit/${h.hotelId}/800/520.auto` : null
+}));
+
+renderHotels(hotels);
   } catch (err) {
     console.error('❌ Ошибка поиска отелей:', err);
     alert('Ошибка загрузки отелей');
