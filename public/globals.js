@@ -339,8 +339,8 @@ function hideLoading() {
 window.capitalize = capitalize;
 window.formatCategory = formatCategory;
 window.animateCards = animateCards;
-window.showLoading = showLoading;
-window.hideLoading = hideLoading;
+//window.showLoading = showLoading;
+//window.hideLoading = hideLoading;
 window.applyTranslations = applyTranslations;
 window.translations = translations;
 window.supabase = supabase;
