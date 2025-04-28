@@ -234,7 +234,7 @@ card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 tr
 
   container.appendChild(card);
 });
-
+container.classList.add('visible');
   // ✨ После создания всех карточек анимируем
   animateCards("#hotelsResult .card");
 }
