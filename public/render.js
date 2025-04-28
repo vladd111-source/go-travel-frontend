@@ -210,9 +210,9 @@ export function renderHotels(hotels) {
 
   hotels.forEach(hotel => {
     const card = document.createElement("div");
-    card.className = "card bg-white p-4 rounded-xl shadow mb-4";
+    card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 transform scale-95 transition-all duration-300"; // ✨ добавил opacity-0 и scale-95
 
-    const hotelId = hotel.hotelId || hotel.id; // берем либо hotelId, либо id
+    const hotelId = hotel.hotelId || hotel.id;
     const imageUrl = hotel.image 
       ? hotel.image 
       : (hotelId ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.auto` : `https://via.placeholder.com/800x520?text=No+Image`);
@@ -232,6 +232,9 @@ export function renderHotels(hotels) {
 
     container.appendChild(card);
   });
+
+  // ✨ После создания всех карточек анимируем
+  animateCards("#hotelsResult .card");
 }
 
 //Места
