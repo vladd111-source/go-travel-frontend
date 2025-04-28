@@ -288,7 +288,7 @@ function formatCategory(code) {
 }
 
 // ✅ Анимация карточек
-function animateCards(selector) {
+export function animateCards(selector) {
   setTimeout(() => {
     document.querySelectorAll(selector).forEach(card => {
       card.classList.remove("opacity-0", "scale-95");
