@@ -210,7 +210,7 @@ export function renderHotels(hotels) {
 
  hotels.forEach(hotel => {
   const card = document.createElement("div");
- card.className = "card bg-white p-4 rounded-xl shadow mb-4";
+card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
 
   const hotelId = hotel.hotelId || hotel.id;
   const imageUrl = hotel.image 
