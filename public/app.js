@@ -309,7 +309,7 @@ document.getElementById('hotelForm').addEventListener('submit', async (e) => {
     hideLoading();
   }
 });
-  
+  }
 // ✅ Поиск рейсов (включая "Туда и обратно")
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
    e.preventDefault();
