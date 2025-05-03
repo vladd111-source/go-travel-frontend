@@ -249,8 +249,11 @@ export function renderHotels(hotels) {
       ? hotel.image
       : (hotelId ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.auto` : `https://via.placeholder.com/800x520?text=No+Image`);
 
-    const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent('https://search.hotellook.com/?location=' + encodeURIComponent(hotelCity) + '&name=' + encodeURIComponent(hotelName))}&campaign_id=101`;
+   const bookingUrl = hotelId
+  ? `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(`https://search.hotellook.com/?hotelId=${hotelId}`)}&campaign_id=101`
+  : `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(`https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`)}&campaign_id=101`;
 
+    
     card.innerHTML = `
       <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover" />
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
