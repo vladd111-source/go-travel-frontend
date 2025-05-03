@@ -186,6 +186,7 @@ const t = window.translations[lang];
   }
 }
 
+//Отели
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
@@ -244,8 +245,8 @@ export function renderHotels(hotels) {
     const hotelId = hotel.hotelId || hotel.id;
     const hotelName = hotel.name || hotel.hotelName || "Без названия";
     const hotelCity = hotel.city || hotel.location?.name || "Город неизвестен";
-    const hotelPrice = hotel.pricePerNight ? `$${hotel.pricePerNight.toFixed(2)}` : "Нет данных";
-    const totalPrice = hotel.price ? `$${hotel.price.toFixed(2)}` : "Нет данных";
+   const hotelPrice = hotel.pricePerNight ? `$${Math.floor(hotel.pricePerNight)}` : "Нет данных";
+const totalPrice = hotel.price ? `$${Math.floor(hotel.price)}` : "Нет данных";
 
     const imageUrl = hotel.image
       ? hotel.image
