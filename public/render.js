@@ -242,7 +242,8 @@ export function renderHotels(hotels) {
     const hotelId = hotel.hotelId || hotel.id;
     const hotelName = hotel.name || hotel.hotelName || "Без названия";
     const hotelCity = hotel.city || hotel.location?.name || "Город неизвестен";
-    const hotelPrice = hotel.pricePerNight ? `$${hotel.pricePerNight.toFixed(2)}` : "Нет данных";
+    const pricePerNight = hotel.pricePerNight ? `$${hotel.pricePerNight.toFixed(2)}` : "Нет данных";
+    const fullPrice = hotel.price ? `$${hotel.price.toFixed(2)}` : "Нет данных";
 
     const imageUrl = hotel.image
       ? hotel.image
@@ -262,7 +263,8 @@ export function renderHotels(hotels) {
       <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover" />
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
-      <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
+      <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${pricePerNight}</p>
+      <p class="text-sm text-gray-600 mb-1">💵 Общая стоимость: ${fullPrice}</p>
       <a href="${bookingUrl}" target="_blank" 
          class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center mt-2">
          🔗 Забронировать
