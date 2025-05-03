@@ -255,34 +255,53 @@ if (hotelCityInput) {
 
   hotelCityInput.setAttribute("autofocus", "autofocus");
 
-// Новый обработчик поиска отелей
+// Новый обработчик поиска отелей с проверками
 document.getElementById('hotelForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const city = document.getElementById('hotelCity').value.trim();
-  const checkIn = document.getElementById('checkIn').value;
-  const checkOut = document.getElementById('checkOut').value;
+  const city = document.getElementById('hotelCity')?.value.trim();
+  const checkIn = document.getElementById('checkIn')?.value;
+  const checkOut = document.getElementById('checkOut')?.value;
 
   if (!city) {
-    alert('Введите город');
+    alert('⚠️ Введите город');
+    return;
+  }
+
+  if (!checkIn || !checkOut) {
+    alert("⚠️ Укажите даты заезда и выезда");
+    return;
+  }
+
+  const now = new Date();
+  const dateIn = new Date(checkIn);
+  const dateOut = new Date(checkOut);
+
+  if (dateIn < now.setHours(0, 0, 0, 0)) {
+    alert("⛔ Дата заезда не может быть в прошлом");
+    return;
+  }
+
+  if (dateOut <= dateIn) {
+    alert("⛔ Дата выезда должна быть позже даты заезда");
     return;
   }
 
   showLoading();
 
   try {
-   const hotelsRaw = await searchHotels(city, checkIn, checkOut);
+    const hotelsRaw = await searchHotels(city, checkIn, checkOut);
 
-const hotels = hotelsRaw.map(h => ({
-  id: h.hotelId || h.id || null,
-  name: h.hotelName || h.name || "Без названия",
-  city: h.city || "Город неизвестен",
-  price: h.priceFrom || h.priceAvg || 0,
-  rating: h.rating || (h.stars ? h.stars * 2 : 0),
-  image: h.hotelId ? `https://photo.hotellook.com/image_v2/limit/${h.hotelId}/800/520.auto` : null
-}));
+    const hotels = hotelsRaw.map(h => ({
+      id: h.hotelId || h.id || null,
+      name: h.hotelName || h.name || "Без названия",
+      city: h.city || city || "Город неизвестен", // ← используем введённый город как fallback
+      price: h.priceFrom || h.priceAvg || 0,
+      rating: h.rating || (h.stars ? h.stars * 2 : 0),
+      image: h.hotelId ? `https://photo.hotellook.com/image_v2/limit/${h.hotelId}/800/520.auto` : null
+    }));
 
-renderHotels(hotels);
+    renderHotels(hotels);
   } catch (err) {
     console.error('❌ Ошибка поиска отелей:', err);
     alert('Ошибка загрузки отелей');
@@ -290,7 +309,7 @@ renderHotels(hotels);
     hideLoading();
   }
 });
-}
+  
 // ✅ Поиск рейсов (включая "Туда и обратно")
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
    e.preventDefault();
