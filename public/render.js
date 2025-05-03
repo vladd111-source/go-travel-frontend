@@ -219,19 +219,21 @@ export function renderHotels(hotels) {
     hotel.pricePerNight = hotel.price && nights ? (hotel.price / nights) : 0;
   });
 
-  hotels = hotels.filter(hotel => {
-    const type = (hotel.property_type || "").toLowerCase();
-    const selectedType = propertyTypeFilter?.value || "all";
+ hotels = hotels.filter(hotel => {
+  const type = (hotel.property_type || "").toLowerCase();
+  const selectedType = propertyTypeFilter?.value || "all";
 
-    const matchesType =
-      selectedType === "all" ||
-      (selectedType === "hotel" && type.includes("hotel")) ||
-      (selectedType === "apartment" && type.includes("apartment"));
+  const matchesType =
+    selectedType === "all" ||
+    (selectedType === "hotel" && type.includes("hotel")) ||
+    (selectedType === "apartment" && type.includes("apartment"));
 
-    const matchesPrice = hotel.pricePerNight && hotel.pricePerNight <= maxPrice;
+  const matchesPrice = hotel.pricePerNight && hotel.pricePerNight <= maxPrice;
 
-    return matchesType && matchesPrice;
-  });
+  const hasAvailability = typeof hotel.price === "number" && hotel.price > 0;
+
+  return matchesType && matchesPrice && hasAvailability;
+});
 
   hotels.sort((a, b) => (a.pricePerNight || 0) - (b.pricePerNight || 0));
 
