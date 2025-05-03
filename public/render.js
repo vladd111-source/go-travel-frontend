@@ -186,6 +186,7 @@ const t = window.translations[lang];
   }
 }
 
+//Отели
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
@@ -218,7 +219,6 @@ export function renderHotels(hotels) {
     hotel.pricePerNight = hotel.price && nights ? (hotel.price / nights) : 0;
   });
 
-  // 🔍 Фильтрация
   hotels = hotels.filter(hotel => {
     const type = (hotel.property_type || "").toLowerCase();
     const selectedType = propertyTypeFilter?.value || "all";
@@ -233,7 +233,6 @@ export function renderHotels(hotels) {
     return matchesType && matchesPrice;
   });
 
-  // 🔃 Сортировка
   hotels.sort((a, b) => (a.pricePerNight || 0) - (b.pricePerNight || 0));
 
   hotels.forEach(hotel => {
@@ -249,11 +248,14 @@ export function renderHotels(hotels) {
       ? hotel.image
       : (hotelId ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.auto` : `https://via.placeholder.com/800x520?text=No+Image`);
 
-   const bookingUrl = hotelId
-  ? `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(`https://search.hotellook.com/?hotelId=${hotelId}`)}&campaign_id=101`
-  : `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(`https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`)}&campaign_id=101`;
+    const dateParams = (checkIn && checkOut)
+      ? `&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}`
+      : "";
 
-    
+    const bookingUrl = hotelId
+      ? `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(`https://search.hotellook.com/?hotelId=${hotelId}${dateParams}`)}&campaign_id=101`
+      : `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(`https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}${dateParams}`)}&campaign_id=101`;
+
     card.innerHTML = `
       <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover" />
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
