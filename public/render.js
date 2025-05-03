@@ -186,7 +186,7 @@ const t = window.translations[lang];
   }
 }
 
-//Отели
+// Отели
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
@@ -248,17 +248,16 @@ export function renderHotels(hotels) {
       ? hotel.image
       : (hotelId ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.auto` : `https://via.placeholder.com/800x520?text=No+Image`);
 
+    const baseUrl = hotelId
+      ? `https://search.hotellook.com/?hotelId=${hotelId}`
+      : `https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`;
+
     const dateParams = (checkIn && checkOut)
       ? `&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}`
       : "";
 
-   const baseUrl = `https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`;
-const dateParams = (checkIn && checkOut)
-  ? `&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}`
-  : "";
+    const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
 
-const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
-    
     card.innerHTML = `
       <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover" />
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
