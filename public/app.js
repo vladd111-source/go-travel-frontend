@@ -291,7 +291,7 @@ document.getElementById('hotelForm').addEventListener('submit', async (e) => {
 
   try {
     const hotelsRaw = await searchHotels(city, checkIn, checkOut);
-
+console.log("📦 Hotels from API (raw):", hotelsRaw);
     const hotels = hotelsRaw.map(h => ({
       id: h.hotelId || h.id || null,
       name: h.hotelName || h.name || "Без названия",
