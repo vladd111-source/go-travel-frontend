@@ -186,7 +186,6 @@ const t = window.translations[lang];
   }
 }
 
-//Отели
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   container.innerHTML = "";
@@ -215,13 +214,15 @@ export function renderHotels(hotels) {
     nights = Math.max(1, diffMs / (1000 * 60 * 60 * 24));
   }
 
-  // 💥 Исключаем отели без цен (обычно это значит: мест нет)
+  // ❌ Убираем отели без цены или нулевой стоимости
   hotels = hotels.filter(hotel => hotel.price && hotel.price > 0);
 
+  // 💵 Расчёт цен
   hotels.forEach(hotel => {
-    hotel.pricePerNight = hotel.price && nights ? (hotel.price / nights) : 0;
+    hotel.pricePerNight = hotel.price && nights ? hotel.price / nights : 0;
   });
 
+  // 🔍 Применение фильтров
   hotels = hotels.filter(hotel => {
     const type = (hotel.property_type || "").toLowerCase();
     const selectedType = propertyTypeFilter?.value || "all";
@@ -236,6 +237,7 @@ export function renderHotels(hotels) {
     return matchesType && matchesPrice;
   });
 
+  // 📊 Сортировка по цене за ночь
   hotels.sort((a, b) => (a.pricePerNight || 0) - (b.pricePerNight || 0));
 
   hotels.forEach(hotel => {
@@ -245,23 +247,23 @@ export function renderHotels(hotels) {
     const hotelId = hotel.hotelId || hotel.id;
     const hotelName = hotel.name || hotel.hotelName || "Без названия";
     const hotelCity = hotel.city || hotel.location?.name || "Город неизвестен";
-   const hotelPrice = hotel.pricePerNight ? `$${Math.floor(hotel.pricePerNight)}` : "Нет данных";
-const totalPrice = hotel.price ? `$${Math.floor(hotel.price)}` : "Нет данных";
+    const hotelPrice = hotel.pricePerNight ? `$${Math.floor(hotel.pricePerNight)}` : "Нет данных";
+    const totalPrice = hotel.price ? `$${Math.floor(hotel.price)}` : "Нет данных";
 
     const imageUrl = hotel.image
       ? hotel.image
       : (hotelId ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.auto` : `https://via.placeholder.com/800x520?text=No+Image`);
 
-   const dateParams = (checkIn && checkOut)
-  ? `&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}`
-  : "";
+    const dateParams = (checkIn && checkOut)
+      ? `&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}`
+      : "";
 
-const baseUrl = hotelId
-  ? `https://search.hotellook.com/?hotelId=${hotelId}`
-  : `https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`;
+    const baseUrl = hotelId
+      ? `https://search.hotellook.com/?hotelId=${hotelId}`
+      : `https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`;
 
-const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
-    
+    const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
+
     card.innerHTML = `
       <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover" />
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
