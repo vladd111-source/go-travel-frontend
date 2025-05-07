@@ -1,38 +1,41 @@
 import { renderHotels, renderFlights, renderPlaces } from './render.js';
 import { showLoading, hideLoading } from './globals.js';
 
-export async function searchHotels(city, checkIn, checkOut) {
-  const res = await fetch(`/api/hotels?city=${encodeURIComponent(city)}&checkIn=${checkIn}&checkOut=${checkOut}`);
-  if (!res.ok) throw new Error('Ошибка загрузки отелей');
-  return await res.json();
-}
-
-const iataCache = {};
-
-async function getIataCode(city) {
-  const lang = localStorage.getItem("lang") || "ru"; // ← язык из локалки
-  const normalized = city.trim().toLowerCase();
-  const cacheKey = `${normalized}_${lang}`; // ← язык добавлен в ключ кэша
-
-  if (iataCache[cacheKey]) return iataCache[cacheKey];
-
-  const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(city)}&locale=${lang}&types[]=city`;
-
+export async function searchHotels(city, checkIn = '', checkOut = '') {
   try {
-    const res = await fetch(url);
-    const json = await res.json();
+    const marker = 618281;
 
-    const match = json.find(item => 
-      item.name?.toLowerCase() === normalized ||
-      item.city_name?.toLowerCase().includes(normalized)
-    );
+    // 🔍 Шаг 1: Запуск поиска отелей через proxy
+    const startRes = await fetch('https://go-travel-backend.vercel.app/api/proxy-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: city,
+        checkIn,
+        checkOut,
+        adultsCount: 2,
+        language: 'ru',
+        currency: 'usd',
+        marker,
+        token: '067df6a5f1de28c8a898bc83744dfdcd'
+      })
+    });
 
-    const code = match?.code?.toUpperCase();
-    if (code) iataCache[cacheKey] = code;
-    return code || null;
+    const startData = await startRes.json();
+    if (!startData.searchId) throw new Error("⛔ Не получен searchId");
+
+    // ⏳ Ждём 1.5–2 сек — API не всегда сразу отдаёт готовые результаты
+    await new Promise(r => setTimeout(r, 2000));
+
+    // 📦 Шаг 2: Получение результатов поиска
+    const resultsRes = await fetch(`https://engine.hotellook.com/api/v2/search/results.json?searchId=${startData.searchId}`);
+    const resultsData = await resultsRes.json();
+
+    const availableHotels = (resultsData.results || []).filter(h => h.available);
+    return availableHotels;
   } catch (err) {
-    console.error("❌ Ошибка при получении IATA:", err);
-    return null;
+    console.error("❌ Ошибка получения отелей:", err);
+    return [];
   }
 }
 
