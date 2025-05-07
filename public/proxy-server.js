@@ -1,31 +1,52 @@
 import express from 'express';
 import fetch from 'node-fetch';
+import cors from 'cors';
 
 const app = express();
+const PORT = 3000;
+
+app.use(cors());
+app.use(express.json());
 
 app.get('/api/hotels', async (req, res) => {
   const { city, checkIn, checkOut } = req.query;
-  const token = '067df6a5f1de28c8a898bc83744dfdcd'; // твой API token
+  const token = '067df6a5f1de28c8a898bc83744dfdcd';
+  const marker = 618281;
 
   try {
-    const lookupUrl = `https://engine.hotellook.com/api/v2/lookup.json?query=${encodeURIComponent(city)}&token=${token}&marker=618281`;
-    const lookupRes = await fetch(lookupUrl);
-    const lookupData = await lookupRes.json();
-    const locationId = lookupData?.results?.locations?.[0]?.id;
+    // Шаг 1: старт поиска
+    const startRes = await fetch('https://engine.hotellook.com/api/v2/search/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: city,
+        checkIn,
+        checkOut,
+        adultsCount: 2,
+        language: 'ru',
+        currency: 'usd',
+        marker,
+        token
+      })
+    });
 
-    if (!locationId) return res.status(400).json({ error: 'Локация не найдена' });
+    const startData = await startRes.json();
+    const searchId = startData.searchId;
+    if (!searchId) throw new Error('Не удалось получить searchId');
 
-    const hotelsUrl = `https://engine.hotellook.com/api/v2/cache.json?locationId=${locationId}&checkIn=${checkIn}&checkOut=${checkOut}&limit=100&token=${token}&marker=618281`;
-    const hotelsRes = await fetch(hotelsUrl);
-    const hotels = await hotelsRes.json();
+    // Шаг 2: получение результатов
+    const resultsUrl = `https://engine.hotellook.com/api/v2/search/results.json?searchId=${searchId}`;
+    const resultsRes = await fetch(resultsUrl);
+    const resultsData = await resultsRes.json();
 
+    const hotels = (resultsData.results || []).filter(h => h.available);
     res.json(hotels);
-  } catch (error) {
-    console.error('❌ Прокси-сервер ошибка:', error);
-    res.status(500).json({ error: 'Ошибка на сервере' });
+  } catch (err) {
+    console.error('❌ Прокси-сервер ошибка:', err);
+    res.status(500).json({ error: 'Ошибка получения отелей' });
   }
 });
 
-app.listen(3000, () => {
-  console.log('🚀 Прокси-сервер запущен на http://localhost:3000');
+app.listen(PORT, () => {
+  console.log(`🚀 Прокси работает на http://localhost:${PORT}`);
 });
