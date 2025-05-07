@@ -1,27 +1,40 @@
 import { renderHotels, renderFlights, renderPlaces } from './render.js';
 import { showLoading, hideLoading } from './globals.js';
 
-// Добавляешь сюда 👇
 export async function searchHotels(city, checkIn = '', checkOut = '') {
   try {
-    const token = '067df6a5f1de28c8a898bc83744dfdcd'; // твой токен
-   const url = `https://engine.hotellook.com/api/v2/lookup.json?query=${encodeURIComponent(city)}&token=${token}&marker=618281`;
+    const token = '067df6a5f1de28c8a898bc83744dfdcd'; // токен API поиска отелей
+    const marker = 618281;
 
-    const lookupResponse = await fetch(url);
-    if (!lookupResponse.ok) throw new Error(`Ошибка определения локации: ${lookupResponse.status}`);
-    const lookupData = await lookupResponse.json();
+    // Шаг 1: запускаем поиск
+    const searchStartRes = await fetch('https://engine.hotellook.com/api/v2/search/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: city,
+        checkIn,
+        checkOut,
+        adultsCount: 2,
+        language: 'ru',
+        currency: 'usd',
+        marker,
+        token
+      })
+    });
 
-    const locationId = lookupData?.results?.locations?.[0]?.id;
-    if (!locationId) throw new Error('Локация не найдена');
+    const startData = await searchStartRes.json();
+    const searchId = startData.searchId;
+    if (!searchId) throw new Error('Не получен searchId');
 
-  const hotelsUrl = `https://engine.hotellook.com/api/v2/cache.json?locationId=${locationId}&checkIn=${checkIn}&checkOut=${checkOut}&limit=100&token=${token}&marker=618281`;
-    const hotelsResponse = await fetch(hotelsUrl);
-    if (!hotelsResponse.ok) throw new Error(`Ошибка поиска отелей: ${hotelsResponse.status}`);
+    // Шаг 2: получаем результаты
+    const resultsUrl = `https://engine.hotellook.com/api/v2/search/results.json?searchId=${searchId}`;
+    const resultsRes = await fetch(resultsUrl);
+    const resultsData = await resultsRes.json();
 
-    const hotels = await hotelsResponse.json();
-    return hotels || [];
+    const hotels = (resultsData.results || []).filter(h => h.available); // фильтр: только доступные
+    return hotels;
   } catch (error) {
-    console.error('❌ Ошибка поиска отелей через Travelpayouts:', error);
+    console.error('❌ Ошибка в Hotel Search API:', error);
     return [];
   }
 }
