@@ -1,42 +1,10 @@
 import { renderHotels, renderFlights, renderPlaces } from './render.js';
 import { showLoading, hideLoading } from './globals.js';
 
-export async function searchHotels(city, checkIn = '', checkOut = '') {
-  try {
-    const token = '067df6a5f1de28c8a898bc83744dfdcd'; // токен API поиска отелей
-    const marker = 618281;
-
-    // Шаг 1: запускаем поиск
-    const searchStartRes = await fetch('https://engine.hotellook.com/api/v2/search/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: city,
-        checkIn,
-        checkOut,
-        adultsCount: 2,
-        language: 'ru',
-        currency: 'usd',
-        marker,
-        token
-      })
-    });
-
-    const startData = await searchStartRes.json();
-    const searchId = startData.searchId;
-    if (!searchId) throw new Error('Не получен searchId');
-
-    // Шаг 2: получаем результаты
-    const resultsUrl = `https://engine.hotellook.com/api/v2/search/results.json?searchId=${searchId}`;
-    const resultsRes = await fetch(resultsUrl);
-    const resultsData = await resultsRes.json();
-
-    const hotels = (resultsData.results || []).filter(h => h.available); // фильтр: только доступные
-    return hotels;
-  } catch (error) {
-    console.error('❌ Ошибка в Hotel Search API:', error);
-    return [];
-  }
+export async function searchHotels(city, checkIn, checkOut) {
+  const res = await fetch(`/api/hotels?city=${encodeURIComponent(city)}&checkIn=${checkIn}&checkOut=${checkOut}`);
+  if (!res.ok) throw new Error('Ошибка загрузки отелей');
+  return await res.json();
 }
 
 const iataCache = {};
