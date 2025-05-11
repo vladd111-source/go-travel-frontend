@@ -3,41 +3,20 @@ import { showLoading, hideLoading } from './globals.js';
 
 export async function searchHotels(city, checkIn = '', checkOut = '') {
   try {
-    const marker = 618281;
+    const res = await fetch(
+      `https://go-travel-backend.vercel.app/api/hotels?city=${encodeURIComponent(city)}&checkIn=${checkIn}&checkOut=${checkOut}`
+    );
 
-    // 🔍 Шаг 1: Запуск поиска отелей через proxy
-    const startRes = await fetch('https://go-travel-backend.vercel.app/api/proxy-search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: city,
-        checkIn,
-        checkOut,
-        adultsCount: 2,
-        language: 'ru',
-        currency: 'usd',
-        marker,
-        token: '067df6a5f1de28c8a898bc83744dfdcd'
-      })
-    });
+    if (!res.ok) throw new Error("⛔ Ошибка получения данных от сервера");
 
-    const startData = await startRes.json();
-    if (!startData.searchId) throw new Error("⛔ Не получен searchId");
-
-    // ⏳ Ждём 1.5–2 сек — API не всегда сразу отдаёт готовые результаты
-    await new Promise(r => setTimeout(r, 2000));
-
-    // 📦 Шаг 2: Получение результатов поиска
-    const resultsRes = await fetch(`https://engine.hotellook.com/api/v2/search/results.json?searchId=${startData.searchId}`);
-    const resultsData = await resultsRes.json();
-
-    const availableHotels = (resultsData.results || []).filter(h => h.available);
-    return availableHotels;
+    const hotels = await res.json();
+    return hotels;
   } catch (err) {
     console.error("❌ Ошибка получения отелей:", err);
     return [];
   }
 }
+
 
 let lastSearchTime = 0;
 
