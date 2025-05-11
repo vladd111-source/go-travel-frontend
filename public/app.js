@@ -3,22 +3,22 @@ import { showLoading, hideLoading } from './globals.js';
 
 export async function searchHotels(city, checkIn, checkOut) {
   try {
-    const query = new URLSearchParams({
-      city,
-      checkIn,
-      checkOut
-    });
+    // ⏱ Формируем query string
+    const query = new URLSearchParams({ city, checkIn, checkOut });
 
+    // 🌐 Отправляем запрос на API-бэкенд
     const res = await fetch(`https://go-travel-backend.vercel.app/api/hotels?${query.toString()}`);
 
     if (!res.ok) {
-      throw new Error("Ошибка получения данных от сервера");
+      const errText = await res.text();
+      throw new Error(`Ошибка сервера: ${res.status} – ${errText}`);
     }
 
+    // 📦 Разбираем JSON
     const hotels = await res.json();
-    return hotels;
+    return Array.isArray(hotels) ? hotels : [];
   } catch (err) {
-    console.error("❌ Ошибка получения отелей:", err);
+    console.error("❌ Ошибка получения отелей:", err.message || err);
     return [];
   }
 }
