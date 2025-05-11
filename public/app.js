@@ -1,13 +1,19 @@
 import { renderHotels, renderFlights, renderPlaces } from './render.js';
 import { showLoading, hideLoading } from './globals.js';
 
-export async function searchHotels(city, checkIn = '', checkOut = '') {
+export async function searchHotels(city, checkIn, checkOut) {
   try {
-    const res = await fetch(
-      `https://go-travel-backend.vercel.app/api/hotels?city=${encodeURIComponent(city)}&checkIn=${checkIn}&checkOut=${checkOut}`
-    );
+    const query = new URLSearchParams({
+      city,
+      checkIn,
+      checkOut
+    });
 
-    if (!res.ok) throw new Error("⛔ Ошибка получения данных от сервера");
+    const res = await fetch(`https://go-travel-backend.vercel.app/api/hotels?${query.toString()}`);
+
+    if (!res.ok) {
+      throw new Error("Ошибка получения данных от сервера");
+    }
 
     const hotels = await res.json();
     return hotels;
