@@ -249,10 +249,10 @@ export function renderHotels(hotels) {
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
- let imageUrl = `https://via.placeholder.com/800x520?text=No+Image`;
-if (hotel.image && typeof hotel.image === "string") {
+let imageUrl = `https://via.placeholder.com/800x520?text=No+Image`;
+if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
   imageUrl = hotel.image;
-} else if (hotelId) {
+} else if (hotelId && typeof hotelId === "string") {
   imageUrl = `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto`;
 }
     
@@ -267,7 +267,8 @@ if (hotel.image && typeof hotel.image === "string") {
     const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
 
     card.innerHTML = `
-      <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover" />
+     <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover"
+     onerror="this.onerror=null;this.src='https://via.placeholder.com/800x520?text=No+Image';" />
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
       <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
