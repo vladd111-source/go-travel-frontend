@@ -275,9 +275,10 @@ document.getElementById('hotelForm').addEventListener('submit', async (e) => {
 console.log("📦 Hotels from API (raw):", hotelsRaw);
 
 // Правка: убедимся, что hotelId всегда есть
-    const dateIn = new Date(checkIn);
+  const dateIn = new Date(checkIn);
 const dateOut = new Date(checkOut);
 const nights = Math.max(1, (dateOut - dateIn) / (1000 * 60 * 60 * 24));
+
 const hotels = hotelsRaw
   .filter(h => h.priceFrom > 0)
   .map(h => {
@@ -290,7 +291,7 @@ const hotels = hotelsRaw
       name: h.hotelName || h.name || "Без названия",
       city: h.city || h.location?.name || city || "Город неизвестен",
       fullPrice,
-      pricePerNight: fullPrice / nights, // nights должен быть определён выше
+      pricePerNight: fullPrice / nights,
       rating: h.rating || (h.stars ? h.stars * 2 : 0),
       image: hotelId
         ? `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto`
