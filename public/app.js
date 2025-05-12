@@ -54,6 +54,20 @@ function retryFetch(url, options = {}, retries = 6, backoff = 2000) {
 }
 
 
+async function getIataCode(cityName) {
+  try {
+    const url = `https://autocomplete.travelpayouts.com/places2?term=${encodeURIComponent(cityName)}&locale=ru&types[]=city`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return data?.[0]?.code || null;
+  } catch (err) {
+    console.error("❌ Ошибка при получении IATA-кода:", err);
+    return null;
+  }
+}
+
+
+
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
   try {
