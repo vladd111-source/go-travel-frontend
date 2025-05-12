@@ -278,10 +278,13 @@ console.log("📦 Hotels from API (raw):", hotelsRaw);
 const hotels = hotelsRaw.map(h => {
   const hotelId = h.hotelId || h.id || null;
   return {
-    ...h,
-    hotelId,
     id: hotelId,
-    image: h.image || (hotelId ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.auto` : null)
+    hotelId: hotelId,
+    name: h.hotelName || h.name || "Без названия",
+    city: h.city || h.location?.name || city || "Город неизвестен",
+    price: h.priceFrom || h.priceAvg || 0,
+    rating: h.rating || (h.stars ? h.stars * 2 : 0),
+    image: hotelId ? `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto` : null
   };
 });
 
