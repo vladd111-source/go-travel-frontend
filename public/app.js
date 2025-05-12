@@ -275,6 +275,9 @@ document.getElementById('hotelForm').addEventListener('submit', async (e) => {
 console.log("📦 Hotels from API (raw):", hotelsRaw);
 
 // Правка: убедимся, что hotelId всегда есть
+    const dateIn = new Date(checkIn);
+const dateOut = new Date(checkOut);
+const nights = Math.max(1, (dateOut - dateIn) / (1000 * 60 * 60 * 24));
 const hotels = hotelsRaw
   .filter(h => h.priceFrom > 0)
   .map(h => {
