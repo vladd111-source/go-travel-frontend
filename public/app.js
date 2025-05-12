@@ -280,9 +280,9 @@ const dateOut = new Date(checkOut);
 const nights = Math.max(1, (dateOut - dateIn) / (1000 * 60 * 60 * 24));
 
 const hotels = hotelsRaw
-  .filter(h => h.priceFrom > 0)
+  .filter(h => h.priceFrom > 0 && (h.hotelId || h.id)) // обязательно есть ID
   .map(h => {
-    const hotelId = h.hotelId || h.id || null;
+    const hotelId = h.hotelId || h.id;
     const fullPrice = h.priceFrom || h.fullPrice || 0;
 
     return {
@@ -293,9 +293,7 @@ const hotels = hotelsRaw
       fullPrice,
       pricePerNight: fullPrice / nights,
       rating: h.rating || (h.stars ? h.stars * 2 : 0),
-      image: hotelId
-        ? `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto`
-        : null
+      image: `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto`
     };
   });
 
