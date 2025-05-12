@@ -22,7 +22,6 @@ export async function searchHotels(city, checkIn, checkOut) {
   }
 }
 
-
 let lastSearchTime = 0;
 
 // 🔁 Повтор при 429 (без async/await)
