@@ -249,8 +249,13 @@ export function renderHotels(hotels) {
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
-   const imageUrl = hotel.image
-  || (hotelId ? `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto` : `https://via.placeholder.com/800x520?text=No+Image`);
+ let imageUrl = `https://via.placeholder.com/800x520?text=No+Image`;
+if (hotel.image && typeof hotel.image === "string") {
+  imageUrl = hotel.image;
+} else if (hotelId) {
+  imageUrl = `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto`;
+}
+    
     const baseUrl = hotelId
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
       : `https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`;
