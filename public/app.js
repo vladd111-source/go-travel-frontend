@@ -275,18 +275,25 @@ document.getElementById('hotelForm').addEventListener('submit', async (e) => {
 console.log("📦 Hotels from API (raw):", hotelsRaw);
 
 // Правка: убедимся, что hotelId всегда есть
-const hotels = hotelsRaw.map(h => {
-  const hotelId = h.hotelId || h.id || null;
-  return {
-    id: hotelId,
-    hotelId: hotelId,
-    name: h.hotelName || h.name || "Без названия",
-    city: h.city || h.location?.name || city || "Город неизвестен",
-    price: h.priceFrom || h.priceAvg || 0,
-    rating: h.rating || (h.stars ? h.stars * 2 : 0),
-    image: hotelId ? `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto` : null
-  };
-});
+const hotels = hotelsRaw
+  .filter(h => h.priceFrom > 0)
+  .map(h => {
+    const hotelId = h.hotelId || h.id || null;
+    const fullPrice = h.priceFrom || h.fullPrice || 0;
+
+    return {
+      id: hotelId,
+      hotelId,
+      name: h.hotelName || h.name || "Без названия",
+      city: h.city || h.location?.name || city || "Город неизвестен",
+      fullPrice,
+      pricePerNight: fullPrice / nights, // nights должен быть определён выше
+      rating: h.rating || (h.stars ? h.stars * 2 : 0),
+      image: hotelId
+        ? `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto`
+        : null
+    };
+  });
 
     renderHotels(hotels);
   } catch (err) {
