@@ -223,17 +223,17 @@ export function renderHotels(hotels) {
   });
 
   // 🔍 Фильтрация
-  hotels = hotels.filter(hotel => {
-    const selectedType = propertyTypeFilter?.value || "all";
-    const matchesType =
-      selectedType === "all" ||
-      (selectedType === "hotel" && (hotel.property_type || "").toLowerCase().includes("hotel")) ||
-      (selectedType === "apartment" && (hotel.property_type || "").toLowerCase().includes("apartment"));
+ // hotels = hotels.filter(hotel => {
+   // const selectedType = propertyTypeFilter?.value || "all";
+   // const matchesType =
+   //   selectedType === "all" ||
+   //   (selectedType === "hotel" && (hotel.property_type || "").toLowerCase().includes("hotel")) ||
+   //   (selectedType === "apartment" && (hotel.property_type || "").toLowerCase().includes("apartment"));
 
-    const matchesPrice = hotel.pricePerNight <= maxPrice;
+  //  const matchesPrice = hotel.pricePerNight <= maxPrice;
 
-    return matchesType && matchesPrice;
-  });
+  //  return matchesType && matchesPrice;
+ // });
 
   // 📊 Сортировка по цене
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
