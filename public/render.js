@@ -186,6 +186,7 @@ const t = window.translations[lang];
   }
 }
 
+//Отели
 console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
 
 export function renderHotels(hotels) {
@@ -246,6 +247,9 @@ hotels.forEach(hotel => {
    return matchesType && matchesPrice;
   });
 
+  console.log("✅ После фильтрации осталось:", hotels.length);
+console.log("📦 Пример отеля:", hotels[0]);
+  
   // 📊 Сортировка по цене
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
 
