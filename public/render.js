@@ -269,7 +269,9 @@ console.log("📦 Пример отеля:", hotels[0]);
 let imageUrl = "https://via.placeholder.com/800x520?text=No+Image";
 
 try {
-  const id = (hotel.hotelId || hotel.id || "").toString();
+ let id = "";
+if (hotel.hotelId) id = String(hotel.hotelId);
+else if (hotel.id) id = String(hotel.id);
 
   if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
     imageUrl = hotel.image;
