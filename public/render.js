@@ -186,7 +186,6 @@ const t = window.translations[lang];
   }
 }
 
-//Отели
 console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
 
 export function renderHotels(hotels) {
@@ -231,6 +230,9 @@ export function renderHotels(hotels) {
     hotel.pricePerNight = hotel.fullPrice && nights ? hotel.fullPrice / nights : 0;
   });
 
+  // ❌ Исключаем отели без адекватной цены
+  hotels = hotels.filter(hotel => hotel.pricePerNight > 0);
+
   console.table(hotels.slice(0, 10), ["name", "pricePerNight", "fullPrice", "priceFrom"]);
 
   // 🔍 Фильтрация
@@ -241,7 +243,7 @@ export function renderHotels(hotels) {
       selectedType === "all" ||
       (selectedType === "hotel" && (hotel.property_type || "").toLowerCase().includes("hotel")) ||
       (selectedType === "apartment" && (hotel.property_type || "").toLowerCase().includes("apartment")) ||
-      !hotel.property_type; // ✅ allow hotels without a defined type
+      !hotel.property_type; // ✅ Разрешаем без типа
 
     const matchesPrice = hotel.pricePerNight <= maxPrice;
 
@@ -307,6 +309,7 @@ export function renderHotels(hotels) {
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
 }
+
 
 //Места
 export function renderPlaces(places) {
