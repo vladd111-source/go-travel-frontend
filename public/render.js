@@ -219,7 +219,7 @@ console.log("🧩 Найдено отелей:", hotels.length);
   }
 
   // ❌ Убираем отели без цены
-  hotels = hotels.filter(hotel => hotel.fullPrice && hotel.fullPrice > 0);
+ // hotels = hotels.filter(hotel => hotel.fullPrice && hotel.fullPrice > 0);
 
   // 💵 Расчёт цены за ночь
   hotels.forEach(hotel => {
