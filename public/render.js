@@ -265,12 +265,21 @@ console.log("📦 Пример отеля:", hotels[0]);
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
-let imageUrl = `https://via.placeholder.com/800x520?text=No+Image`;
-if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
-  imageUrl = hotel.image;
-} else if (hotelId && typeof hotelId === "string") {
-  imageUrl = `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto`;
+    
+let imageUrl = "https://via.placeholder.com/800x520?text=No+Image";
+
+try {
+  const id = (hotel.hotelId || hotel.id || "").toString();
+
+  if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
+    imageUrl = hotel.image;
+  } else if (id.length) {
+    imageUrl = `https://photo.hotellook.com/image_v2/crop/${id}/2048/1536.auto`;
+  }
+} catch (err) {
+  console.warn("⚠️ Ошибка при генерации изображения отеля:", hotel, err);
 }
+    
     
     const baseUrl = hotelId
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
@@ -295,6 +304,13 @@ if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
       </a>
     `;
 
+
+    
+    if (!card || !card.innerHTML) {
+  console.warn("⚠️ Пустая карточка, отель:", hotel);
+}
+
+    
     container.appendChild(card);
   });
 
