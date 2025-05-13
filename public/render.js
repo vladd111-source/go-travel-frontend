@@ -233,19 +233,20 @@ hotels.forEach(hotel => {
   hotels.forEach(hotel => {
     hotel.pricePerNight = hotel.fullPrice && nights ? hotel.fullPrice / nights : 0;
   });
-
+  
+console.table(hotels.slice(0, 10), ["name", "pricePerNight", "fullPrice", "priceFrom"]);
+  
   // 🔍 Фильтрация
-  hotels = hotels.filter(hotel => {
-   const selectedType = propertyTypeFilter?.value || "all";
-    const matchesType =
-   selectedType === "all" ||
-     (selectedType === "hotel" && (hotel.property_type || "").toLowerCase().includes("hotel")) ||
-    (selectedType === "apartment" && (hotel.property_type || "").toLowerCase().includes("apartment"));
+ // hotels = hotels.filter(hotel => {
+//   const selectedType = propertyTypeFilter?.value || "all";
+//   const matchesType =
+//     selectedType === "all" ||
+//     (selectedType === "hotel" && (hotel.property_type || "").toLowerCase().includes("hotel")) ||
+//     (selectedType === "apartment" && (hotel.property_type || "").toLowerCase().includes("apartment"));
 
-   const matchesPrice = hotel.pricePerNight <= maxPrice;
-
-   return matchesType && matchesPrice;
-  });
+//   const matchesPrice = hotel.pricePerNight <= maxPrice;
+//   return matchesType && matchesPrice;
+// });
 
   console.log("✅ После фильтрации осталось:", hotels.length);
 console.log("📦 Пример отеля:", hotels[0]);
