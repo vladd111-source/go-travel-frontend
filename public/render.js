@@ -186,8 +186,12 @@ const t = window.translations[lang];
   }
 }
 
+console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
+
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
+  console.log("🧩 Контейнер:", container);
+console.log("🧩 Найдено отелей:", hotels.length);
   container.innerHTML = "";
 
   if (!Array.isArray(hotels) || !hotels.length) {
