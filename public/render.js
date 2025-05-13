@@ -221,6 +221,13 @@ console.log("🧩 Найдено отелей:", hotels.length);
   // ❌ Убираем отели без цены
  // hotels = hotels.filter(hotel => hotel.fullPrice && hotel.fullPrice > 0);
 
+  // 🛠 Устанавливаем fullPrice, если он отсутствует
+hotels.forEach(hotel => {
+  if (!hotel.fullPrice && hotel.priceFrom) {
+    hotel.fullPrice = hotel.priceFrom;
+  }
+});
+  
   // 💵 Расчёт цены за ночь
   hotels.forEach(hotel => {
     hotel.pricePerNight = hotel.fullPrice && nights ? hotel.fullPrice / nights : 0;
