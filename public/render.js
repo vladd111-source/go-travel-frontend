@@ -192,7 +192,7 @@ console.log("➡️ Вызов renderHotels, перед фильтрацией:"
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   console.log("🧩 Контейнер:", container);
-console.log("🧩 Найдено отелей:", hotels.length);
+  console.log("🧩 Найдено отелей:", hotels.length);
   container.innerHTML = "";
 
   if (!Array.isArray(hotels) || !hotels.length) {
@@ -219,38 +219,38 @@ console.log("🧩 Найдено отелей:", hotels.length);
     nights = Math.max(1, diffMs / (1000 * 60 * 60 * 24));
   }
 
-  // ❌ Убираем отели без цены
- // hotels = hotels.filter(hotel => hotel.fullPrice && hotel.fullPrice > 0);
-
   // 🛠 Устанавливаем fullPrice, если он отсутствует
-hotels.forEach(hotel => {
-  if (!hotel.fullPrice && hotel.priceFrom) {
-    hotel.fullPrice = hotel.priceFrom;
-  }
-});
-  
+  hotels.forEach(hotel => {
+    if (!hotel.fullPrice && hotel.priceFrom) {
+      hotel.fullPrice = hotel.priceFrom;
+    }
+  });
+
   // 💵 Расчёт цены за ночь
   hotels.forEach(hotel => {
     hotel.pricePerNight = hotel.fullPrice && nights ? hotel.fullPrice / nights : 0;
   });
-  
-console.table(hotels.slice(0, 10), ["name", "pricePerNight", "fullPrice", "priceFrom"]);
-  
-  // 🔍 Фильтрация
- hotels = hotels.filter(hotel => {
-const selectedType = propertyTypeFilter?.value || "all";
-const matchesType =
-selectedType === "all" ||
-(selectedType === "hotel" && (hotel.property_type || "").toLowerCase().includes("hotel")) ||
-(selectedType === "apartment" && (hotel.property_type || "").toLowerCase().includes("apartment"));
 
-const matchesPrice = hotel.pricePerNight <= maxPrice;
-return matchesType && matchesPrice;
-});
+  console.table(hotels.slice(0, 10), ["name", "pricePerNight", "fullPrice", "priceFrom"]);
+
+  // 🔍 Фильтрация
+  hotels = hotels.filter(hotel => {
+    const selectedType = propertyTypeFilter?.value || "all";
+
+    const matchesType =
+      selectedType === "all" ||
+      (selectedType === "hotel" && (hotel.property_type || "").toLowerCase().includes("hotel")) ||
+      (selectedType === "apartment" && (hotel.property_type || "").toLowerCase().includes("apartment")) ||
+      !hotel.property_type; // ✅ allow hotels without a defined type
+
+    const matchesPrice = hotel.pricePerNight <= maxPrice;
+
+    return matchesType && matchesPrice;
+  });
 
   console.log("✅ После фильтрации осталось:", hotels.length);
-console.log("📦 Пример отеля:", hotels[0]);
-  
+  console.log("📦 Пример отеля:", hotels[0]);
+
   // 📊 Сортировка по цене
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
 
@@ -265,24 +265,19 @@ console.log("📦 Пример отеля:", hotels[0]);
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
-    
-let imageUrl = "https://via.placeholder.com/800x520?text=No+Image";
+    let imageUrl = "https://via.placeholder.com/800x520?text=No+Image";
+    try {
+      const id = (hotel.hotelId || hotel.id || "").toString();
 
-try {
- let id = "";
-if (hotel.hotelId) id = String(hotel.hotelId);
-else if (hotel.id) id = String(hotel.id);
+      if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
+        imageUrl = hotel.image;
+      } else if (id.length) {
+        imageUrl = `https://photo.hotellook.com/image_v2/crop/${id}/2048/1536.auto`;
+      }
+    } catch (err) {
+      console.warn("⚠️ Ошибка при генерации изображения отеля:", hotel, err);
+    }
 
-  if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
-    imageUrl = hotel.image;
-  } else if (id.length) {
-    imageUrl = `https://photo.hotellook.com/image_v2/crop/${id}/2048/1536.auto`;
-  }
-} catch (err) {
-  console.warn("⚠️ Ошибка при генерации изображения отеля:", hotel, err);
-}
-    
-    
     const baseUrl = hotelId
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
       : `https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`;
@@ -306,20 +301,12 @@ else if (hotel.id) id = String(hotel.id);
       </a>
     `;
 
-
-    
-    if (!card || !card.innerHTML) {
-  console.warn("⚠️ Пустая карточка, отель:", hotel);
-}
-
-    
     container.appendChild(card);
   });
 
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
 }
-
 
 //Места
 export function renderPlaces(places) {
