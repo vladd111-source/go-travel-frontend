@@ -230,14 +230,18 @@ export function renderHotels(hotels) {
     hotel.pricePerNight = hotel.fullPrice && nights > 0
       ? hotel.fullPrice / nights
       : hotel.fullPrice || 0;
-
-    if (!hotel.pricePerNight || isNaN(hotel.pricePerNight)) {
-      console.warn("❌ Отель с некорректной ценой:", hotel.name, hotel.fullPrice, hotel.pricePerNight);
-    }
   });
 
+  // 🔍 Вывод перед фильтрацией
+  console.log("📊 Отели перед фильтрацией:");
+  hotels.forEach(h => {
+    console.log(`🏨 ${h.name || h.hotelName || "Без названия"} | fullPrice: ${h.fullPrice} | perNight: ${h.pricePerNight}`);
+  });
+
+  // ❗ Отфильтровываем
   hotels = hotels.filter(hotel => {
     const selectedType = propertyTypeFilter?.value || "all";
+
     const matchesType =
       selectedType === "all" ||
       (selectedType === "hotel" && (hotel.property_type || "").toLowerCase().includes("hotel")) ||
