@@ -197,7 +197,7 @@ export function renderHotels(hotels) {
   }
 
   console.log("🧩 Контейнер:", container);
-  console.log("🧩 Найдено отелей:", hotels.length);
+  console.log("🧩 Получено отелей:", hotels.length);
   container.innerHTML = "";
 
   if (!Array.isArray(hotels) || !hotels.length) {
@@ -223,25 +223,23 @@ export function renderHotels(hotels) {
     nights = Math.max(1, (dateOut - dateIn) / (1000 * 60 * 60 * 24));
   }
 
+  // 🛠 Нормализация
   hotels.forEach(hotel => {
-    if (!hotel.fullPrice && hotel.priceFrom) {
-      hotel.fullPrice = hotel.priceFrom;
-    }
-    hotel.pricePerNight = hotel.fullPrice && nights > 0
-      ? hotel.fullPrice / nights
-      : hotel.fullPrice || 0;
+    const fallbackPrice = hotel.priceFrom || hotel.fullPrice || 0;
+    hotel.fullPrice = fallbackPrice;
+    hotel.pricePerNight = nights > 0 ? fallbackPrice / nights : fallbackPrice;
   });
 
   // 🔍 Вывод перед фильтрацией
-  console.log("📊 Отели перед фильтрацией:");
+  console.group("📊 Данные перед фильтрацией:");
   hotels.forEach(h => {
-    console.log(`🏨 ${h.name || h.hotelName || "Без названия"} | fullPrice: ${h.fullPrice} | perNight: ${h.pricePerNight}`);
+    console.log(`🏨 ${h.name || h.hotelName || "—"} | fullPrice: ${h.fullPrice} | perNight: ${h.pricePerNight} | type: ${h.property_type}`);
   });
+  console.groupEnd();
 
-  // ❗ Отфильтровываем
+  // 🧹 Фильтрация
   hotels = hotels.filter(hotel => {
     const selectedType = propertyTypeFilter?.value || "all";
-
     const matchesType =
       selectedType === "all" ||
       (selectedType === "hotel" && (hotel.property_type || "").toLowerCase().includes("hotel")) ||
@@ -256,9 +254,11 @@ export function renderHotels(hotels) {
     return matchesType && matchesPrice;
   });
 
-  console.log("✅ После фильтрации осталось:", hotels.length);
-  if (hotels.length > 0) {
-    console.log("📦 Пример отеля:", hotels[0]);
+  console.log("✅ После фильтрации:", hotels.length);
+
+  if (!hotels.length) {
+    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены по заданным критериям</div>`;
+    return;
   }
 
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
@@ -271,18 +271,13 @@ export function renderHotels(hotels) {
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
     let imageUrl = "https://via.placeholder.com/800x520?text=No+Image";
-    try {
-      const id = (hotelId || "").toString();
-      if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
-        imageUrl = hotel.image;
-      } else if (id.length) {
-        imageUrl = `https://photo.hotellook.com/image_v2/limit/${id}/640/480.auto`;
-      }
-    } catch (err) {
-      console.warn("⚠️ Ошибка при генерации изображения отеля:", hotel, err);
-    }
+    const id = hotelId?.toString() || "";
 
-    console.log("📷 Изображение:", imageUrl);
+    if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
+      imageUrl = hotel.image;
+    } else if (id.length) {
+      imageUrl = `https://photo.hotellook.com/image_v2/limit/${id}/640/480.auto`;
+    }
 
     const baseUrl = hotelId
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
