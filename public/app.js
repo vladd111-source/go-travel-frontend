@@ -279,24 +279,30 @@ console.log("📦 Hotels from API (raw):", hotelsRaw);
 const dateOut = new Date(checkOut);
 const nights = Math.max(1, (dateOut - dateIn) / (1000 * 60 * 60 * 24));
 
+
+    
 const hotels = hotelsRaw
-  .filter(h => h.priceFrom > 0 && (h.hotelId || h.id)) // обязательно есть ID
+  .filter(h => (h.hotelId || h.id)) // ID обязателен, но не цена
   .map(h => {
     const hotelId = h.hotelId || h.id;
-    const fullPrice = h.priceFrom || h.fullPrice || 0;
+    const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
 
     return {
       id: hotelId,
       hotelId,
       name: h.hotelName || h.name || "Без названия",
       city: h.city || h.location?.name || city || "Город неизвестен",
-      fullPrice,
-      pricePerNight: fullPrice / nights,
+      fullPrice: rawPrice,
+      pricePerNight: nights > 0 ? rawPrice / nights : rawPrice,
       rating: h.rating || (h.stars ? h.stars * 2 : 0),
-      image: `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto`
+      image: h.image || `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto`,
+      property_type: h.property_type || ""
     };
-  });
+  })
+  .filter(h => h.fullPrice > 0); // фильтрация только после нормализации
 
+
+    
     renderHotels(hotels);
   } catch (err) {
     console.error('❌ Ошибка поиска отелей:', err);
