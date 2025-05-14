@@ -237,14 +237,25 @@ export function renderHotels(hotels) {
   });
   console.groupEnd();
 
+  console.log("🔎 Перед фильтрацией по цене:");
+hotels.forEach(h => {
+  console.log(`${h.name || h.hotelName} → perNight: ${h.pricePerNight}, maxPrice: ${maxPrice}`);
+});
+
   // 🧹 Фильтрация
   hotels = hotels.filter(hotel => {
-    const selectedType = propertyTypeFilter?.value || "all";
-    const matchesType =
-      selectedType === "all" ||
-      (selectedType === "hotel" && (hotel.property_type || "").toLowerCase().includes("hotel")) ||
-      (selectedType === "apartment" && (hotel.property_type || "").toLowerCase().includes("apartment")) ||
-      !hotel.property_type;
+   const selectedType = propertyTypeFilter?.value || "all";
+const rawType = (hotel.property_type || "").toLowerCase();
+
+if (!hotel.property_type) {
+  console.warn("❗ Отель без типа:", hotel.name, hotel);
+}
+
+const matchesType =
+  selectedType === "all" ||
+  (selectedType === "hotel" && rawType.includes("hotel")) ||
+  (selectedType === "apartment" && rawType.includes("apartment"));
+    
 
     const matchesPrice =
       !isNaN(hotel.pricePerNight) &&
