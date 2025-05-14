@@ -190,6 +190,11 @@ console.log("➡️ Вызов renderHotels, перед фильтрацией:"
 
 //Отели
 export function renderHotels(hotels) {
+
+if (!document.getElementById("hotelsResult")) {
+  console.error("❌ Элемент #hotelsResult не найден в DOM");
+}
+  
   const container = document.getElementById("hotelsResult");
   console.log("🧩 Контейнер:", container);
   console.log("🧩 Найдено отелей:", hotels.length);
@@ -278,7 +283,7 @@ export function renderHotels(hotels) {
       if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
         imageUrl = hotel.image;
       } else if (id.length) {
-        imageUrl = `https://photo.hotellook.com/image_v2/crop/${id}/2048/1536.auto`;
+        imageUrl = `https://photo.hotellook.com/image_v2/limit/${id}/640/480.auto`;
       }
     } catch (err) {
       console.warn("⚠️ Ошибка при генерации изображения отеля:", hotel, err);
