@@ -188,6 +188,7 @@ const t = window.translations[lang];
 
 console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
 
+//Отели
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   console.log("🧩 Контейнер:", container);
@@ -227,13 +228,13 @@ export function renderHotels(hotels) {
 
   // 💵 Расчёт цены за ночь
   hotels.forEach(hotel => {
-    hotel.pricePerNight = hotel.fullPrice && nights ? hotel.fullPrice / nights : 0;
+   hotel.pricePerNight = hotel.fullPrice && nights > 0 ? hotel.fullPrice / nights : hotel.fullPrice || 0;
   });
 
   // ❌ Исключаем отели без адекватной цены
-  hotels = hotels.filter(hotel => hotel.pricePerNight > 0);
+ // hotels = hotels.filter(hotel => hotel.pricePerNight > 0);
 
-  console.table(hotels.slice(0, 10), ["name", "pricePerNight", "fullPrice", "priceFrom"]);
+ // console.table(hotels.slice(0, 10), ["name", "pricePerNight", "fullPrice", "priceFrom"]);
 
   // 🔍 Фильтрация
   hotels = hotels.filter(hotel => {
