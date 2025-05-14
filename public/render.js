@@ -357,14 +357,3 @@ export function animateCards(selector) {
 }
 // Сделать функции глобально доступными
 window.generateAviasalesLink = generateAviasalesLink;
-
-renderHotels([
-  {
-    hotelId: "test123",
-    name: "Тест Отель",
-    city: "Москва",
-    fullPrice: 100,
-    pricePerNight: 50,
-    image: ""
-  }
-]);
