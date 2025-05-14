@@ -221,14 +221,12 @@ export function renderHotels(hotels) {
 
   console.log("🔎 Значение maxPrice из фильтра:", maxPrice);
 
-  // 🛠 Устанавливаем fullPrice, если он отсутствует
   hotels.forEach(hotel => {
     if (!hotel.fullPrice && hotel.priceFrom) {
       hotel.fullPrice = hotel.priceFrom;
     }
   });
 
-  // 💵 Расчёт цены за ночь
   hotels.forEach(hotel => {
     hotel.pricePerNight =
       hotel.fullPrice && nights > 0
@@ -236,14 +234,12 @@ export function renderHotels(hotels) {
         : hotel.fullPrice || 0;
   });
 
-  // 🚫 Диагностика "пустых" цен
   hotels.forEach(hotel => {
     if (!hotel.pricePerNight || isNaN(hotel.pricePerNight)) {
       console.warn("❌ Отель с некорректной ценой:", hotel.name, hotel.fullPrice, hotel.pricePerNight);
     }
   });
 
-  // 🔍 Фильтрация
   hotels = hotels.filter(hotel => {
     const selectedType = propertyTypeFilter?.value || "all";
 
@@ -264,10 +260,8 @@ export function renderHotels(hotels) {
   console.log("✅ После фильтрации осталось:", hotels.length);
   if (hotels.length > 0) console.log("📦 Пример отеля:", hotels[0]);
 
-  // 📊 Сортировка по цене
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
 
-  // 🏨 Отображение карточек
   hotels.forEach(hotel => {
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
@@ -302,8 +296,7 @@ export function renderHotels(hotels) {
     const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
 
     card.innerHTML = `
-      <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover"
-           onerror="this.onerror=null;this.src='https://via.placeholder.com/800x520?text=No+Image';" />
+      <img class="hotel-img rounded-lg mb-3 w-full h-48 object-cover" alt="${hotelName}" />
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
       <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
@@ -314,13 +307,19 @@ export function renderHotels(hotels) {
       </a>
     `;
 
+    // Установка изображения через JS + fallback
+    const img = card.querySelector(".hotel-img");
+    img.src = imageUrl;
+    img.onerror = () => {
+      img.src = "https://via.placeholder.com/800x520?text=No+Image";
+    };
+
     container.appendChild(card);
   });
 
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
 }
-
 
 //Места
 export function renderPlaces(places) {
