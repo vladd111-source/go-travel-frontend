@@ -236,6 +236,12 @@ export function renderHotels(hotels) {
 
  // console.table(hotels.slice(0, 10), ["name", "pricePerNight", "fullPrice", "priceFrom"]);
 
+hotels.forEach(hotel => {
+  if (!hotel.pricePerNight || hotel.pricePerNight === 0 || isNaN(hotel.pricePerNight)) {
+    console.warn("❌ Отель с некорректной ценой:", hotel.name, hotel.fullPrice, hotel.pricePerNight);
+  }
+});
+  
   // 🔍 Фильтрация
   hotels = hotels.filter(hotel => {
     const selectedType = propertyTypeFilter?.value || "all";
@@ -246,7 +252,7 @@ export function renderHotels(hotels) {
       (selectedType === "apartment" && (hotel.property_type || "").toLowerCase().includes("apartment")) ||
       !hotel.property_type; // ✅ Разрешаем без типа
 
-    const matchesPrice = hotel.pricePerNight <= maxPrice;
+   const matchesPrice = !isNaN(hotel.pricePerNight) && hotel.pricePerNight > 0 && hotel.pricePerNight <= maxPrice;
 
     return matchesType && matchesPrice;
   });
