@@ -219,6 +219,8 @@ export function renderHotels(hotels) {
     nights = Math.max(1, diffMs / (1000 * 60 * 60 * 24));
   }
 
+  console.log("🔎 Значение maxPrice из фильтра:", maxPrice);
+
   // 🛠 Устанавливаем fullPrice, если он отсутствует
   hotels.forEach(hotel => {
     if (!hotel.fullPrice && hotel.priceFrom) {
@@ -355,3 +357,14 @@ export function animateCards(selector) {
 }
 // Сделать функции глобально доступными
 window.generateAviasalesLink = generateAviasalesLink;
+
+renderHotels([
+  {
+    hotelId: "test123",
+    name: "Тест Отель",
+    city: "Москва",
+    fullPrice: 100,
+    pricePerNight: 50,
+    image: ""
+  }
+]);
