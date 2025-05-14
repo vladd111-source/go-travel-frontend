@@ -228,20 +228,19 @@ export function renderHotels(hotels) {
 
   // 💵 Расчёт цены за ночь
   hotels.forEach(hotel => {
-   hotel.pricePerNight = hotel.fullPrice && nights > 0 ? hotel.fullPrice / nights : hotel.fullPrice || 0;
+    hotel.pricePerNight =
+      hotel.fullPrice && nights > 0
+        ? hotel.fullPrice / nights
+        : hotel.fullPrice || 0;
   });
 
-  // ❌ Исключаем отели без адекватной цены
- // hotels = hotels.filter(hotel => hotel.pricePerNight > 0);
+  // 🚫 Диагностика "пустых" цен
+  hotels.forEach(hotel => {
+    if (!hotel.pricePerNight || isNaN(hotel.pricePerNight)) {
+      console.warn("❌ Отель с некорректной ценой:", hotel.name, hotel.fullPrice, hotel.pricePerNight);
+    }
+  });
 
- // console.table(hotels.slice(0, 10), ["name", "pricePerNight", "fullPrice", "priceFrom"]);
-
-hotels.forEach(hotel => {
-  if (!hotel.pricePerNight || hotel.pricePerNight === 0 || isNaN(hotel.pricePerNight)) {
-    console.warn("❌ Отель с некорректной ценой:", hotel.name, hotel.fullPrice, hotel.pricePerNight);
-  }
-});
-  
   // 🔍 Фильтрация
   hotels = hotels.filter(hotel => {
     const selectedType = propertyTypeFilter?.value || "all";
@@ -250,15 +249,18 @@ hotels.forEach(hotel => {
       selectedType === "all" ||
       (selectedType === "hotel" && (hotel.property_type || "").toLowerCase().includes("hotel")) ||
       (selectedType === "apartment" && (hotel.property_type || "").toLowerCase().includes("apartment")) ||
-      !hotel.property_type; // ✅ Разрешаем без типа
+      !hotel.property_type;
 
-   const matchesPrice = !isNaN(hotel.pricePerNight) && hotel.pricePerNight > 0 && hotel.pricePerNight <= maxPrice;
+    const matchesPrice =
+      !isNaN(hotel.pricePerNight) &&
+      hotel.pricePerNight > 0 &&
+      hotel.pricePerNight <= maxPrice;
 
     return matchesType && matchesPrice;
   });
 
   console.log("✅ После фильтрации осталось:", hotels.length);
-  console.log("📦 Пример отеля:", hotels[0]);
+  if (hotels.length > 0) console.log("📦 Пример отеля:", hotels[0]);
 
   // 📊 Сортировка по цене
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
@@ -277,7 +279,6 @@ hotels.forEach(hotel => {
     let imageUrl = "https://via.placeholder.com/800x520?text=No+Image";
     try {
       const id = (hotel.hotelId || hotel.id || "").toString();
-
       if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
         imageUrl = hotel.image;
       } else if (id.length) {
@@ -291,20 +292,21 @@ hotels.forEach(hotel => {
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
       : `https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`;
 
-    const dateParams = checkIn && checkOut
-      ? `&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}`
-      : "";
+    const dateParams =
+      checkIn && checkOut
+        ? `&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}`
+        : "";
 
     const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
 
     card.innerHTML = `
-     <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover"
-     onerror="this.onerror=null;this.src='https://via.placeholder.com/800x520?text=No+Image';" />
+      <img src="${imageUrl}" alt="${hotelName}" class="rounded-lg mb-3 w-full h-48 object-cover"
+           onerror="this.onerror=null;this.src='https://via.placeholder.com/800x520?text=No+Image';" />
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
       <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
       <p class="text-sm text-gray-600 mb-1">💵 Всего за период: ${totalPrice}</p>
-      <a href="${bookingUrl}" target="_blank" 
+      <a href="${bookingUrl}" target="_blank"
          class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center mt-2">
          🔗 Забронировать
       </a>
