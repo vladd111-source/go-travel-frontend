@@ -223,39 +223,20 @@ export function renderHotels(hotels) {
     nights = Math.max(1, (dateOut - dateIn) / (1000 * 60 * 60 * 24));
   }
 
-  // 🛠 Нормализация
   hotels.forEach(hotel => {
     const fallbackPrice = hotel.priceFrom || hotel.fullPrice || 0;
     hotel.fullPrice = fallbackPrice;
     hotel.pricePerNight = nights > 0 ? fallbackPrice / nights : fallbackPrice;
   });
 
-  // 🔍 Вывод перед фильтрацией
-  console.group("📊 Данные перед фильтрацией:");
-  hotels.forEach(h => {
-    console.log(`🏨 ${h.name || h.hotelName || "—"} | fullPrice: ${h.fullPrice} | perNight: ${h.pricePerNight} | type: ${h.property_type}`);
-  });
-  console.groupEnd();
-
-  console.log("🔎 Перед фильтрацией по цене:");
-hotels.forEach(h => {
-  console.log(`${h.name || h.hotelName} → perNight: ${h.pricePerNight}, maxPrice: ${maxPrice}`);
-});
-
-  // 🧹 Фильтрация
   hotels = hotels.filter(hotel => {
-   const selectedType = propertyTypeFilter?.value || "all";
-const rawType = (hotel.property_type || "").toLowerCase();
+    const selectedType = propertyTypeFilter?.value || "all";
+    const rawType = (hotel.property_type || "").toLowerCase();
 
-if (!hotel.property_type) {
-  console.warn("❗ Отель без типа:", hotel.name, hotel);
-}
-
-const matchesType =
-  selectedType === "all" ||
-  (selectedType === "hotel" && rawType.includes("hotel")) ||
-  (selectedType === "apartment" && rawType.includes("apartment"));
-    
+    const matchesType =
+      selectedType === "all" ||
+      (selectedType === "hotel" && rawType.includes("hotel")) ||
+      (selectedType === "apartment" && rawType.includes("apartment"));
 
     const matchesPrice =
       !isNaN(hotel.pricePerNight) &&
@@ -266,7 +247,6 @@ const matchesType =
   });
 
   console.log("✅ После фильтрации:", hotels.length);
-
   if (!hotels.length) {
     container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены по заданным критериям</div>`;
     return;
@@ -281,14 +261,9 @@ const matchesType =
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
-    let imageUrl = "https://via.placeholder.com/800x520?text=No+Image";
-    const id = hotelId?.toString() || "";
-
-    if (typeof hotel.image === "string" && hotel.image.startsWith("http")) {
-      imageUrl = hotel.image;
-    } else if (id.length) {
-      imageUrl = `https://photo.hotellook.com/image_v2/limit/${id}/640/480.auto`;
-    }
+    const imageUrl = hotelId
+      ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.jpeg`
+      : "https://via.placeholder.com/800x520?text=No+Image";
 
     const baseUrl = hotelId
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
@@ -306,7 +281,8 @@ const matchesType =
 
     card.innerHTML = `
       <img src="${imageUrl}" alt="${hotelName}"
-           class="rounded-lg mb-3 w-full h-48 object-cover"
+           class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
+           loading="lazy"
            onerror="this.onerror=null;this.src='https://via.placeholder.com/800x520?text=No+Image';" />
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
@@ -324,6 +300,7 @@ const matchesType =
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
 }
+
 
 //Места
 export function renderPlaces(places) {
