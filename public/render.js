@@ -301,7 +301,6 @@ export function renderHotels(hotels) {
   animateCards("#hotelsResult .card");
 }
 
-
 //Места
 export function renderPlaces(places) {
   const container = document.getElementById("placesResult");
