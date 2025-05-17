@@ -256,15 +256,17 @@ export function renderHotels(hotels) {
 
   hotels.forEach(hotel => {
     const hotelId = hotel.hotelId || hotel.id;
+    console.log("🏨 Отель:", hotel.name, "| ID:", hotelId);
+
     const hotelName = hotel.name || "Без названия";
     const hotelCity = hotel.city || "Город неизвестен";
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
- const imageUrl = hotelId
-  ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.jpeg`
-  : "https://via.placeholder.com/800x520?text=No+Image";
-    
+    const imageUrl = hotelId
+      ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.jpeg`
+      : "https://via.placeholder.com/800x520?text=No+Image";
+
     const baseUrl = hotelId
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
       : `https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`;
@@ -281,6 +283,8 @@ export function renderHotels(hotels) {
 
     card.innerHTML = `
       <img src="${imageUrl}" alt="${hotelName}"
+           referrerpolicy="no-referrer"
+           crossorigin="anonymous"
            class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
            loading="lazy"
            onerror="this.onerror=null;this.src='https://via.placeholder.com/800x520?text=No+Image';" />
@@ -300,6 +304,7 @@ export function renderHotels(hotels) {
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
 }
+
 
 //Места
 export function renderPlaces(places) {
