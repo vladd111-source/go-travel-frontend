@@ -263,10 +263,7 @@ export function renderHotels(hotels) {
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
-    const imageUrl =
-      hotelId >= 100000000
-        ? `https://photo.hotellook.com/image_v2/limit/${hotelId}/800/520.jpeg`
-        : "https://via.placeholder.com/800x520?text=No+Image";
+   const imageUrl = hotel.image || "https://via.placeholder.com/800x520?text=No+Image";
 
     const baseUrl = hotelId
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
