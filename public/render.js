@@ -264,10 +264,9 @@ export function renderHotels(hotels) {
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
     
-  const imageUrl =
-  typeof hotel.image === "string" && hotel.image.startsWith("http")
-    ? hotel.image
-    : "https://via.placeholder.com/800x520?text=No+Image";
+  const imageUrl = hotel.photoId
+  ? `https://your-backend.vercel.app/api/proxy-image?photoId=${hotel.photoId}`
+  : "https://placehold.co/800x520?text=No+Image";
     
 
     const baseUrl = hotelId
