@@ -586,6 +586,25 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
     `;
   }).join("");
 
+
+  // 🔮 Подгрузка совета от GPT
+const gptAdvice = await askGptAdvisor(`Что ты посоветуешь туристу в городе ${city}, категория: ${category || "любая"}?`);
+
+const gptBlock = document.createElement("div");
+gptBlock.className = "bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded text-sm text-gray-800";
+gptBlock.innerHTML = `
+  <div class="flex items-start gap-2">
+    <span class="text-2xl">🤖</span>
+    <div>
+      <p class="font-semibold mb-1">Совет тревел-ассистента:</p>
+      <p>${gptAdvice}</p>
+    </div>
+  </div>
+`;
+
+resultBlock.prepend(gptBlock);
+  
+
   updateHearts("places");
 
   if (remaining.length > 0) {
