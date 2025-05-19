@@ -63,7 +63,7 @@ window.translations = {
 };
 
 // 🧠 GPT-режим — передача в запрос
-async function askGptAdvisor(question) {
+export async function askGptAdvisor(question) {
   const telegramId = window._telegramId || "unknown";
   const mode = document.getElementById("gptMode")?.value || "basic";
 
