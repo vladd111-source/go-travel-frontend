@@ -504,7 +504,7 @@ if (placeCategorySelect) {
 
 placeCityInput.setAttribute("autofocus", "autofocus");
 
-document.getElementById("placeForm")?.addEventListener("submit", (e) => {
+document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const city = placeCityInput.value.trim().toLowerCase();
