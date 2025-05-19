@@ -62,24 +62,28 @@ window.translations = {
   }
 };
 
-export async function askGptAdvisor(prompt) {
-  try {
-    const telegramId = window._telegramId || "anonymous";
-    const mode = document.getElementById("gptMode")?.value || "basic";
+// 🧠 GPT-режим — передача в запрос
+async function askGptAdvisor(question) {
+  const telegramId = window._telegramId || "unknown";
+  const mode = document.getElementById("gptMode")?.value || "basic";
 
-    const res = await fetch("https://go-travel-backend.vercel.app/api/gpt", {
+  try {
+    const res = await fetch("https://go-travel-backend.onrender.com/api/gpt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question: `${prompt} (режим: ${mode})`, telegramId })
+      body: JSON.stringify({ question, telegramId, mode })
     });
 
-    if (!res.ok) throw new Error("Ошибка GPT запроса");
-
-    const json = await res.json();
-    return json.answer || "Нет ответа от GPT";
+    const data = await res.json();
+    if (res.ok && data.answer) {
+      return data.answer;
+    } else {
+      console.warn("❌ GPT ответ с ошибкой:", data.error);
+      return "🤖 Что-то пошло не так. Попробуй позже.";
+    }
   } catch (err) {
-    console.warn("❌ GPT ошибка:", err);
-    return "GPT недоступен сейчас.";
+    console.error("❌ GPT fetch error:", err);
+    return "⚠️ Ошибка запроса. Проверь соединение.";
   }
 }
 
