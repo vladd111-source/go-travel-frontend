@@ -1,6 +1,31 @@
 import { renderHotels, renderFlights, renderPlaces } from './render.js';
 import { showLoading, hideLoading } from './globals.js';
 
+// 🧠 GPT-режим — передача в запрос
+async function askGptAdvisor(question) {
+  const telegramId = window._telegramId || "unknown";
+  const mode = document.getElementById("gptMode")?.value || "basic";
+
+  try {
+    const res = await fetch("https://go-travel-backend.onrender.com/api/gpt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, telegramId, mode })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.answer) {
+      return data.answer;
+    } else {
+      console.warn("❌ GPT ответ с ошибкой:", data.error);
+      return "🤖 Что-то пошло не так. Попробуй позже.";
+    }
+  } catch (err) {
+    console.error("❌ GPT fetch error:", err);
+    return "⚠️ Ошибка запроса. Проверь соединение.";
+  }
+}
+
 export async function searchHotels(city, checkIn, checkOut) {
   try {
     const query = new URLSearchParams({ city, checkIn, checkOut });
