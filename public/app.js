@@ -588,21 +588,41 @@ document.getElementById("placeForm")?.addEventListener("submit", (e) => {
 
 
   // 🔮 Подгрузка совета от GPT
-const gptAdvice = await askGptAdvisor(`Что ты посоветуешь туристу в городе ${city}, категория: ${category || "любая"}?`);
+try {
+  const gptAdvice = await askGptAdvisor(`Что ты посоветуешь туристу в городе ${city}, категория: ${category || "любая"}?`);
 
-const gptBlock = document.createElement("div");
-gptBlock.className = "bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded text-sm text-gray-800";
-gptBlock.innerHTML = `
-  <div class="flex items-start gap-2">
-    <span class="text-2xl">🤖</span>
-    <div>
-      <p class="font-semibold mb-1">Совет тревел-ассистента:</p>
-      <p>${gptAdvice}</p>
+  const gptBlock = document.createElement("div");
+  gptBlock.className = "bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded text-sm text-gray-800 mb-4";
+
+  gptBlock.innerHTML = `
+    <div class="flex justify-between items-start gap-4">
+      <div class="flex gap-2">
+        <span class="text-2xl">🤖</span>
+        <div>
+          <p class="font-semibold mb-1">Совет тревел-ассистента:</p>
+          <p id="gptText">${gptAdvice}</p>
+        </div>
+      </div>
+      <button id="refreshGptBtn" title="Обновить совет" class="text-yellow-600 hover:text-yellow-800 text-lg font-bold">🔁</button>
     </div>
-  </div>
-`;
+  `;
 
-resultBlock.prepend(gptBlock);
+  resultBlock.prepend(gptBlock);
+
+  // 🔁 Обработка кнопки обновления
+  document.getElementById("refreshGptBtn")?.addEventListener("click", async () => {
+    const btn = document.getElementById("refreshGptBtn");
+    btn.textContent = "⏳";
+
+    const newAdvice = await askGptAdvisor(`Что ты посоветуешь туристу в городе ${city}, категория: ${category || "любая"}?`);
+    document.getElementById("gptText").textContent = newAdvice;
+
+    btn.textContent = "🔁";
+  });
+
+} catch (err) {
+  console.warn("❌ GPT совет не получен:", err);
+}
   
 
   updateHearts("places");
