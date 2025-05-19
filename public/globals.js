@@ -621,6 +621,24 @@ window.focusFirstInputIn = function(tabId) {
   if (input) input.focus();
 };
 
+// ✅ Загрузка мест с фильтрацией
+export async function fetchPlaces(city = "", category = "") {
+  try {
+    const res = await fetch("/api/places");
+    const allPlaces = await res.json();
+
+    const filtered = allPlaces.filter(p =>
+      (!city || p.city.toLowerCase().includes(city.toLowerCase())) &&
+      (!category || p.category === category)
+    );
+
+    return filtered;
+  } catch (err) {
+    console.error("❌ Ошибка загрузки мест:", err);
+    return [];
+  }
+}
+
 // 🚀 Автозагрузка горячих предложений при первом заходе
 window.addEventListener("DOMContentLoaded", async () => {
   const hotDealsBtn = document.getElementById("loadHotDeals");
