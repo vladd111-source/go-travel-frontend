@@ -1,5 +1,5 @@
 import { renderHotels, renderFlights, renderPlaces } from './render.js';
-import { showLoading, hideLoading } from './globals.js';
+import { showLoading, hideLoading, askGptAdvisor } from './globals.js';
 
 // 🧠 GPT-режим — передача в запрос
 async function askGptAdvisor(question) {
