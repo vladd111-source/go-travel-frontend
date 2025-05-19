@@ -551,10 +551,6 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
     `;
   }).join("");
 
-
-});
-
-
   // 🔮 Подгрузка совета от GPT
 try {
   const gptAdvice = await askGptAdvisor(`Что ты посоветуешь туристу в городе ${city}, категория: ${category || "любая"}?`);
