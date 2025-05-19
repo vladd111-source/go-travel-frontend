@@ -47,6 +47,35 @@ export async function searchHotels(city, checkIn, checkOut) {
   }
 }
 
+
+
+export async function askGptAdvisor(prompt) {
+  try {
+    const res = await fetch("https://go-travel-backend.vercel.app/api/gpt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question: prompt,
+        telegramId: window._telegramId || "unknown"
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      console.warn("❌ GPT ответ с ошибкой:", data.error);
+      return "🤖 Что-то пошло не так. Попробуй позже.";
+    }
+
+    return data.answer || "🤖 Без ответа.";
+  } catch (err) {
+    console.error("⚠️ Ошибка запроса GPT:", err);
+    return "⚠️ Ошибка запроса. Проверь соединение.";
+  }
+}
+
+
+
 let lastSearchTime = 0;
 
 // 🔁 Повтор при 429 (без async/await)
