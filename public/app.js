@@ -1,5 +1,5 @@
 import { renderHotels, renderFlights, renderPlaces } from './render.js';
-import { showLoading, hideLoading, askGptAdvisor } from './globals.js';
+import { fetchPlaces, showLoading, hideLoading, askGptAdvisor } from './globals.js';
 
 export async function searchHotels(city, checkIn, checkOut) {
   try {
@@ -513,21 +513,11 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   localStorage.setItem("placeCity", city);
   localStorage.setItem("placeCategory", category);
 
-  const dummyPlaces = [
-    { name: "Castelo de São Jorge", description: "Древняя крепость с видом на Лиссабон", city: "лиссабон", category: "culture", image: "https://picsum.photos/300/180?random=1" },
-    { name: "Miradouro da Senhora do Monte", description: "Лучший панорамный вид на город", city: "лиссабон", category: "nature", image: "https://picsum.photos/300/180?random=2" },
-    { name: "Oceanário de Lisboa", description: "Современный океанариум", city: "лиссабон", category: "fun", image: "https://picsum.photos/300/180?random=3" },
-    { name: "Time Out Market", description: "Фудкорт и рынок в центре города", city: "лиссабон", category: "food", image: "https://picsum.photos/300/180?random=4" },
-    { name: "Centro Colombo", description: "Крупный торговый центр", city: "лиссабон", category: "shopping", image: "https://picsum.photos/300/180?random=5" }
-  ];
-
   resultBlock.classList.remove("visible");
   resultBlock.innerHTML = "";
 
-  const filtered = dummyPlaces.filter(p =>
-    (!city || p.city.includes(city)) &&
-    (!category || p.category === category)
-  );
+  // 🧠 Новый fetch с API
+  const filtered = await fetchPlaces(city, category);
 
   if (filtered.length === 0) {
     resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
@@ -560,6 +550,9 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
       </div>
     `;
   }).join("");
+
+
+});
 
 
   // 🔮 Подгрузка совета от GPT
