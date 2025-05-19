@@ -67,11 +67,18 @@ export async function askGptAdvisor(question) {
   const telegramId = window._telegramId || "unknown";
   const mode = document.getElementById("gptMode")?.value || "basic";
 
-  // 🚨 Проверка данных перед отправкой
   if (!question || !telegramId) {
     console.warn("⚠️ Пропущен вопрос или Telegram ID", { question, telegramId });
     return "❌ Не хватает данных для запроса.";
   }
+
+  // 🔍 Показываем данные, которые пойдут в запрос
+  console.log("📤 Отправка в GPT", {
+    question,
+    telegramId,
+    mode,
+    body: JSON.stringify({ question, telegramId, mode })
+  });
 
   try {
     const res = await fetch("https://go-travel-backend-86i8.onrender.com/api/gpt", {
@@ -80,8 +87,11 @@ export async function askGptAdvisor(question) {
       body: JSON.stringify({ question, telegramId, mode })
     });
 
-    // 🧪 Проверяем ответ
     const data = await res.json();
+
+    // 📥 Показываем ответ от сервера
+    console.log("📬 Ответ GPT:", data);
+
     if (res.ok && data.answer) {
       return data.answer;
     } else {
