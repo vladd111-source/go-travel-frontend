@@ -74,7 +74,7 @@ export async function askGptAdvisor(question) {
   }
 
   try {
-    const res = await fetch("https://go-travel-backend.vercel.app/api/gpt", {
+    const res = await fetch("https://go-travel-backend-86i8.onrender.com/api/gpt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question, telegramId, mode })
