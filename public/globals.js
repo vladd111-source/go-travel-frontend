@@ -62,17 +62,16 @@ window.translations = {
   }
 };
 
+
 export async function askGptAdvisor(question) {
   const telegramId = window._telegramId || "unknown";
   const mode = document.getElementById("gptMode")?.value || "basic";
 
-  // 🚨 Проверка перед отправкой
-  console.log("📤 GPT запрос:", {
-    question,
-    telegramId,
-    mode,
-    isValid: !!question && !!telegramId
-  });
+  // 🚨 Проверка данных перед отправкой
+  if (!question || !telegramId) {
+    console.warn("⚠️ Пропущен вопрос или Telegram ID", { question, telegramId });
+    return "❌ Не хватает данных для запроса.";
+  }
 
   try {
     const res = await fetch("https://go-travel-backend.vercel.app/api/gpt", {
@@ -81,18 +80,20 @@ export async function askGptAdvisor(question) {
       body: JSON.stringify({ question, telegramId, mode })
     });
 
+    // 🧪 Проверяем ответ
     const data = await res.json();
     if (res.ok && data.answer) {
       return data.answer;
     } else {
-      console.warn("❌ GPT ответ с ошибкой:", data.error);
+      console.warn("❌ GPT вернул ошибку:", data);
       return "🤖 Что-то пошло не так. Попробуй позже.";
     }
   } catch (err) {
     console.error("❌ GPT fetch error:", err);
-    return "⚠️ Ошибка запроса. Проверь соединение.";
+    return "⚠️ Не удалось подключиться к серверу.";
   }
 }
+
 
 export function showFlightModal(flight) {
   // 🔧 Подстраховка: если нет departure_at, подставим date
