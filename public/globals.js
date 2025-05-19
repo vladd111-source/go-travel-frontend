@@ -62,13 +62,20 @@ window.translations = {
   }
 };
 
-// 🧠 GPT-режим — передача в запрос
 export async function askGptAdvisor(question) {
   const telegramId = window._telegramId || "unknown";
   const mode = document.getElementById("gptMode")?.value || "basic";
 
+  // 🚨 Проверка перед отправкой
+  console.log("📤 GPT запрос:", {
+    question,
+    telegramId,
+    mode,
+    isValid: !!question && !!telegramId
+  });
+
   try {
-   const res = await fetch("https://go-travel-backend.vercel.app/api/gpt", {
+    const res = await fetch("https://go-travel-backend.vercel.app/api/gpt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question, telegramId, mode })
