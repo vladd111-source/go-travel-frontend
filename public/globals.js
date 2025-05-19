@@ -624,7 +624,7 @@ window.focusFirstInputIn = function(tabId) {
 // ✅ Загрузка мест с фильтрацией
 export async function fetchPlaces(city = "", category = "") {
   try {
-    const res = await fetch("/api/places");
+    const res = await fetch("https://go-travel-backend.vercel.app/api/places");
     const allPlaces = await res.json();
 
     const filtered = allPlaces.filter(p =>
