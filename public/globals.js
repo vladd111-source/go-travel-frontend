@@ -118,13 +118,13 @@ export function parsePlacesFromGpt(rawText) {
     const mapMatch = block.match(/Google\s*Maps\s*:\s*(https?:\/\/[^\s]+)/i);
     const imageMatch = block.match(/Фото\s*:\s*(https?:\/\/[^\s]+)/i);
 
-    let image = (imageMatch?.[1] || "").trim();
+    let image = imageMatch?.[1]?.trim() || "";
 
+    // 🔒 Проверка валидности картинки
     if (
       !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(image) ||
       image.includes("bit.ly") ||
       image.includes("wikimedia") ||
-      image.includes("pixabay") ||
       image.includes("wikipedia")
     ) {
       image = "https://placehold.co/300x180?text=No+Image";
