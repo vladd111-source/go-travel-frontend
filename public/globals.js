@@ -62,7 +62,7 @@ window.translations = {
   }
 };
 
-
+// запрос в гпт
 export async function askGptAdvisor(question) {
   const telegramId = window._telegramId || "unknown";
   const mode = document.getElementById("gptMode")?.value || "basic";
@@ -104,28 +104,7 @@ export async function askGptAdvisor(question) {
   }
 }
 
-
-
-// 📦 Парсинг 3 карточек мест из ответа GPT
-function parsePlacesFromGpt(text) {
-  const regex = /(\d+)\.\s*(.+?)\nОписание:\s*(.+?)\nАдрес:\s*(.+?)\nGoogle Maps:\s*(https?:\/\/[^\s]+)\nФото:\s*(https?:\/\/[^\s]+)/g;
-  const result = [];
-  let match;
-
-  while ((match = regex.exec(text)) !== null) {
-    result.push({
-      name: match[2].trim(),
-      description: match[3].trim(),
-      address: match[4].trim(),
-      map: match[5].trim(),
-      image: match[6].trim(),
-    });
-  }
-
-  return result;
-}
-
-
+// 📦 Парсинг до 3 карточек мест из ответа GPT
 export function parsePlacesFromGpt(rawText) {
   const blocks = rawText
     .split(/\n(?=\d\.)/) // делим по "1." / "2." / "3."
@@ -144,11 +123,11 @@ export function parsePlacesFromGpt(rawText) {
       description: descriptionMatch?.[1]?.trim() || "Описание отсутствует.",
       address: addressMatch?.[1]?.trim() || "Адрес не указан",
       map: mapMatch?.[1]?.trim() || "#",
-      image: imageMatch?.[1]?.trim() || "https://picsum.photos/300/180?random=" + Math.floor(Math.random() * 1000)
+      image: imageMatch?.[1]?.trim() || `https://picsum.photos/300/180?random=${Math.floor(Math.random() * 1000)}`
     };
   });
 
-  return places.slice(0, 3); // максимум 3 места
+  return places.slice(0, 3); // максимум 3 карточки
 }
 
 
