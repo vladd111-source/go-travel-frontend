@@ -686,23 +686,25 @@ window.focusFirstInputIn = function(tabId) {
   if (input) input.focus();
 };
 
-// ✅ Загрузка мест с фильтрацией
-export async function fetchPlaces(city = "", category = "") {
+// 📡 GPT-запрос мест вместо заглушки
+export async function fetchPlaces(city, category) {
+  const question = `Дай 3 лучших места в городе ${city} по теме "${category}". Формат:
+1. Название
+Описание: ...
+Адрес: ...
+Google Maps: https://...
+Фото: https://...`;
+
   try {
-    const res = await fetch("https://go-travel-backend.vercel.app/api/places");
-    const allPlaces = await res.json();
-
-    const filtered = allPlaces.filter(p =>
-      (!city || p.city.toLowerCase().includes(city.toLowerCase())) &&
-      (!category || p.category === category)
-    );
-
-    return filtered;
+    const rawAnswer = await askGptAdvisor(question);
+    const places = parsePlacesFromGpt(rawAnswer);
+    return places;
   } catch (err) {
-    console.error("❌ Ошибка загрузки мест:", err);
+    console.error("❌ GPT не смог вернуть места:", err);
     return [];
   }
 }
+
 
 // 🚀 Автозагрузка горячих предложений при первом заходе
 window.addEventListener("DOMContentLoaded", async () => {
