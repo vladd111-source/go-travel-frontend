@@ -614,7 +614,7 @@ try {
             onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, category }))}', this)" 
             class="text-xl ml-2"
           >
-            ${isFav ? "💙" : "🤍"}
+            ${isFav ? "💙" : "❤️"}
           </button>
         </div>
       </div>
@@ -628,6 +628,7 @@ try {
 } catch (err) {
   console.warn("❌ GPT совет не получен:", err);
 }
+
 
 
   
