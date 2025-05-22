@@ -118,18 +118,24 @@ export function parsePlacesFromGpt(rawText) {
     const mapMatch = block.match(/Google\s*Maps\s*:\s*(https?:\/\/[^\s]+)/i);
     const imageMatch = block.match(/Фото\s*:\s*(https?:\/\/[^\s]+)/i);
 
+    let image = imageMatch?.[1]?.trim() || "";
+
+    // ✅ Защита от битых и коротких URL
+    if (!/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(image)) {
+      image = `https://placehold.co/300x180?text=No+Image`;
+    }
+
     return {
       name: nameMatch?.[1]?.trim() || "Без названия",
       description: descriptionMatch?.[1]?.trim() || "Описание отсутствует.",
       address: addressMatch?.[1]?.trim() || "Адрес не указан",
       map: mapMatch?.[1]?.trim() || "#",
-      image: imageMatch?.[1]?.trim() || `https://picsum.photos/300/180?random=${Math.floor(Math.random() * 1000)}`
+      image
     };
   });
 
-  return places.slice(0, 3); // максимум 3 карточки
+  return places.slice(0, 3);
 }
-
 
 export function showFlightModal(flight) {
   // 🔧 Подстраховка: если нет departure_at, подставим date
