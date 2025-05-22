@@ -308,7 +308,6 @@ export function renderHotels(hotels) {
 }
 
 
-//Места
 export function renderPlaces(places) {
   const container = document.getElementById("placesResult");
   container.innerHTML = "";
@@ -320,26 +319,28 @@ export function renderPlaces(places) {
 
   places.forEach(place => {
     const card = document.createElement("div");
-    card.className = "card bg-white p-4 rounded-xl shadow mb-4";
+    card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
+
+    const addressLink = place.address
+      ? `<a href="${place.map}" target="_blank" class="text-sm text-blue-600 underline">${place.address}</a>`
+      : "";
+
+    const imageBlock = place.image
+      ? `<img src="${place.image}" alt="${place.name}" class="w-full h-40 object-cover rounded-md mb-3" loading="lazy" />`
+      : "";
 
     card.innerHTML = `
+      ${imageBlock}
       <h3 class="text-lg font-semibold mb-1">${place.name}</h3>
-      <p class="text-sm text-gray-600 mb-1">📍 ${place.city}</p>
-      <p class="text-sm text-gray-600 mb-1">🗂️ Категория: ${place.category}</p>
-      <p class="text-sm text-gray-600 mb-1">📝 ${place.description}</p>
+      <p class="text-sm text-gray-600 mb-1">${place.description}</p>
+      ${addressLink}
     `;
 
     container.appendChild(card);
   });
+
+  animateCards("#placesResult .card");
 }
-export function animateCards(selector) {
-  const cards = document.querySelectorAll(selector);
-  cards.forEach((card, i) => {
-    setTimeout(() => {
-      card.classList.remove("opacity-0", "scale-95");
-      card.classList.add("opacity-100", "scale-100");
-    }, i * 100);
-  });
-}
+
 // Сделать функции глобально доступными
 window.generateAviasalesLink = generateAviasalesLink;
