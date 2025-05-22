@@ -516,7 +516,6 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   resultBlock.classList.remove("visible");
   resultBlock.innerHTML = "";
 
-  // 🧠 Новый fetch с API
   const filtered = await fetchPlaces(city, category);
 
   if (filtered.length === 0) {
@@ -537,7 +536,7 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
         <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
         <p class="text-sm text-gray-600 mb-1">${p.description}</p>
         ${addressLink}
-        <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+        <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${(p.city || "").charAt(0).toUpperCase() + (p.city || "").slice(1)}</p>
         <div class="flex justify-between items-center mt-2">
           <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
           <button 
@@ -552,87 +551,66 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
     `;
   }).join("");
 
+  // 🔮 Подгрузка совета от GPT + карточек мест
+  try {
+    const gptRaw = await askGptAdvisor(`Дай 3 лучших места в городе ${city} по теме "${formatCategory(category)}".\nФормат:\n1. Название места\nОписание: ...\nАдрес: ...\nGoogle Maps: https://...\nФото: https://...`);
 
+    const parsedPlaces = parsePlacesFromGpt(gptRaw);
 
-  
-// 🔮 Подгрузка совета от GPT + карточек мест
-try {
-  const gptRaw = await askGptAdvisor(`Дай 3 лучших места в городе ${city} по теме "${formatCategory(category)}".
-  Формат:
-  1. Название места
-  Описание: ...
-  Адрес: ...
-  Google Maps: https://...
-  Фото: https://...`);
-
-  const parsedPlaces = parsePlacesFromGpt(gptRaw);
-
-  // 👇 Блок совета сверху
-  const gptBlock = document.createElement("div");
-  gptBlock.className = "bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded text-sm text-gray-800 mb-4";
-  gptBlock.innerHTML = `
-    <div class="flex justify-between items-start gap-4">
-      <div class="flex gap-2">
-        <span class="text-2xl">🤖</span>
-        <div>
-          <p class="font-semibold mb-1">Совет тревел-ассистента:</p>
-          <p id="gptText">${gptRaw}</p>
+    const gptBlock = document.createElement("div");
+    gptBlock.className = "bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded text-sm text-gray-800 mb-4";
+    gptBlock.innerHTML = `
+      <div class="flex justify-between items-start gap-4">
+        <div class="flex gap-2">
+          <span class="text-2xl">🤖</span>
+          <div>
+            <p class="font-semibold mb-1">Совет тревел-ассистента:</p>
+            <p id="gptText">${gptRaw}</p>
+          </div>
         </div>
-      </div>
-      <button id="refreshGptBtn" title="Обновить совет" class="text-yellow-600 hover:text-yellow-800 text-lg font-bold">🔁</button>
-    </div>
-  `;
-  resultBlock.prepend(gptBlock);
-
-  document.getElementById("refreshGptBtn")?.addEventListener("click", async () => {
-    const btn = document.getElementById("refreshGptBtn");
-    btn.textContent = "⏳";
-    const newRaw = await askGptAdvisor(`Дай 3 лучших места в городе ${city} по теме "${formatCategory(category)}".
-    Формат:
-    1. Название места
-    Описание: ...
-    Адрес: ...
-    Google Maps: https://...
-    Фото: https://...`);
-    document.getElementById("gptText").textContent = newRaw;
-    btn.textContent = "🔁";
-  });
-
-  // 👇 Карточки от GPT (3 шт)
-  const gptCards = parsedPlaces.map(p => {
-    const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-    const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
-    return `
-      <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-        <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
-        <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-        <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-        <a href="${p.map}" target="_blank" class="text-sm text-blue-600 underline">${p.address}</a>
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
-          <button 
-            onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, category }))}', this)" 
-            class="text-xl ml-2"
-          >
-            ${isFav ? "💙" : "❤️"}
-          </button>
-        </div>
+        <button id="refreshGptBtn" title="Обновить совет" class="text-yellow-600 hover:text-yellow-800 text-lg font-bold">🔁</button>
       </div>
     `;
-  }).join("");
+    resultBlock.prepend(gptBlock);
 
-  resultBlock.insertAdjacentHTML("beforeend", gptCards);
-  animateCards("#placesResult .card");
-  updateHearts("places");
+    document.getElementById("refreshGptBtn")?.addEventListener("click", async () => {
+      const btn = document.getElementById("refreshGptBtn");
+      btn.textContent = "⏳";
+      const newRaw = await askGptAdvisor(`Дай 3 лучших места в городе ${city} по теме "${formatCategory(category)}".\nФормат:\n1. Название места\nОписание: ...\nАдрес: ...\nGoogle Maps: https://...\nФото: https://...`);
+      document.getElementById("gptText").textContent = newRaw;
+      btn.textContent = "🔁";
+    });
 
-} catch (err) {
-  console.warn("❌ GPT совет не получен:", err);
-}
+    const gptCards = parsedPlaces.map(p => {
+      const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+      const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
+      const imageUrl = p.image?.startsWith("http") ? p.image : `https://picsum.photos/300/180?random=${Math.floor(Math.random() * 1000)}`;
+      return `
+        <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+          <img src="${imageUrl}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
+          <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+          <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+          <a href="${p.map}" target="_blank" class="text-sm text-blue-600 underline">${p.address}</a>
+          <div class="flex justify-between items-center mt-2">
+            <a href="${p.map}" target="_blank" class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</a>
+            <button 
+              onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, category }))}', this)" 
+              class="text-xl ml-2"
+            >
+              ${isFav ? "💙" : "🤍"}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
 
+    resultBlock.insertAdjacentHTML("beforeend", gptCards);
+    animateCards("#placesResult .card");
+    updateHearts("places");
 
-
-  
-  updateHearts("places");
+  } catch (err) {
+    console.warn("❌ GPT совет не получен:", err);
+  }
 
   if (remaining.length > 0) {
     const moreBtn = document.createElement("button");
@@ -650,7 +628,7 @@ try {
             <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
             <p class="text-sm text-gray-600 mb-1">${p.description}</p>
             ${addressLink}
-            <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${capitalize(p.city)}</p>
+            <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${(p.city || "").charAt(0).toUpperCase() + (p.city || "").slice(1)}</p>
             <div class="flex justify-between items-center mt-2">
               <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
               <button 
@@ -685,6 +663,7 @@ try {
 
   trackEvent("Поиск мест", { city, category });
 });
+
 
 // ✅ Сохранение длительности сессии
 window.addEventListener("beforeunload", () => {
