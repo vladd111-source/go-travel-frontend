@@ -566,10 +566,15 @@ Google Maps: https://...
 
   const parsedPlaces = parsePlacesFromGpt(gptRaw);
 
- const gptCards = parsedPlaces.map(p => {
+const gptCards = parsedPlaces.map(p => {
   const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
   const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
-  const imageUrl = p.image?.startsWith("http") ? p.image : `https://picsum.photos/300/180?random=${Math.floor(Math.random() * 1000)}`;
+
+  // 🔧 Защита от битых и bit.ly ссылок
+  const imageUrl =
+    p.image?.startsWith("http") && !p.image.includes("bit.ly")
+      ? p.image
+      : `https://placehold.co/300x180?text=No+Image`;
 
   return `
     <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
@@ -595,7 +600,7 @@ Google Maps: https://...
       </div>
     </div>
   `;
-}).join("");
+});
 
   resultBlock.insertAdjacentHTML("beforeend", gptCards);
   animateCards("#placesResult .card");
