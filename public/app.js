@@ -536,7 +536,9 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
         <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
         <p class="text-sm text-gray-600 mb-1">${p.description}</p>
         ${addressLink}
-        <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${(p.city || "").charAt(0).toUpperCase() + (p.city || "").slice(1)}</p>
+       <p class="text-sm text-gray-500">
+  ${formatCategory(p.category || category)} • ${(p.city || city || "").charAt(0).toUpperCase() + (p.city || city || "").slice(1)}
+</p>
         <div class="flex justify-between items-center mt-2">
           <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
           <button 
@@ -612,7 +614,9 @@ try {
             <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
             <p class="text-sm text-gray-600 mb-1">${p.description}</p>
             ${addressLink}
-            <p class="text-sm text-gray-500">${formatCategory(p.category)} • ${(p.city || "").charAt(0).toUpperCase() + (p.city || "").slice(1)}</p>
+            <p class="text-sm text-gray-500">
+  ${formatCategory(p.category || category)} • ${(p.city || city || "").charAt(0).toUpperCase() + (p.city || city || "").slice(1)}
+</p>
             <div class="flex justify-between items-center mt-2">
               <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
               <button 
