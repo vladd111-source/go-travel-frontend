@@ -573,8 +573,8 @@ const gptCards = parsedPlaces.map(p => {
   // 🔧 Защита от битых и bit.ly ссылок
  const imageUrl =
   p.image?.startsWith("http") &&
-  !p.image.includes("bit.ly") &&
-  /\.(jpe?g|png|webp)$/i.test(p.image)
+  /\.(jpe?g|png|webp)$/i.test(p.image) &&
+  !p.image.includes("bit.ly")
     ? p.image
     : `https://placehold.co/300x180?text=No+Image`;
 
