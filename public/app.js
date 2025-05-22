@@ -552,38 +552,60 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
     `;
   }).join("");
 
-  // 🔮 Подгрузка совета от GPT
-  try {
-    const gptAdvice = await askGptAdvisor(`Предложи 3 интересных места в городе ${city} по теме "${formatCategory(category)}". Кратко, эмоционально, в стиле местного жителя.`);
 
-    const gptBlock = document.createElement("div");
-    gptBlock.className = "bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded text-sm text-gray-800 mb-4";
 
-    gptBlock.innerHTML = `
-      <div class="flex justify-between items-start gap-4">
-        <div class="flex gap-2">
-          <span class="text-2xl">🤖</span>
-          <div>
-            <p class="font-semibold mb-1">Совет тревел-ассистента:</p>
-            <p id="gptText">${gptAdvice}</p>
-          </div>
+  
+// 🔮 Подгрузка совета от GPT + карточек мест
+try {
+  const gptRaw = await askGptAdvisor(`Дай 3 лучших места в городе ${city} по теме "${formatCategory(category)}".
+  Формат:
+  1. Название места
+  Описание: ...
+  Адрес: ...
+  Google Maps: https://...
+  Фото: https://...`);
+
+  const parsedPlaces = parsePlacesFromGpt(gptRaw);
+
+  const gptBlock = document.createElement("div");
+  gptBlock.className = "bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded text-sm text-gray-800 mb-4";
+  gptBlock.innerHTML = `
+    <div class="flex justify-between items-start gap-4">
+      <div class="flex gap-2">
+        <span class="text-2xl">🤖</span>
+        <div>
+          <p class="font-semibold mb-1">Совет тревел-ассистента:</p>
+          <p id="gptText">${gptRaw}</p>
         </div>
-        <button id="refreshGptBtn" title="Обновить совет" class="text-yellow-600 hover:text-yellow-800 text-lg font-bold">🔁</button>
       </div>
-    `;
+      <button id="refreshGptBtn" title="Обновить совет" class="text-yellow-600 hover:text-yellow-800 text-lg font-bold">🔁</button>
+    </div>
+  `;
+  resultBlock.prepend(gptBlock);
 
-    resultBlock.prepend(gptBlock);
+  // 🔁 Кнопка обновления
+  document.getElementById("refreshGptBtn")?.addEventListener("click", async () => {
+    const btn = document.getElementById("refreshGptBtn");
+    btn.textContent = "⏳";
+    const newRaw = await askGptAdvisor(`Дай 3 лучших места в городе ${city} по теме "${formatCategory(category)}".`);
+    document.getElementById("gptText").textContent = newRaw;
+    btn.textContent = "🔁";
+  });
 
-    document.getElementById("refreshGptBtn")?.addEventListener("click", async () => {
-      const btn = document.getElementById("refreshGptBtn");
-      btn.textContent = "⏳";
-      const newAdvice = await askGptAdvisor(`Предложи 3 интересных места в городе ${city} по теме "${formatCategory(category)}". Кратко, эмоционально, в стиле местного жителя.`);
-      document.getElementById("gptText").textContent = newAdvice;
-      btn.textContent = "🔁";
-    });
-  } catch (err) {
-    console.warn("❌ GPT совет не получен:", err);
-  }
+  // 📍 Карточки от GPT
+  const cardsFromGpt = parsedPlaces.map(p => `
+    <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+      <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
+      <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+      <a href="${p.map}" target="_blank" class="text-sm text-blue-600 underline">${p.address}</a>
+    </div>
+  `).join("");
+
+  resultBlock.insertAdjacentHTML("beforeend", cardsFromGpt);
+} catch (err) {
+  console.warn("❌ GPT совет не получен:", err);
+}
 
   updateHearts("places");
 
