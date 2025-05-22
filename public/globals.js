@@ -104,6 +104,28 @@ export async function askGptAdvisor(question) {
   }
 }
 
+
+
+// 📦 Парсинг 3 карточек мест из ответа GPT
+export function parsePlacesFromGpt(text) {
+  const regex = /(\d+)\.\s*(.+?)\nОписание:\s*(.+?)\nАдрес:\s*(.+?)\nGoogle Maps:\s*(https?:\/\/[^\s]+)\nФото:\s*(https?:\/\/[^\s]+)/g;
+  const result = [];
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    result.push({
+      name: match[2].trim(),
+      description: match[3].trim(),
+      address: match[4].trim(),
+      map: match[5].trim(),
+      image: match[6].trim(),
+    });
+  }
+
+  return result;
+}
+
+
 export function parsePlacesFromGpt(rawText) {
   const blocks = rawText
     .split(/\n(?=\d\.)/) // делим по "1." / "2." / "3."
