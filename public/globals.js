@@ -104,6 +104,31 @@ export async function askGptAdvisor(question) {
   }
 }
 
+export function parsePlacesFromGpt(rawText) {
+  const blocks = rawText
+    .split(/\n(?=\d\.)/) // делим по "1." / "2." / "3."
+    .map(block => block.trim())
+    .filter(Boolean);
+
+  const places = blocks.map(block => {
+    const nameMatch = block.match(/^\d\.\s*(.+)/);
+    const descriptionMatch = block.match(/Описание:\s*(.+)/i);
+    const addressMatch = block.match(/Адрес:\s*(.+)/i);
+    const mapMatch = block.match(/Google\s*Maps\s*:\s*(https?:\/\/[^\s]+)/i);
+    const imageMatch = block.match(/Фото\s*:\s*(https?:\/\/[^\s]+)/i);
+
+    return {
+      name: nameMatch?.[1]?.trim() || "Без названия",
+      description: descriptionMatch?.[1]?.trim() || "Описание отсутствует.",
+      address: addressMatch?.[1]?.trim() || "Адрес не указан",
+      map: mapMatch?.[1]?.trim() || "#",
+      image: imageMatch?.[1]?.trim() || "https://picsum.photos/300/180?random=" + Math.floor(Math.random() * 1000)
+    };
+  });
+
+  return places.slice(0, 3); // максимум 3 места
+}
+
 
 export function showFlightModal(flight) {
   // 🔧 Подстраховка: если нет departure_at, подставим date
