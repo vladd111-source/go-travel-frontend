@@ -340,7 +340,8 @@ window.switchFavTab = function(subTab) {
 };
 
 // ✅ Заглавная первая буква
-function capitalize(str) {
+export function capitalize(str) {
+  if (typeof str !== "string") return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
