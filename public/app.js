@@ -571,21 +571,23 @@ const gptCards = parsedPlaces.map(p => {
   const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
 
   // 🔧 Защита от битых и bit.ly ссылок
-  const imageUrl =
-    p.image?.startsWith("http") && !p.image.includes("bit.ly")
-      ? p.image
-      : `https://placehold.co/300x180?text=No+Image`;
+ const imageUrl =
+  p.image?.startsWith("http") &&
+  !p.image.includes("bit.ly") &&
+  /\.(jpe?g|png|webp)$/i.test(p.image)
+    ? p.image
+    : `https://placehold.co/300x180?text=No+Image`;
 
   return `
     <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-      <img 
-        src="${imageUrl}" 
-        alt="${p.name}" 
-        class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
-        referrerpolicy="no-referrer"
-        loading="lazy"
-        onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
-      />
+     <img 
+  src="${imageUrl}" 
+  alt="${p.name}" 
+  class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
+  referrerpolicy="no-referrer"
+  loading="lazy"
+  onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
+/>
       <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
       <p class="text-sm text-gray-600 mb-1">${p.description}</p>
       <a href="${p.map}" target="_blank" class="text-sm text-blue-600 underline">${p.address}</a>
