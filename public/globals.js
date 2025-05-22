@@ -107,7 +107,7 @@ export async function askGptAdvisor(question) {
 
 
 // 📦 Парсинг 3 карточек мест из ответа GPT
-export function parsePlacesFromGpt(text) {
+function parsePlacesFromGpt(text) {
   const regex = /(\d+)\.\s*(.+?)\nОписание:\s*(.+?)\nАдрес:\s*(.+?)\nGoogle Maps:\s*(https?:\/\/[^\s]+)\nФото:\s*(https?:\/\/[^\s]+)/g;
   const result = [];
   let match;
