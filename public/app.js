@@ -557,13 +557,13 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   
 // 🔮 Получение 3 карточек мест от GPT
 try {
-  const gptRaw = await askGptAdvisor(`Дай 3 лучших места в городе ${city} по теме "${formatCategory(category)}".
+ const gptRaw = await askGptAdvisor(`Дай 3 лучших места в городе ${city} по теме "${formatCategory(category)}".
 Формат:
 1. Название места
 Описание: ...
 Адрес: ...
 Google Maps: https://...
-Фото (прямая ссылка на изображение, не сокращённая): https://...`);
+Фото (должна быть .jpg или .png, прямая ссылка, не из Википедии и без bit.ly): https://...`);
 
   const parsedPlaces = parsePlacesFromGpt(gptRaw);
 
