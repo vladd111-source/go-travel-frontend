@@ -566,29 +566,36 @@ try {
 
   const parsedPlaces = parsePlacesFromGpt(gptRaw);
 
-  const gptCards = parsedPlaces.map(p => {
-    const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-    const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
-    const imageUrl = p.image?.startsWith("http") ? p.image : `https://picsum.photos/300/180?random=${Math.floor(Math.random() * 1000)}`;
+ const gptCards = parsedPlaces.map(p => {
+  const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
+  const imageUrl = p.image?.startsWith("http") ? p.image : `https://picsum.photos/300/180?random=${Math.floor(Math.random() * 1000)}`;
 
-    return `
-      <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-        <img src="${imageUrl}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
-        <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-        <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-        <a href="${p.map}" target="_blank" class="text-sm text-blue-600 underline">${p.address}</a>
-        <div class="flex justify-between items-center mt-2">
-          <a href="${p.map}" target="_blank" class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</a>
-          <button 
-            onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, category }))}', this)" 
-            class="text-xl ml-2"
-          >
-            ${isFav ? "💙" : "🤍"}
-          </button>
-        </div>
+  return `
+    <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+      <img 
+        src="${imageUrl}" 
+        alt="${p.name}" 
+        class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
+        referrerpolicy="no-referrer"
+        loading="lazy"
+        onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
+      />
+      <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+      <a href="${p.map}" target="_blank" class="text-sm text-blue-600 underline">${p.address}</a>
+      <div class="flex justify-between items-center mt-2">
+        <a href="${p.map}" target="_blank" class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</a>
+        <button 
+          onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, category }))}', this)" 
+          class="text-xl ml-2"
+        >
+          ${isFav ? "💙" : "🤍"}
+        </button>
       </div>
-    `;
-  }).join("");
+    </div>
+  `;
+}).join("");
 
   resultBlock.insertAdjacentHTML("beforeend", gptCards);
   animateCards("#placesResult .card");
