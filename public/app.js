@@ -484,7 +484,7 @@ document.getElementById("clearFlights")?.addEventListener("click", () => {
 
 // ✅ Поиск мест
 const placeCityInput = document.getElementById("placeCity");
-const placeCategorySelect = document.getElementById("placeCategory");
+const placeMoodSelect = document.getElementById("placeMood");
 const resultBlock = document.getElementById("placesResult");
 
 if (placeCityInput) {
@@ -495,11 +495,11 @@ if (placeCityInput) {
   });
 }
 
-if (placeCategorySelect) {
-  const cachedCategory = localStorage.getItem("placeCategory");
-  if (cachedCategory) placeCategorySelect.value = cachedCategory;
-  placeCategorySelect.addEventListener("change", (e) => {
-    localStorage.setItem("placeCategory", e.target.value);
+if (placeMoodSelect) {
+  const cachedCategory = localStorage.getItem("placeMood");
+  if (cachedCategory) placeMoodSelect.value = cachedCategory;
+  placeMoodSelect.addEventListener("change", (e) => {
+    localStorage.setItem("placeMood", e.target.value);
   });
 }
 
@@ -509,10 +509,10 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const city = placeCityInput.value.trim().toLowerCase();
-  const category = placeCategorySelect.value;
+  const category = placeMoodSelect.value;
 
   localStorage.setItem("placeCity", city);
-  localStorage.setItem("placeCategory", category);
+  localStorage.setItem("placeMood", category);
 
   resultBlock.classList.remove("visible");
   resultBlock.innerHTML = "";
@@ -538,7 +538,7 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
         <p class="text-sm text-gray-600 mb-1">${p.description}</p>
         ${addressLink}
        <p class="text-sm text-gray-500">
-  ${formatCategory(p.category || category)} • ${(p.city || city || "").charAt(0).toUpperCase() + (p.city || city || "").slice(1)}
+  ${formatCategory(p.category || mood)} • ${(p.city || city || "").charAt(0).toUpperCase() + (p.city || city || "").slice(1)}
 </p>
         <div class="flex justify-between items-center mt-2">
           <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
@@ -557,13 +557,13 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   
 // 🔮 Получение 3 карточек мест от GPT
 try {
- const gptRaw = await askGptAdvisor(`Дай 3 лучших места в городе ${city} по теме "${formatCategory(category)}".
-Формат:
-1. Название места
+const gptRaw = await askGptAdvisor(`Предложи насыщенный день в городе ${city} под настроение "${mood}". Верни 3 карточки:
+1. Название
 Описание: ...
 Адрес: ...
-Google Maps: https://...
-Фото (прямая ссылка на изображение, оканчивается на .jpg или .png): https://...`);
+Координаты: ...
+Фото: (прямая ссылка на изображение, оканчивается на .jpg или .png): https://...`);
+
 
   const parsedPlaces = parsePlacesFromGpt(gptRaw);
 
