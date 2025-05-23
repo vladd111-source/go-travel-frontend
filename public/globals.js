@@ -104,13 +104,12 @@ export async function askGptAdvisor(question) {
   }
 }
 
-// 📦 Парсинг до 3 карточек мест из ответа GPT
 export function parsePlacesFromGpt(rawText) {
   const blocks = rawText
     .split(/\n(?=\d\.)/)
     .map(block => block.trim())
     .filter(Boolean)
-    .slice(0, 3); // ⬅️ Ограничиваем 3 карточками
+    .slice(0, 3); // ⬅️ Жесткое ограничение на 3 карточки
 
   const places = blocks.map(block => {
     const nameMatch = block.match(/^\d\.\s*(.+)/);
@@ -119,7 +118,7 @@ export function parsePlacesFromGpt(rawText) {
     const coordsMatch = block.match(/Координаты:\s*([0-9.,\-\s]+)/i);
     const imageMatch = block.match(/Фото\s*:\s*(https?:\/\/[^\s]+)/i);
 
-    // 🖼 Обработка картинки
+    // 🖼 Картинка: проверка валидности
     let image = imageMatch?.[1]?.trim() || "";
     if (
       !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(image) ||
@@ -131,17 +130,17 @@ export function parsePlacesFromGpt(rawText) {
       image = "https://placehold.co/300x180?text=No+Image";
     }
 
-    // 🗺 Обработка координат
+    // 📍 Координаты: валидация и карта
     let coords = coordsMatch?.[1]?.trim().replace(/\s+/g, "");
-    if (!/^[-\d.]+,[-\d.]+$/.test(coords)) coords = "";
-    const mapLink = coords ? `https://maps.google.com/?q=${coords}` : "#";
+    const isValidCoords = coords && /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(coords);
+    const mapLink = isValidCoords ? `https://maps.google.com/?q=${coords}` : "#";
 
     return {
       name: nameMatch?.[1]?.trim() || "Без названия",
       description: descriptionMatch?.[1]?.trim() || "Описание отсутствует.",
       address: addressMatch?.[1]?.trim() || "Адрес не указан",
+      coords: isValidCoords ? coords : "",
       map: mapLink,
-      coords,
       image
     };
   });
