@@ -109,29 +109,31 @@ export function parsePlacesFromGpt(rawText) {
   const blocks = rawText
     .split(/\n(?=\d\.)/)
     .map(block => block.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .slice(0, 3); // ⬅️ Ограничиваем 3 карточками
 
   const places = blocks.map(block => {
     const nameMatch = block.match(/^\d\.\s*(.+)/);
     const descriptionMatch = block.match(/Описание:\s*(.+)/i);
     const addressMatch = block.match(/Адрес:\s*(.+)/i);
-    const coordsMatch = block.match(/Координаты:\s*([0-9\.\-]+,[0-9\.\-]+)/i);
+    const coordsMatch = block.match(/Координаты:\s*([0-9.,\-\s]+)/i);
     const imageMatch = block.match(/Фото\s*:\s*(https?:\/\/[^\s]+)/i);
 
+    // 🖼 Обработка картинки
     let image = imageMatch?.[1]?.trim() || "";
-
-    // 🔒 Фильтрация плохих ссылок
     if (
       !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(image) ||
       image.includes("bit.ly") ||
       image.includes("wikimedia") ||
-      image.includes("wikipedia")
+      image.includes("wikipedia") ||
+      image.includes("pixabay")
     ) {
       image = "https://placehold.co/300x180?text=No+Image";
     }
 
-    // 🗺 Генерация карты по координатам
-    const coords = coordsMatch?.[1]?.trim();
+    // 🗺 Обработка координат
+    let coords = coordsMatch?.[1]?.trim().replace(/\s+/g, "");
+    if (!/^[-\d.]+,[-\d.]+$/.test(coords)) coords = "";
     const mapLink = coords ? `https://maps.google.com/?q=${coords}` : "#";
 
     return {
@@ -139,12 +141,12 @@ export function parsePlacesFromGpt(rawText) {
       description: descriptionMatch?.[1]?.trim() || "Описание отсутствует.",
       address: addressMatch?.[1]?.trim() || "Адрес не указан",
       map: mapLink,
-      coords: coords || "",
+      coords,
       image
     };
   });
 
-  return places.slice(0, 3);
+  return places;
 }
 
 export function showFlightModal(flight) {
