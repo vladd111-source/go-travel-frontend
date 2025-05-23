@@ -496,8 +496,8 @@ if (placeCityInput) {
 }
 
 if (placeMoodSelect) {
-  const cachedCategory = localStorage.getItem("placeMood");
-  if (cachedCategory) placeMoodSelect.value = cachedCategory;
+  const cachedMood = localStorage.getItem("placeMood");
+  if (cachedMood) placeMoodSelect.value = cachedMood;
   placeMoodSelect.addEventListener("change", (e) => {
     localStorage.setItem("placeMood", e.target.value);
   });
@@ -509,15 +509,15 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const city = placeCityInput.value.trim().toLowerCase();
-  const category = placeMoodSelect.value;
+  const mood = placeMoodSelect.value;
 
   localStorage.setItem("placeCity", city);
-  localStorage.setItem("placeMood", category);
+  localStorage.setItem("placeMood", mood);
 
   resultBlock.classList.remove("visible");
   resultBlock.innerHTML = "";
 
-  const filtered = await fetchPlaces(city, category);
+  const filtered = await fetchPlaces(city, mood);
 
   if (filtered.length === 0) {
     resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
@@ -538,8 +538,8 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
         <p class="text-sm text-gray-600 mb-1">${p.description}</p>
         ${addressLink}
        <p class="text-sm text-gray-500">
-  ${formatCategory(p.category || mood)} • ${(p.city || city || "").charAt(0).toUpperCase() + (p.city || city || "").slice(1)}
-</p>
+          ${formatCategory(p.category || mood)} • ${(p.city || city || "").charAt(0).toUpperCase() + (p.city || city || "").slice(1)}
+        </p>
         <div class="flex justify-between items-center mt-2">
           <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
           <button 
@@ -554,78 +554,68 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
     `;
   }).join("");
 
-  
-// 🔮 Получение 3 карточек мест от GPT
-try {
-const gptRaw = await askGptAdvisor(`Предложи насыщенный день в городе ${city} под настроение "${mood}". Верни 3 карточки:
-1. Название
-Описание: ...
-Адрес: ...
-Координаты: ...
-Фото: (прямая ссылка на изображение, оканчивается на .jpg или .png): https://...`);
+  // 🔮 Получение 3 карточек мест от GPT
+  try {
+    const gptRaw = await askGptAdvisor(`Предложи насыщенный день в городе ${city} под настроение "${mood}". Верни 3 карточки:\n1. Название\nОписание: ...\nАдрес: ...\nКоординаты: ...\nФото: (прямая ссылка на изображение, оканчивается на .jpg или .png): https://...`);
 
+    const parsedPlaces = parsePlacesFromGpt(gptRaw);
 
-  const parsedPlaces = parsePlacesFromGpt(gptRaw);
+    const gptCards = parsedPlaces.map(p => {
+      const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+      const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
 
-  const gptCards = parsedPlaces.map(p => {
-    const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-    const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
+      let imageUrl = (p.image || "").trim();
+      if (
+        !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
+        imageUrl.includes("bit.ly") ||
+        imageUrl.includes("wikipedia") ||
+        imageUrl.includes("wikimedia") ||
+        imageUrl.includes("pixabay")
+      ) {
+        imageUrl = "https://placehold.co/300x180?text=No+Image";
+      }
 
-    // 🔧 Защита от битых ссылок, редиректов и форматов
-    let imageUrl = (p.image || "").trim();
-    if (
-      !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
-      imageUrl.includes("bit.ly") ||
-      imageUrl.includes("wikipedia") ||
-      imageUrl.includes("wikimedia") ||
-      imageUrl.includes("pixabay")
-    ) {
-      imageUrl = "https://placehold.co/300x180?text=No+Image";
-    }
+      return `
+        <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+          <img 
+            src="${imageUrl}" 
+            alt="${p.name}" 
+            class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
+            referrerpolicy="no-referrer"
+            loading="lazy"
+            onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
+          />
+          <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+          <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+          <a href="${p.map && p.map !== '#' ? p.map : (p.coords ? `https://maps.google.com/?q=${p.coords}` : '#')}" 
+             target="_blank" 
+             class="text-sm text-blue-600 underline">
+             ${p.address || "Адрес не указан"}
+          </a>
+          <div class="flex justify-between items-center mt-2">
+            <a href="${p.map && p.map !== '#' ? p.map : (p.coords ? `https://maps.google.com/?q=${p.coords}` : '#')}" 
+               target="_blank" 
+               class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
+              📍 Подробнее
+            </a>
+            <button 
+              onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, mood }))}', this)" 
+              class="text-xl ml-2"
+            >
+              ${isFav ? "💙" : "🤍"}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
 
-    return `
-     <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-  <img 
-    src="${imageUrl}" 
-    alt="${p.name}" 
-    class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
-    referrerpolicy="no-referrer"
-    loading="lazy"
-    onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
-  />
-  <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-  <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+    resultBlock.insertAdjacentHTML("beforeend", gptCards);
+    animateCards("#placesResult .card");
+    updateHearts("places");
 
-  <a href="${p.map && p.map !== '#' ? p.map : (p.coords ? `https://maps.google.com/?q=${p.coords}` : '#')}" 
-     target="_blank" 
-     class="text-sm text-blue-600 underline">
-     ${p.address || "Адрес не указан"}
-  </a>
-
-  <div class="flex justify-between items-center mt-2">
-    <a href="${p.map && p.map !== '#' ? p.map : (p.coords ? `https://maps.google.com/?q=${p.coords}` : '#')}" 
-       target="_blank" 
-       class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
-      📍 Подробнее
-    </a>
-    <button 
-      onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, category }))}', this)" 
-      class="text-xl ml-2"
-    >
-      ${isFav ? "💙" : "🤍"}
-    </button>
-  </div>
-</div>
-    `;
-  }).join("");
-
-  resultBlock.insertAdjacentHTML("beforeend", gptCards);
-  animateCards("#placesResult .card");
-  updateHearts("places");
-
-} catch (err) {
-  console.warn("❌ GPT карточки мест не получены:", err);
-}
+  } catch (err) {
+    console.warn("❌ GPT карточки мест не получены:", err);
+  }
 
   if (remaining.length > 0) {
     const moreBtn = document.createElement("button");
@@ -644,8 +634,8 @@ const gptRaw = await askGptAdvisor(`Предложи насыщенный ден
             <p class="text-sm text-gray-600 mb-1">${p.description}</p>
             ${addressLink}
             <p class="text-sm text-gray-500">
-  ${formatCategory(p.category || category)} • ${(p.city || city || "").charAt(0).toUpperCase() + (p.city || city || "").slice(1)}
-</p>
+              ${formatCategory(p.category || mood)} • ${(p.city || city || "").charAt(0).toUpperCase() + (p.city || city || "").slice(1)}
+            </p>
             <div class="flex justify-between items-center mt-2">
               <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
               <button 
@@ -678,7 +668,7 @@ const gptRaw = await askGptAdvisor(`Предложи насыщенный ден
   resultBlock.classList.add("visible");
   animateCards("#placesResult .card");
 
-  trackEvent("Поиск мест", { city, category });
+  trackEvent("Поиск мест", { city, mood });
 });
 
 
