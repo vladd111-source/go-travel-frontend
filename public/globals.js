@@ -115,12 +115,12 @@ export function parsePlacesFromGpt(rawText) {
     const nameMatch = block.match(/^\d\.\s*(.+)/);
     const descriptionMatch = block.match(/Описание:\s*(.+)/i);
     const addressMatch = block.match(/Адрес:\s*(.+)/i);
-    const mapMatch = block.match(/Google\s*Maps\s*:\s*(https?:\/\/[^\s]+)/i);
+    const coordsMatch = block.match(/Координаты:\s*([0-9\.\-]+,[0-9\.\-]+)/i);
     const imageMatch = block.match(/Фото\s*:\s*(https?:\/\/[^\s]+)/i);
 
     let image = imageMatch?.[1]?.trim() || "";
 
-    // 🔒 Проверка валидности картинки
+    // 🔒 Фильтрация плохих ссылок
     if (
       !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(image) ||
       image.includes("bit.ly") ||
@@ -130,11 +130,16 @@ export function parsePlacesFromGpt(rawText) {
       image = "https://placehold.co/300x180?text=No+Image";
     }
 
+    // 🗺 Генерация карты по координатам
+    const coords = coordsMatch?.[1]?.trim();
+    const mapLink = coords ? `https://maps.google.com/?q=${coords}` : "#";
+
     return {
       name: nameMatch?.[1]?.trim() || "Без названия",
       description: descriptionMatch?.[1]?.trim() || "Описание отсутствует.",
       address: addressMatch?.[1]?.trim() || "Адрес не указан",
-      map: mapMatch?.[1]?.trim() || "#",
+      map: mapLink,
+      coords: coords || "",
       image
     };
   });
