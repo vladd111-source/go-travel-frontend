@@ -581,7 +581,7 @@ const gptRaw = await askGptAdvisor(`Ты тревел-ассистент. Отв
       imageUrl = "https://placehold.co/300x180?text=No+Image";
     }
 
-    const mapLink = p.map && p.map !== '#' ? p.map : (p.coords ? `https://maps.google.com/?q=${p.coords}` : '#');
+   const mapLink = p.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}` : "#";
 
     return `
       <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
