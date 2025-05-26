@@ -517,162 +517,68 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   resultBlock.classList.remove("visible");
   resultBlock.innerHTML = "";
 
-  const filtered = await fetchPlaces(city, mood);
+  try {
+    const gptRaw = await askGptAdvisor(`Ты тревел-ассистент. Ответь строго в формате: 3 карточки. Никакого текста вне этого списка. Пример:\n1. Название\nОписание: ...\nАдрес: ...\nКоординаты: 48.858844,2.294351\nФото: https://example.com/image.jpg\nПовтори этот формат строго для города ${city}, настроение \"${mood}\".`);
 
-  if (filtered.length === 0) {
-    resultBlock.innerHTML = `<p class="text-sm text-gray-500">Ничего не найдено.</p>`;
-    return;
-  }
+    const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
 
-  const firstBatch = filtered.slice(0, 3);
-  const remaining = filtered.slice(3);
+    const gptCards = parsedPlaces.map(p => {
+      const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+      const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
 
-  resultBlock.innerHTML = firstBatch.map(p => {
-    const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-    const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
-    const addressLink = p.address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" class="text-blue-600 text-sm underline" target="_blank">📍 ${p.address}</a>` : "";
-    return `
-      <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-        <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
-        <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-        <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-        ${addressLink}
-       <p class="text-sm text-gray-500">
-          ${formatCategory(p.category || mood)} • ${(p.city || city || "").charAt(0).toUpperCase() + (p.city || city || "").slice(1)}
-        </p>
-        <div class="flex justify-between items-center mt-2">
-          <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
-          <button 
-            onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
-            class="text-xl ml-2"
-            data-place-id="${encodeURIComponent(JSON.stringify(p))}"
-          >
-            ${isFav ? "💙" : "🤍"}
-          </button>
-        </div>
-      </div>
-    `;
-  }).join("");
+      let imageUrl = (p.image || "").trim();
+      if (
+        !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
+        imageUrl.includes("bit.ly") ||
+        imageUrl.includes("wikipedia") ||
+        imageUrl.includes("wikimedia") ||
+        imageUrl.includes("pixabay")
+      ) {
+        imageUrl = "https://placehold.co/300x180?text=No+Image";
+      }
 
-  // 🔮 Получение 3 карточек мест от GPT
-try {
-const gptRaw = await askGptAdvisor(`Ты тревел-ассистент. Ответь строго в формате: 3 карточки. Никакого текста вне этого списка. Пример:
-1. Название
-Описание: ...
-Адрес: ...
-Координаты: 48.858844,2.294351
-Фото: https://example.com/image.jpg
-Повтори этот формат строго для города ${city}, настроение "${mood}".`);
+      const mapLink = p.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}` : "#";
 
-  const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3); // 💥 гарантия 3 карточек
-
-  const gptCards = parsedPlaces.map(p => {
-    const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-    const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
-
-    let imageUrl = (p.image || "").trim();
-    if (
-      !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
-      imageUrl.includes("bit.ly") ||
-      imageUrl.includes("wikipedia") ||
-      imageUrl.includes("wikimedia") ||
-      imageUrl.includes("pixabay")
-    ) {
-      imageUrl = "https://placehold.co/300x180?text=No+Image";
-    }
-
-   const mapLink = p.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}` : "#";
-
-    return `
-      <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-        <img 
-          src="${imageUrl}" 
-          alt="${p.name}" 
-          class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
-          referrerpolicy="no-referrer"
-          loading="lazy"
-          onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
-        />
-        <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-        <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-        <a href="${mapLink}" target="_blank" class="text-sm text-blue-600 underline">
-          ${p.address || "Адрес не указан"}
-        </a>
-        <div class="flex justify-between items-center mt-2">
-          <a href="${mapLink}" target="_blank" class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
-            📍 Подробнее
+      return `
+        <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+          <img 
+            src="${imageUrl}" 
+            alt="${p.name}" 
+            class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
+            referrerpolicy="no-referrer"
+            loading="lazy"
+            onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
+          />
+          <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+          <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+          <a href="${mapLink}" target="_blank" class="text-sm text-blue-600 underline">
+            ${p.address || "Адрес не указан"}
           </a>
-          <button 
-            onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, mood }))}', this)" 
-            class="text-xl ml-2"
-          >
-            ${isFav ? "💙" : "🤍"}
-          </button>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  resultBlock.insertAdjacentHTML("beforeend", gptCards);
-  animateCards("#placesResult .card");
-  updateHearts("places");
-
-} catch (err) {
-  console.warn("❌ GPT карточки мест не получены:", err);
-}
-  
-
-  if (remaining.length > 0) {
-    const moreBtn = document.createElement("button");
-    moreBtn.textContent = "Показать ещё";
-    moreBtn.className = "btn w-full mt-4 bg-blue-500 text-white text-sm rounded py-2 px-4";
-
-    moreBtn.addEventListener("click", () => {
-      const remainingCards = remaining.map(p => {
-        const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-        const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === p.city);
-        const addressLink = p.address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" class="text-blue-600 text-sm underline" target="_blank">📍 ${p.address}</a>` : "";
-        return `
-          <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-            <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-md mb-3" />
-            <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-            <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-            ${addressLink}
-            <p class="text-sm text-gray-500">
-              ${formatCategory(p.category || mood)} • ${(p.city || city || "").charAt(0).toUpperCase() + (p.city || city || "").slice(1)}
-            </p>
-            <div class="flex justify-between items-center mt-2">
-              <button class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">📍 Подробнее</button>
-              <button 
-                onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify(p))}', this)" 
-                class="text-xl ml-2"
-                data-place-id="${encodeURIComponent(JSON.stringify(p))}"
-              >
-                ${isFav ? "💙" : "🤍"}
-              </button>
-            </div>
+          <div class="flex justify-between items-center mt-2">
+            <a href="${mapLink}" target="_blank" class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
+              📍 Подробнее
+            </a>
+            <button 
+              onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, mood }))}', this)" 
+              class="text-xl ml-2"
+            >
+              ${isFav ? "💙" : "🤍"}
+            </button>
           </div>
-        `;
-      }).join("");
+        </div>
+      `;
+    }).join("");
 
-      resultBlock.insertAdjacentHTML("beforeend", remainingCards);
-      animateCards("#placesResult .card");
-      updateHearts("places");
+    resultBlock.innerHTML = gptCards;
+    animateCards("#placesResult .card");
+    updateHearts("places");
 
-      setTimeout(() => {
-        const cards = resultBlock.querySelectorAll(".card");
-        cards[3]?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
-
-      moreBtn.remove();
-    });
-
-    resultBlock.appendChild(moreBtn);
+  } catch (err) {
+    console.warn("❌ GPT карточки мест не получены:", err);
+    resultBlock.innerHTML = `<p class="text-sm text-gray-500">Не удалось получить рекомендации. Попробуйте позже.</p>`;
   }
 
   resultBlock.classList.add("visible");
-  animateCards("#placesResult .card");
-
   trackEvent("Поиск мест", { city, mood });
 });
 
