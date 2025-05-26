@@ -536,14 +536,30 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
 Без текста вне списка. Только 3 карточки.`);
 
     const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
-
     const gptCardsArr = [];
 
     for (const p of parsedPlaces) {
       const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
       const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
 
-      const { url: imageUrl } = await getUnsplashImage(`${p.name} ${city}`);
+      let imageUrl = (p.image || "").trim();
+      if (
+        !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
+        imageUrl.includes("example.com") ||
+        imageUrl.includes("bit.ly") ||
+        imageUrl.includes("wikipedia") ||
+        imageUrl.includes("wikimedia") ||
+        imageUrl.includes("pixabay")
+      ) {
+        try {
+          const res = await fetch(`/api/image?query=${encodeURIComponent(p.name + " " + city)}`);
+          const data = await res.json();
+          imageUrl = data.url || "https://placehold.co/300x180?text=No+Image";
+        } catch (err) {
+          console.warn("❌ Прокси-ошибка при загрузке изображения:", err);
+          imageUrl = "https://placehold.co/300x180?text=No+Image";
+        }
+      }
 
       const mapLink = p.address
         ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`
