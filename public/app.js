@@ -542,15 +542,16 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
       const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
 
       let imageUrl = (p.image || "").trim();
-      if (
-        !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
-        imageUrl.includes("bit.ly") ||
-        imageUrl.includes("wikipedia") ||
-        imageUrl.includes("wikimedia") ||
-        imageUrl.includes("pixabay")
-      ) {
-        imageUrl = "https://placehold.co/300x180?text=No+Image";
-      }
+    if (
+  !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(image) ||
+  image.includes("example.com") ||
+  image.includes("bit.ly") ||
+  image.includes("wikipedia") ||
+  image.includes("wikimedia") ||
+  image.includes("pixabay")
+) {
+  image = "https://placehold.co/300x180?text=No+Image";
+}
 
       const mapLink = p.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}` : "#";
 
