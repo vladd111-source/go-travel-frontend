@@ -535,14 +535,7 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
 
 Без текста вне списка. Только 3 карточки.`);
 
-    const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
-    const gptCardsArr = [];
-
-    for (const p of parsedPlaces) {
-      const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-      const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
-
-     let imageUrl = (p.image || "").trim();
+let imageUrl = (p.image || "").trim();
 if (
   !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
   imageUrl.includes("example.com") ||
