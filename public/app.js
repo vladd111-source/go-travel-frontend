@@ -538,53 +538,56 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
     const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
 
     const gptCards = parsedPlaces.map(p => {
-      const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-      const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
+  const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
 
-      let imageUrl = (p.image || "").trim();
-    if (
-  !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(image) ||
-  image.includes("example.com") ||
-  image.includes("bit.ly") ||
-  image.includes("wikipedia") ||
-  image.includes("wikimedia") ||
-  image.includes("pixabay")
-) {
-  image = "https://placehold.co/300x180?text=No+Image";
-}
+  // 🖼 Авто-поиск картинки через Unsplash по названию и городу
+  let imageUrl = (p.image || "").trim();
+  if (
+    !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
+    imageUrl.includes("example.com") ||
+    imageUrl.includes("bit.ly") ||
+    imageUrl.includes("wikipedia") ||
+    imageUrl.includes("wikimedia") ||
+    imageUrl.includes("pixabay")
+  ) {
+    imageUrl = `https://source.unsplash.com/600x400/?${encodeURIComponent(p.name + " " + city)}`;
+  }
 
-      const mapLink = p.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}` : "#";
+  const mapLink = p.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`
+    : "#";
 
-      return `
-        <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-          <img 
-            src="${imageUrl}" 
-            alt="${p.name}" 
-            class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
-            referrerpolicy="no-referrer"
-            loading="lazy"
-            onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
-          />
-          <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-          <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-          <a href="${mapLink}" target="_blank" class="text-sm text-blue-600 underline">
-            ${p.address || "Адрес не указан"}
-          </a>
-          <div class="flex justify-between items-center mt-2">
-            <a href="${mapLink}" target="_blank" class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
-              📍 Подробнее
-            </a>
-            <button 
-              onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, mood }))}', this)" 
-              class="text-xl ml-2"
-            >
-              ${isFav ? "💙" : "🤍"}
-            </button>
-          </div>
-        </div>
-      `;
-    }).join("");
-
+  return `
+    <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+      <img 
+        src="${imageUrl}" 
+        alt="${p.name}" 
+        class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
+        referrerpolicy="no-referrer"
+        loading="lazy"
+        onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
+      />
+      <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+      <a href="${mapLink}" target="_blank" class="text-sm text-blue-600 underline">
+        ${p.address || "Адрес не указан"}
+      </a>
+      <div class="flex justify-between items-center mt-2">
+        <a href="${mapLink}" target="_blank" class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
+          📍 Подробнее
+        </a>
+        <button 
+          onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, mood }))}', this)" 
+          class="text-xl ml-2"
+        >
+          ${isFav ? "💙" : "🤍"}
+        </button>
+      </div>
+    </div>
+  `;
+}).join("");
+    
     resultBlock.innerHTML = gptCards;
     animateCards("#placesResult .card");
     updateHearts("places");
