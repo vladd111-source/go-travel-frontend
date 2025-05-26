@@ -482,60 +482,106 @@ document.getElementById("clearFlights")?.addEventListener("click", () => {
   console.log("🧼 Очищено: поля, localStorage, и результаты");
 });
 
-const gptCardsArr = [];
+// ✅ Поиск мест
+const placeCityInput = document.getElementById("placeCity");
+const placeMoodSelect = document.getElementById("placeMood");
+const resultBlock = document.getElementById("placesResult");
 
-for (const p of parsedPlaces) {
-  const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-  const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
-
-  const { url: imageUrl } = await getUnsplashImage(`${p.name} ${city}`);
-
-  const mapLink = p.address
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`
-    : "#";
-
-  const cardHtml = `
-    <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
-      <img 
-        src="${imageUrl}" 
-        alt="${p.name}" 
-        class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
-        referrerpolicy="no-referrer"
-        loading="lazy"
-        onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
-      />
-      <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
-      <p class="text-sm text-gray-600 mb-1">${p.description}</p>
-      <a href="${mapLink}" target="_blank" class="text-sm text-blue-600 underline">
-        ${p.address || "Адрес не указан"}
-      </a>
-      <div class="flex justify-between items-center mt-2">
-        <a href="${mapLink}" target="_blank" class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
-          📍 Подробнее
-        </a>
-        <button 
-          onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, mood }))}', this)" 
-          class="text-xl ml-2"
-        >
-          ${isFav ? "💙" : "🤍"}
-        </button>
-      </div>
-    </div>
-  `;
-
-  gptCardsArr.push(cardHtml);
+if (placeCityInput) {
+  const cachedCity = localStorage.getItem("placeCity");
+  if (cachedCity) placeCityInput.value = cachedCity;
+  placeCityInput.addEventListener("input", (e) => {
+    localStorage.setItem("placeCity", e.target.value.trim());
+  });
 }
 
-const gptCards = gptCardsArr.join("");
+if (placeMoodSelect) {
+  const cachedMood = localStorage.getItem("placeMood");
+  if (cachedMood) placeMoodSelect.value = cachedMood;
+  placeMoodSelect.addEventListener("change", (e) => {
+    localStorage.setItem("placeMood", e.target.value);
+  });
+}
 
+placeCityInput.setAttribute("autofocus", "autofocus");
 
-    // ✅ Отправка в Telegram WebApp
-Telegram.WebApp?.sendData?.(`🌍 Места в ${city}, настроение "${mood}" получены`);
-    
-    resultBlock.innerHTML = gptCards;
+document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const city = placeCityInput.value.trim().toLowerCase();
+  const mood = placeMoodSelect.value;
+
+  localStorage.setItem("placeCity", city);
+  localStorage.setItem("placeMood", mood);
+
+  resultBlock.classList.remove("visible");
+  resultBlock.innerHTML = "";
+
+  try {
+    const gptRaw = await askGptAdvisor(`
+Ты местный инсайдер, знаешь самые атмосферные, нестандартные и редкие точки. Составь подборку для насыщенного дня в городе "${city}" под настроение "${mood}". 
+
+Включи:
+— топовые маршруты, 
+— уникальные места, 
+— секретные локации и события (если есть).
+
+Формат ответа строго такой:
+1. Название
+Описание: ...
+Адрес (на английском языке): ...
+Фото (реальная прямая ссылка на изображение в .jpg или .png, без редиректов и без example.com): https://...
+
+Без текста вне списка. Только 3 карточки.`);
+
+    const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
+
+    const gptCardsArr = [];
+
+    for (const p of parsedPlaces) {
+      const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+      const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
+
+      const { url: imageUrl } = await getUnsplashImage(`${p.name} ${city}`);
+
+      const mapLink = p.address
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`
+        : "#";
+
+      gptCardsArr.push(`
+        <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
+          <img 
+            src="${imageUrl}" 
+            alt="${p.name}" 
+            class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
+            referrerpolicy="no-referrer"
+            loading="lazy"
+            onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
+          />
+          <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
+          <p class="text-sm text-gray-600 mb-1">${p.description}</p>
+          <a href="${mapLink}" target="_blank" class="text-sm text-blue-600 underline">
+            ${p.address || "Адрес не указан"}
+          </a>
+          <div class="flex justify-between items-center mt-2">
+            <a href="${mapLink}" target="_blank" class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
+              📍 Подробнее
+            </a>
+            <button 
+              onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...p, city, mood }))}', this)" 
+              class="text-xl ml-2"
+            >
+              ${isFav ? "💙" : "🤍"}
+            </button>
+          </div>
+        </div>
+      `);
+    }
+
+    resultBlock.innerHTML = gptCardsArr.join("");
     animateCards("#placesResult .card");
     updateHearts("places");
-
+    Telegram.WebApp?.sendData?.(`🌍 Места в ${city}, настроение "${mood}" получены`);
   } catch (err) {
     console.warn("❌ GPT карточки мест не получены:", err);
     resultBlock.innerHTML = `<p class="text-sm text-gray-500">Не удалось получить рекомендации. Попробуйте позже.</p>`;
