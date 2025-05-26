@@ -482,95 +482,19 @@ document.getElementById("clearFlights")?.addEventListener("click", () => {
   console.log("🧼 Очищено: поля, localStorage, и результаты");
 });
 
-// ✅ Поиск мест
-const placeCityInput = document.getElementById("placeCity");
-const placeMoodSelect = document.getElementById("placeMood");
-const resultBlock = document.getElementById("placesResult");
+const gptCardsArr = [];
 
-if (placeCityInput) {
-  const cachedCity = localStorage.getItem("placeCity");
-  if (cachedCity) placeCityInput.value = cachedCity;
-  placeCityInput.addEventListener("input", (e) => {
-    localStorage.setItem("placeCity", e.target.value.trim());
-  });
-}
-
-if (placeMoodSelect) {
-  const cachedMood = localStorage.getItem("placeMood");
-  if (cachedMood) placeMoodSelect.value = cachedMood;
-  placeMoodSelect.addEventListener("change", (e) => {
-    localStorage.setItem("placeMood", e.target.value);
-  });
-}
-
-placeCityInput.setAttribute("autofocus", "autofocus");
-
-document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const city = placeCityInput.value.trim().toLowerCase();
-  const mood = placeMoodSelect.value;
-
-  localStorage.setItem("placeCity", city);
-  localStorage.setItem("placeMood", mood);
-
-  resultBlock.classList.remove("visible");
-  resultBlock.innerHTML = "";
-
-  try {
-   const gptRaw = await askGptAdvisor(`
-Ты местный инсайдер, знаешь самые атмосферные, нестандартные и редкие точки. Составь подборку для насыщенного дня в городе "${city}" под настроение "${mood}". 
-
-Включи:
-— топовые маршруты, 
-— уникальные места, 
-— секретные локации и события (если есть).
-
-Формат ответа строго такой:
-1. Название
-Описание: ...
-Адрес (на английском языке): ...
-Фото (реальная прямая ссылка на изображение в .jpg или .png, без редиректов и без example.com): https://...
-
-Без текста вне списка. Только 3 карточки.`);
-
-
-    const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
-
-    const gptCards = parsedPlaces.map(p => {
+for (const p of parsedPlaces) {
   const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
   const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
 
- // 🧼 Очистка строки от кириллицы и лишнего
-function sanitizeForImageQuery(text) {
-  return text
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // убрать диакритику
-    .replace(/[^\w\s]/gi, '')      // спецсимволы
-    .replace(/[а-яА-ЯёЁ]/g, '')    // кириллицу
-    .trim()
-    .replace(/\s+/g, ',') || "travel";
-}
+  const { url: imageUrl } = await getUnsplashImage(`${p.name} ${city}`);
 
-// 🖼 Авто-поиск картинки через Unsplash по названию и городу
-let imageUrl = (p.image || "").trim();
-if (
-  !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
-  imageUrl.includes("example.com") ||
-  imageUrl.includes("bit.ly") ||
-  imageUrl.includes("wikipedia") ||
-  imageUrl.includes("wikimedia") ||
-  imageUrl.includes("pixabay")
-) {
-  const imageQuery = sanitizeForImageQuery(`${p.name} ${city}`);
-  imageUrl = `https://source.unsplash.com/600x400/?${imageQuery}`;
-}
+  const mapLink = p.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`
+    : "#";
 
-// 🗺 Генерация ссылки на карту
-const mapLink = p.address
-  ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`
-  : "#";
-
-  return `
+  const cardHtml = `
     <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
       <img 
         src="${imageUrl}" 
@@ -598,7 +522,12 @@ const mapLink = p.address
       </div>
     </div>
   `;
-}).join("");
+
+  gptCardsArr.push(cardHtml);
+}
+
+const gptCards = gptCardsArr.join("");
+
 
     // ✅ Отправка в Telegram WebApp
 Telegram.WebApp?.sendData?.(`🌍 Места в ${city}, настроение "${mood}" получены`);
