@@ -552,7 +552,8 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
         imageUrl.includes("pixabay")
       ) {
         try {
-          const res = await fetch(`/api/image?query=${encodeURIComponent(p.name + " " + city)}`);
+          const query = `${p.name} ${city}`;
+          const res = await fetch(`/api/image?query=${query}`);
           const data = await res.json();
           imageUrl = data.url || "https://placehold.co/300x180?text=No+Image";
         } catch (err) {
