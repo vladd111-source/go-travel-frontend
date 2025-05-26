@@ -558,7 +558,7 @@ if (
     console.warn("❌ Прокси-ошибка при загрузке изображения:", err);
     imageUrl = "https://placehold.co/300x180?text=No+Image";
   }
-}
+
 
       const mapLink = p.address
         ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`
