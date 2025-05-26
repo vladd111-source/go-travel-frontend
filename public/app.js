@@ -1,6 +1,7 @@
 import { renderHotels, renderFlights, renderPlaces } from './render.js';
 import { fetchPlaces, showLoading, hideLoading, askGptAdvisor } from './globals.js';
 import { parsePlacesFromGpt } from './globals.js';
+import { getUnsplashImage } from './globals.js';
 
 export async function searchHotels(city, checkIn, checkOut) {
   try {
