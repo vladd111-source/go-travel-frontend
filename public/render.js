@@ -307,33 +307,70 @@ export function renderHotels(hotels) {
   animateCards("#hotelsResult .card");
 }
 
-
-export function renderPlaces(places) {
+export function renderPlaces(places = []) {
   const container = document.getElementById("placesResult");
   container.innerHTML = "";
 
-  if (!places || !places.length) {
+  if (!places.length) {
     container.innerHTML = `<div class="text-center text-gray-500 mt-4">Ничего не найдено</div>`;
     return;
   }
+
+  const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
 
   places.forEach(place => {
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
 
-    const addressLink = place.address
-      ? `<a href="${place.map}" target="_blank" class="text-sm text-blue-600 underline">${place.address}</a>`
-      : "";
+    const name = place.name || "Без названия";
+    const description = place.description || "Описание отсутствует.";
+    const address = place.address || "Адрес не указан";
+    const city = place.city || "";
+    const mood = place.mood || "";
 
-    const imageBlock = place.image
-      ? `<img src="${place.image}" alt="${place.name}" class="w-full h-40 object-cover rounded-md mb-3" loading="lazy" />`
-      : "";
+    const isFav = favPlaces.some(fav => fav.name === name && fav.city === city);
+
+    // 🧼 Картинка (проверка и fallback на Unsplash)
+    let imageUrl = (place.image || "").trim();
+    if (
+      !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
+      imageUrl.includes("example.com") ||
+      imageUrl.includes("bit.ly") ||
+      imageUrl.includes("wikipedia") ||
+      imageUrl.includes("wikimedia") ||
+      imageUrl.includes("pixabay")
+    ) {
+      const query = `${name} ${city}`.replace(/[^\w\s]/gi, '').replace(/[а-яА-ЯёЁ]/g, '').replace(/\s+/g, ',');
+      imageUrl = `https://source.unsplash.com/600x400/?${query || "travel"}`;
+    }
+
+    const mapLink = place.address
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address)}`
+      : "#";
 
     card.innerHTML = `
-      ${imageBlock}
-      <h3 class="text-lg font-semibold mb-1">${place.name}</h3>
-      <p class="text-sm text-gray-600 mb-1">${place.description}</p>
-      ${addressLink}
+      <img 
+        src="${imageUrl}" 
+        alt="${name}" 
+        class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
+        referrerpolicy="no-referrer"
+        loading="lazy"
+        onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
+      />
+      <h3 class="text-lg font-semibold mb-1">${name}</h3>
+      <p class="text-sm text-gray-600 mb-1">${description}</p>
+      <a href="${mapLink}" target="_blank" class="text-sm text-blue-600 underline">${address}</a>
+      <div class="flex justify-between items-center mt-2">
+        <a href="${mapLink}" target="_blank" class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
+          📍 Подробнее
+        </a>
+        <button 
+          onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...place, city, mood }))}', this)" 
+          class="text-xl ml-2"
+        >
+          ${isFav ? "💙" : "🤍"}
+        </button>
+      </div>
     `;
 
     container.appendChild(card);
