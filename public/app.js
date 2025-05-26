@@ -587,6 +587,9 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
     </div>
   `;
 }).join("");
+
+    // ✅ Отправка в Telegram WebApp
+Telegram.WebApp?.sendData?.(`🌍 Места в ${city}, настроение "${mood}" получены`);
     
     resultBlock.innerHTML = gptCards;
     animateCards("#placesResult .card");
