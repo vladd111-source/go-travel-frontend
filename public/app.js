@@ -552,7 +552,7 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
         imageUrl.includes("pixabay")
       ) {
       try {
-  const query = `${translateToEnglish(p.name)} ${city}`;
+  const query = `${p.name}`.replace(/[а-яА-ЯёЁ]/g, '').trim() || city + ' travel';
   const res = await fetch(`https://go-travel-backend-86i8.onrender.com/api/image?query=${encodeURIComponent(query)}`);
   const data = await res.json();
   imageUrl = data.url || "https://placehold.co/300x180?text=No+Image";
