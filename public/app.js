@@ -547,8 +547,8 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
 
 let imageUrl = "https://placehold.co/300x180?text=No+Image";
 try {
-  const res = await fetch(`/api/image?query=${encodeURIComponent(p.name)}`);
-  const data = await res.json();
+  const res = await fetch(`https://go-travel-backend-86i8.onrender.com/api/image?query=${encodeURIComponent(p.name)}`);
+const { url: imageUrl } = await res.json();
   imageUrl = data.url || imageUrl;
   console.log("📸 Картинка с Unsplash:", imageUrl);
 } catch (err) {
