@@ -541,22 +541,34 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
   const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
 
-  // 🖼 Авто-поиск картинки через Unsplash по названию и городу
-  let imageUrl = (p.image || "").trim();
-  if (
-    !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
-    imageUrl.includes("example.com") ||
-    imageUrl.includes("bit.ly") ||
-    imageUrl.includes("wikipedia") ||
-    imageUrl.includes("wikimedia") ||
-    imageUrl.includes("pixabay")
-  ) {
-    imageUrl = `https://source.unsplash.com/600x400/?${encodeURIComponent(p.name + " " + city)}`;
-  }
+ // 🧼 Очистка строки от кириллицы и лишнего
+function sanitizeForImageQuery(text) {
+  return text
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // убрать диакритику
+    .replace(/[^\w\s]/gi, '')      // спецсимволы
+    .replace(/[а-яА-ЯёЁ]/g, '')    // кириллицу
+    .trim()
+    .replace(/\s+/g, ',') || "travel";
+}
 
-  const mapLink = p.address
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`
-    : "#";
+// 🖼 Авто-поиск картинки через Unsplash по названию и городу
+let imageUrl = (p.image || "").trim();
+if (
+  !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
+  imageUrl.includes("example.com") ||
+  imageUrl.includes("bit.ly") ||
+  imageUrl.includes("wikipedia") ||
+  imageUrl.includes("wikimedia") ||
+  imageUrl.includes("pixabay")
+) {
+  const imageQuery = sanitizeForImageQuery(`${p.name} ${city}`);
+  imageUrl = `https://source.unsplash.com/600x400/?${imageQuery}`;
+}
+
+// 🗺 Генерация ссылки на карту
+const mapLink = p.address
+  ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`
+  : "#";
 
   return `
     <div class="card bg-white p-4 rounded-xl shadow hover:shadow-md transition-all duration-300 opacity-0 transform scale-95">
