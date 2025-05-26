@@ -535,7 +535,14 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
 
 Без текста вне списка. Только 3 карточки.`);
 
-let imageUrl = (p.image || "").trim();
+ const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
+    const gptCardsArr = [];
+
+    for (const p of parsedPlaces) {
+      const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+      const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
+
+     let imageUrl = (p.image || "").trim();
 if (
   !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
   imageUrl.includes("example.com") ||
@@ -545,11 +552,11 @@ if (
   imageUrl.includes("pixabay")
 ) {
   try {
-    const cleanName = `${p.name}`.replace(/[а-яА-ЯёЁ]/g, '').trim();
-    const fallback = (city ? `${city} travel` : "travel");
+    const cleanName = ${p.name}.replace(/[а-яА-ЯёЁ]/g, '').trim();
+    const fallback = (city ? ${city} travel : "travel");
     const query = cleanName || fallback;
 
-    const res = await fetch(`https://go-travel-backend-86i8.onrender.com/api/image?query=${encodeURIComponent(query)}`);
+    const res = await fetch(https://go-travel-backend-86i8.onrender.com/api/image?query=${encodeURIComponent(query)});
     const data = await res.json();
     imageUrl = data.url || "https://placehold.co/300x180?text=No+Image";
 
@@ -558,6 +565,7 @@ if (
     console.warn("❌ Прокси-ошибка при загрузке изображения:", err);
     imageUrl = "https://placehold.co/300x180?text=No+Image";
   }
+}
 
 
       const mapLink = p.address
