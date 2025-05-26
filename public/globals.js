@@ -62,6 +62,30 @@ window.translations = {
   }
 };
 
+export async function getUnsplashImage(query) {
+  const accessKey = "vuhLL00i9Jyvcecx1V9vuj2Pd9P9bJvr3bcJaFRnH0k"; // ⚠️ хардкодим на свой страх и риск
+
+  try {
+    const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&client_id=${accessKey}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const photo = data?.results?.[0];
+    return {
+      url: photo?.urls?.regular || "https://placehold.co/300x180?text=No+Image",
+      author: photo?.user?.name || "",
+      link: photo?.user?.links?.html || ""
+    };
+  } catch (err) {
+    console.warn("❌ Unsplash API error:", err);
+    return {
+      url: "https://placehold.co/300x180?text=No+Image",
+      author: "",
+      link: ""
+    };
+  }
+}
+
 // запрос в гпт
 export async function askGptAdvisor(question) {
   const telegramId = window._telegramId || "unknown";
