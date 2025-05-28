@@ -297,7 +297,6 @@ const hotels = hotelsRaw
       fullPrice: rawPrice,
       pricePerNight: nights > 0 ? rawPrice / nights : rawPrice,
       rating: h.rating || (h.stars ? h.stars * 2 : 0),
-      image: h.image || `https://photo.hotellook.com/image_v2/crop/${hotelId}/2048/1536.auto`,
       property_type: h.property_type || ""
     };
   })
