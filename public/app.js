@@ -546,11 +546,21 @@ for (const p of parsedPlaces) {
   const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
 
   let imageUrl = "https://placehold.co/300x180?text=No+Image";
+  let photoAuthorName = "";
+  let photoAuthorLink = "";
 
   try {
     const res = await fetch(`https://go-travel-backend-86i8.onrender.com/api/image?query=${encodeURIComponent(p.name)}`);
     const data = await res.json();
     imageUrl = data.url || imageUrl;
+
+    // 🔧 MODERATION ONLY — УДАЛИТЬ после апрува Unsplash
+    photoAuthorName = data.author || "Unknown";
+    photoAuthorLink = data.link || "https://unsplash.com";
+    if (data.download) {
+      fetch(data.download).catch((err) => console.warn("📉 Ошибка скачивания:", err));
+    }
+
     console.log("📸 Картинка с Unsplash:", imageUrl);
   } catch (err) {
     console.warn("❌ Ошибка загрузки фото:", err);
@@ -571,6 +581,21 @@ for (const p of parsedPlaces) {
             loading="lazy"
             onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
           />
+
+
+
+
+
+         
+<p class="text-xs text-gray-400 mt-1">
+  Photo by <a href="${p.author_link}" target="_blank" class="underline">${p.author_name}</a> on <a href="https://unsplash.com" target="_blank" class="underline">Unsplash</a>
+</p>
+
+
+
+
+
+
           <h3 class="text-lg font-semibold mb-1">${p.name}</h3>
           <p class="text-sm text-gray-600 mb-1">${p.description}</p>
           <a href="${mapLink}" target="_blank" class="text-sm text-blue-600 underline">
