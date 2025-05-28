@@ -284,10 +284,12 @@ const nights = Math.max(1, (dateOut - dateIn) / (1000 * 60 * 60 * 24));
 
     
 const hotels = hotelsRaw
-  .filter(h => (h.hotelId || h.id)) // ID обязателен, но не цена
   .map(h => {
     const hotelId = h.hotelId || h.id;
-    const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
+    if (!hotelId) return null; // пропускаем, если нет id
+
+    const rawPrice =
+      h.priceFrom || h.fullPrice || h.minPrice || 0;
 
     return {
       id: hotelId,
@@ -295,12 +297,12 @@ const hotels = hotelsRaw
       name: h.hotelName || h.name || "Без названия",
       city: h.city || h.location?.name || city || "Город неизвестен",
       fullPrice: rawPrice,
-      pricePerNight: nights > 0 ? rawPrice / nights : rawPrice,
+      pricePerNight: nights > 0 ? Math.floor(rawPrice / nights) : rawPrice,
       rating: h.rating || (h.stars ? h.stars * 2 : 0),
       property_type: h.property_type || ""
     };
   })
-  .filter(h => h.fullPrice > 0); // фильтрация только после нормализации
+  .filter(h => h && h.fullPrice > 0);
 
 
     
