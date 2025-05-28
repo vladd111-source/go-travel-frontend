@@ -130,23 +130,19 @@ export async function askGptAdvisor(question) {
 
 export function parsePlacesFromGpt(rawText) {
   const blocks = rawText
-    .split(/\n(?=\d\.)/)
+    .split(/\n(?=Название:\s*)/i) // 🆕 разделение по полю Название:
     .map(block => block.trim())
     .filter(Boolean)
-    .slice(0, 3); // Ограничение на 3 карточки
+    .slice(0, 3); // максимум 3 карточки
 
   const places = blocks.map(block => {
-    const nameMatch = block.match(/^\d\.\s*(.+)/);
+    const nameMatch = block.match(/Название:\s*(.+)/i);
     const descriptionMatch = block.match(/Описание:\s*(.+)/i);
+    const addressMatch = block.match(/Адрес:\s*(.+)/i);
 
-    const addressMatch =
-      block.match(/Адрес:\s*["']?(.+?)["']?(?:\n|$)/i) ||
-      block.match(/Address:\s*["']?(.+?)["']?(?:\n|$)/i);
-
-    const coordsMatch = block.match(/Координаты:\s*([0-9.,\-\s]+)/i);
     const imageMatch = block.match(/Фото\s*:\s*(https?:\/\/[^\s]+)/i);
 
-    // 🖼 Картинка: проверка валидности
+    // 🖼 картинка: чистим левое
     let image = imageMatch?.[1]?.trim() || "";
     if (
       !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(image) ||
@@ -158,17 +154,18 @@ export function parsePlacesFromGpt(rawText) {
       image = "https://placehold.co/300x180?text=No+Image";
     }
 
-    // 📍 Координаты: валидация и карта
-    let coords = coordsMatch?.[1]?.trim().replace(/\s+/g, "");
-    const isValidCoords = coords && /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/.test(coords);
-    const mapLink = isValidCoords ? `https://maps.google.com/?q=${coords}` : "#";
+    // 📍 карта: по адресу, а не координатам
+    const address = addressMatch?.[1]?.trim() || "Адрес не указан";
+    const map = address !== "Адрес не указан"
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+      : "#";
 
     return {
       name: nameMatch?.[1]?.trim() || "Без названия",
       description: descriptionMatch?.[1]?.trim() || "Описание отсутствует.",
-      address: addressMatch?.[1]?.trim() || "Адрес не указан",
-      coords: isValidCoords ? coords : "",
-      map: mapLink,
+      address,
+      coords: "", // теперь не используем координаты
+      map,
       image
     };
   });
