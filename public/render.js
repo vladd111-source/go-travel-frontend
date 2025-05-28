@@ -264,9 +264,7 @@ export function renderHotels(hotels) {
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
     
-  const imageUrl = hotel.photoId
-  ? `https://your-backend.vercel.app/api/proxy-image?photoId=${hotel.photoId}`
-  : "https://placehold.co/800x520?text=No+Image";
+const imageUrl = hotel.image || "https://placehold.co/800x520?text=No+Image";
     
 
     const baseUrl = hotelId
@@ -306,7 +304,7 @@ export function renderHotels(hotels) {
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
 }
-
+//Места
 export function renderPlaces(places = []) {
   const container = document.getElementById("placesResult");
   container.innerHTML = "";
