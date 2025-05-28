@@ -133,12 +133,16 @@ export function parsePlacesFromGpt(rawText) {
     .split(/\n(?=\d\.)/)
     .map(block => block.trim())
     .filter(Boolean)
-    .slice(0, 3); // ⬅️ Жесткое ограничение на 3 карточки
+    .slice(0, 3); // Ограничение на 3 карточки
 
   const places = blocks.map(block => {
     const nameMatch = block.match(/^\d\.\s*(.+)/);
     const descriptionMatch = block.match(/Описание:\s*(.+)/i);
-    const addressMatch = block.match(/Адрес:\s*(.+)/i);
+
+    const addressMatch =
+      block.match(/Адрес:\s*["']?(.+?)["']?(?:\n|$)/i) ||
+      block.match(/Address:\s*["']?(.+?)["']?(?:\n|$)/i);
+
     const coordsMatch = block.match(/Координаты:\s*([0-9.,\-\s]+)/i);
     const imageMatch = block.match(/Фото\s*:\s*(https?:\/\/[^\s]+)/i);
 
