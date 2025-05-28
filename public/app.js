@@ -538,22 +538,23 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
 Никакого текста вне карточек. Только 3 карточки.
 `);
     
- const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
-    const gptCardsArr = [];
+const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
+const gptCardsArr = [];
 
-    for (const p of parsedPlaces) {
-      const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-      const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
+for (const p of parsedPlaces) {
+  const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+  const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
 
-let imageUrl = "https://placehold.co/300x180?text=No+Image";
-try {
-  const res = await fetch(`https://go-travel-backend-86i8.onrender.com/api/image?query=${encodeURIComponent(p.name)}`);
-const { url: imageUrl } = await res.json();
-  imageUrl = data.url || imageUrl;
-  console.log("📸 Картинка с Unsplash:", imageUrl);
-} catch (err) {
-  console.warn("❌ Ошибка загрузки фото:", err);
-}
+  let imageUrl = "https://placehold.co/300x180?text=No+Image";
+
+  try {
+    const res = await fetch(`https://go-travel-backend-86i8.onrender.com/api/image?query=${encodeURIComponent(p.name)}`);
+    const data = await res.json();
+    imageUrl = data.url || imageUrl;
+    console.log("📸 Картинка с Unsplash:", imageUrl);
+  } catch (err) {
+    console.warn("❌ Ошибка загрузки фото:", err);
+  }
 
 
       const mapLink = p.address
