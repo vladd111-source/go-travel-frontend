@@ -188,7 +188,6 @@ const t = window.translations[lang];
 
 console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
 
-
 //Отели
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
@@ -197,11 +196,9 @@ export function renderHotels(hotels) {
     return;
   }
 
-  console.log("🧩 Контейнер:", container);
-  console.log("🧩 Получено отелей:", hotels.length);
   container.innerHTML = "";
 
-  if (!Array.isArray(hotels) || !hotels.length) {
+  if (!Array.isArray(hotels) || hotels.length === 0) {
     container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены</div>`;
     return;
   }
@@ -217,6 +214,7 @@ export function renderHotels(hotels) {
 
   const checkIn = document.getElementById("checkIn")?.value;
   const checkOut = document.getElementById("checkOut")?.value;
+
   let nights = 1;
   if (checkIn && checkOut) {
     const dateIn = new Date(checkIn);
@@ -247,12 +245,6 @@ export function renderHotels(hotels) {
     return matchesType && matchesPrice;
   });
 
-  console.log("✅ После фильтрации:", hotels.length);
-  if (!hotels.length) {
-    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены по заданным критериям</div>`;
-    return;
-  }
-
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
 
   hotels.forEach(hotel => {
@@ -262,13 +254,10 @@ export function renderHotels(hotels) {
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
-    // 🖼 Надёжная проверка наличия изображения
-    const photoId = hotel.image?.match(/\d+/)?.[0]; // вытаскиваем только числовой ID из image
+    const photoId = hotel.image?.match(/\d+/)?.[0];
     const imageUrl = photoId
       ? `https://photo.hotellook.com/image_v2/limit/${photoId}/800/520.auto`
       : "https://placehold.co/800x520?text=No+Image";
-
-    console.log(`🏨 ${hotelName} | ID: ${hotelId} | Фото: ${imageUrl}`);
 
     const baseUrl = hotelId
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
