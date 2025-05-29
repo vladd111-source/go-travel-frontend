@@ -188,6 +188,7 @@ const t = window.translations[lang];
 
 console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
 
+
 //Отели
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
@@ -256,16 +257,18 @@ export function renderHotels(hotels) {
 
   hotels.forEach(hotel => {
     const hotelId = hotel.hotelId || hotel.id;
-    console.log("🏨 Отель:", hotel.name, "| ID:", hotelId);
-
     const hotelName = hotel.name || "Без названия";
     const hotelCity = hotel.city || "Город неизвестен";
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
-    
-const imageUrl = hotel.image || "https://placehold.co/800x520?text=No+Image";
-    
+    // 🖼 Надёжная проверка наличия изображения
+    const photoId = hotel.image?.match(/\d+/)?.[0]; // вытаскиваем только числовой ID из image
+    const imageUrl = photoId
+      ? `https://photo.hotellook.com/image_v2/limit/${photoId}/800/520.auto`
+      : "https://placehold.co/800x520?text=No+Image";
+
+    console.log(`🏨 ${hotelName} | ID: ${hotelId} | Фото: ${imageUrl}`);
 
     const baseUrl = hotelId
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
@@ -283,11 +286,11 @@ const imageUrl = hotel.image || "https://placehold.co/800x520?text=No+Image";
 
     card.innerHTML = `
       <img src="${imageUrl}" alt="${hotelName}"
-           referrerpolicy="no-referrer"
-           crossorigin="anonymous"
            class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
            loading="lazy"
-           onerror="this.onerror=null;this.src='https://via.placeholder.com/800x520?text=No+Image';" />
+           referrerpolicy="no-referrer"
+           crossorigin="anonymous"
+           onerror="this.onerror=null;this.src='https://placehold.co/800x520?text=No+Image';" />
       <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
       <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
       <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
@@ -304,6 +307,7 @@ const imageUrl = hotel.image || "https://placehold.co/800x520?text=No+Image";
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
 }
+
 //Места
 export function renderPlaces(places = []) {
   const container = document.getElementById("placesResult");
