@@ -255,9 +255,9 @@ export function renderHotels(hotels) {
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
     const photoId = hotel.image?.match(/\d+/)?.[0];
-    const imageUrl = photoId
-      ? `https://photo.hotellook.com/image_v2/limit/${photoId}/800/520.jpg`
-      : "https://placehold.co/800x520?text=No+Image";
+const imageUrl = photoId
+  ? `https://photo.hotellook.com/image_v2/limit/${photoId}/800/520.jpg`
+  : "https://placehold.co/800x520?text=No+Image";
 
     const baseUrl = hotelId
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
