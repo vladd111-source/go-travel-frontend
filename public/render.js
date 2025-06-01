@@ -249,60 +249,60 @@ export function renderHotels(hotels) {
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
 
   hotels.forEach(hotel => {
-  const hotelId = hotel.hotelId || hotel.id;
-  const hotelName = hotel.name || "Без названия";
-  const hotelCity = hotel.city || "Город неизвестен";
-  const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
-  const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
+    const hotelId = hotel.hotelId || hotel.id;
+    const hotelName = hotel.name || "Без названия";
+    const hotelCity = hotel.city || "Город неизвестен";
+    const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
+    const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
- // Получаем всё, что после /limit/ (а не только ID)
-let imageUrl = "https://placehold.co/800x520?text=No+Image";
-if (hotel.image && typeof hotel.image === "string") {
-  const match = hotel.image.match(/\/image_v2\/limit\/(\d+)\//); // ⬅️ только ID
-  const photoId = match?.[1];
+    // 🔁 Прокси через photoId (извлекаем только ID из image URL)
+    let imageUrl = "https://placehold.co/800x520?text=No+Image";
+    if (hotel.image && typeof hotel.image === "string") {
+      const match = hotel.image.match(/\/image_v2\/limit\/(\d+)\//);
+      const photoId = match?.[1];
+      if (photoId) {
+        imageUrl = `https://go-travel-backend.vercel.app/api/image-proxy?photoId=${photoId}`;
+      }
+    }
 
-  if (photoId) {
-    imageUrl = `https://go-travel-backend.vercel.app/api/image-proxy?photoId=${photoId}`;
-  }
-}
-  console.log("🏨 HOTEL", hotelName, imageUrl);
+    console.log("🏨 HOTEL", hotelName, imageUrl);
 
-  const baseUrl = hotelId
-    ? `https://search.hotellook.com/?hotelId=${hotelId}`
-    : `https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`;
+    const baseUrl = hotelId
+      ? `https://search.hotellook.com/?hotelId=${hotelId}`
+      : `https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`;
 
-  const dateParams =
-    checkIn && checkOut
-      ? `&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}`
-      : "";
+    const dateParams =
+      checkIn && checkOut
+        ? `&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}`
+        : "";
 
-  const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
+    const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
 
-  const card = document.createElement("div");
-  card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
+    const card = document.createElement("div");
+    card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
 
-  card.innerHTML = `
-    <img src="${imageUrl}" alt="${hotelName}"
-         class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
-         loading="lazy"
-         referrerpolicy="no-referrer"
-         crossorigin="anonymous"
-         onerror="this.onerror=null;this.src='https://placehold.co/800x520?text=No+Image';" />
-    <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
-    <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
-    <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
-    <p class="text-sm text-gray-600 mb-1">💵 Всего за период: ${totalPrice}</p>
-    <a href="${bookingUrl}" target="_blank"
-       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center mt-2">
-       🔗 Забронировать
-    </a>
-  `;
+    card.innerHTML = `
+      <img src="${imageUrl}" alt="${hotelName}"
+           class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
+           loading="lazy"
+           referrerpolicy="no-referrer"
+           crossorigin="anonymous"
+           onerror="this.onerror=null;this.src='https://placehold.co/800x520?text=No+Image';" />
+      <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
+      <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
+      <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
+      <p class="text-sm text-gray-600 mb-1">💵 Всего за период: ${totalPrice}</p>
+      <a href="${bookingUrl}" target="_blank"
+         class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center mt-2">
+         🔗 Забронировать
+      </a>
+    `;
 
-  container.appendChild(card);
-});
+    container.appendChild(card);
+  });
 
-container.classList.add("visible");
-animateCards("#hotelsResult .card");
+  container.classList.add("visible");
+  animateCards("#hotelsResult .card");
 }
 
 //Места
