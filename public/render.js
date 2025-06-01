@@ -253,7 +253,9 @@ export function renderHotels(hotels) {
     const hotelCity = hotel.city || "Город неизвестен";
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
-
+    
+    console.log("🏨 HOTEL", hotel.name, hotel.image);
+    
     // ✅ Используем image напрямую
     const imageUrl = hotel.image || "https://placehold.co/800x520?text=No+Image";
 
