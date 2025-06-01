@@ -286,10 +286,9 @@ const nights = Math.max(1, (dateOut - dateIn) / (1000 * 60 * 60 * 24));
 const hotels = hotelsRaw
   .map(h => {
     const hotelId = h.hotelId || h.id;
-    if (!hotelId) return null; // пропускаем, если нет id
+    if (!hotelId) return null;
 
-    const rawPrice =
-      h.priceFrom || h.fullPrice || h.minPrice || 0;
+    const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
 
     return {
       id: hotelId,
@@ -299,7 +298,8 @@ const hotels = hotelsRaw
       fullPrice: rawPrice,
       pricePerNight: nights > 0 ? Math.floor(rawPrice / nights) : rawPrice,
       rating: h.rating || (h.stars ? h.stars * 2 : 0),
-      property_type: h.property_type || ""
+      property_type: h.property_type || "",
+      image: h.image || "" // ✅ добавь вот это!
     };
   })
   .filter(h => h && h.fullPrice > 0);
