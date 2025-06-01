@@ -188,6 +188,8 @@ const t = window.translations[lang];
 
 console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
 
+
+//Отели
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   if (!container) {
@@ -252,7 +254,10 @@ export function renderHotels(hotels) {
     const hotelCity = hotel.city || "Город неизвестен";
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
-    const imageUrl = hotel.image || "https://placehold.co/800x520?text=No+Image";
+    
+    const imageUrl = hotel.image
+  ? `https://photo.hotellook.com/image_v2/limit/${hotel.image}/800/520.jpg`
+  : "https://placehold.co/800x520?text=No+Image";
 
     console.log("🏨 HOTEL", hotelName, imageUrl);
 
