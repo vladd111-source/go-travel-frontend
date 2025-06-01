@@ -229,21 +229,21 @@ export function renderHotels(hotels) {
   });
 
   hotels = hotels.filter(hotel => {
-    const selectedType = propertyTypeFilter?.value || "all";
-    const rawType = (hotel.property_type || "").toLowerCase();
+  const selectedType = propertyTypeFilter?.value || "all";
+  const rawType = (hotel.property_type || "hotel").toLowerCase(); // ← добавлен дефолт
 
-    const matchesType =
-      selectedType === "all" ||
-      (selectedType === "hotel" && rawType.includes("hotel")) ||
-      (selectedType === "apartment" && rawType.includes("apartment"));
+  const matchesType =
+    selectedType === "all" ||
+    (selectedType === "hotel" && rawType.includes("hotel")) ||
+    (selectedType === "apartment" && rawType.includes("apartment"));
 
-    const matchesPrice =
-      !isNaN(hotel.pricePerNight) &&
-      hotel.pricePerNight > 0 &&
-      hotel.pricePerNight <= maxPrice;
+  const matchesPrice =
+    !isNaN(hotel.pricePerNight) &&
+    hotel.pricePerNight > 0 &&
+    hotel.pricePerNight <= maxPrice;
 
-    return matchesType && matchesPrice;
-  });
+  return matchesType && matchesPrice;
+});
 
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
 
