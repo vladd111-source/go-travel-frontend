@@ -255,14 +255,14 @@ export function renderHotels(hotels) {
   const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
   const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
-  // ✅ Получаем photoId из hotel.image (если есть)
- let imageUrl = "https://placehold.co/800x520?text=No+Image";
+ // Получаем всё, что после /limit/ (а не только ID)
+let imageUrl = "https://placehold.co/800x520?text=No+Image";
 if (hotel.image && typeof hotel.image === "string") {
-  const match = hotel.image.match(/\/image_v2\/limit\/(\d+)\//);
-  const photoId = match?.[1];
+  const match = hotel.image.match(/\/image_v2\/limit\/(.+)$/);
+  const photoPath = match?.[1];
 
-  if (photoId) {
-    imageUrl = `https://go-travel-backend.vercel.app/api/image-proxy?photoId=${photoId}`;
+  if (photoPath) {
+    imageUrl = `https://go-travel-backend.vercel.app/api/image-proxy?photoId=${photoPath}`;
   }
 }
 
