@@ -258,14 +258,13 @@ export function renderHotels(hotels) {
  // Получаем всё, что после /limit/ (а не только ID)
 let imageUrl = "https://placehold.co/800x520?text=No+Image";
 if (hotel.image && typeof hotel.image === "string") {
-  const match = hotel.image.match(/\/image_v2\/limit\/(.+)$/);
-  const photoPath = match?.[1];
+  const match = hotel.image.match(/\/image_v2\/limit\/(\d+)\//); // ⬅️ только ID
+  const photoId = match?.[1];
 
-  if (photoPath) {
-    imageUrl = `https://go-travel-backend.vercel.app/api/image-proxy?photoId=${photoPath}`;
+  if (photoId) {
+    imageUrl = `https://go-travel-backend.vercel.app/api/image-proxy?photoId=${photoId}`;
   }
 }
-
   console.log("🏨 HOTEL", hotelName, imageUrl);
 
   const baseUrl = hotelId
