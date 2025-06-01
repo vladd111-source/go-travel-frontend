@@ -262,9 +262,9 @@ export function renderHotels(hotels) {
       photoId = match ? match[1] : null;
     }
 
-    // ✅ 
-    const imageUrl = hotel.image?.includes("photo.hotellook.com")
-  ? hotel.image
+    // ✅ Проксируем
+   const imageUrl = photoId
+  ? `https://go-travel-backend.vercel.app/api/image-proxy?photoId=${photoId}`
   : "https://placehold.co/800x520?text=No+Image";
 
     console.log("🏨 HOTEL", hotelName, imageUrl);
