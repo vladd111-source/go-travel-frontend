@@ -188,7 +188,6 @@ const t = window.translations[lang];
 
 console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
 
-//Отели
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
   if (!container) {
@@ -229,21 +228,21 @@ export function renderHotels(hotels) {
   });
 
   hotels = hotels.filter(hotel => {
-  const selectedType = propertyTypeFilter?.value || "all";
-  const rawType = (hotel.property_type || "hotel").toLowerCase(); // ← добавлен дефолт
+    const selectedType = propertyTypeFilter?.value || "all";
+    const rawType = (hotel.property_type || "hotel").toLowerCase();
 
-  const matchesType =
-    selectedType === "all" ||
-    (selectedType === "hotel" && rawType.includes("hotel")) ||
-    (selectedType === "apartment" && rawType.includes("apartment"));
+    const matchesType =
+      selectedType === "all" ||
+      (selectedType === "hotel" && rawType.includes("hotel")) ||
+      (selectedType === "apartment" && rawType.includes("apartment"));
 
-  const matchesPrice =
-    !isNaN(hotel.pricePerNight) &&
-    hotel.pricePerNight > 0 &&
-    hotel.pricePerNight <= maxPrice;
+    const matchesPrice =
+      !isNaN(hotel.pricePerNight) &&
+      hotel.pricePerNight > 0 &&
+      hotel.pricePerNight <= maxPrice;
 
-  return matchesType && matchesPrice;
-});
+    return matchesType && matchesPrice;
+  });
 
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
 
@@ -253,11 +252,9 @@ export function renderHotels(hotels) {
     const hotelCity = hotel.city || "Город неизвестен";
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
-    
-    console.log("🏨 HOTEL", hotel.name, hotel.image);
-    
-    // ✅ Используем image напрямую
     const imageUrl = hotel.image || "https://placehold.co/800x520?text=No+Image";
+
+    console.log("🏨 HOTEL", hotelName, imageUrl);
 
     const baseUrl = hotelId
       ? `https://search.hotellook.com/?hotelId=${hotelId}`
@@ -274,7 +271,7 @@ export function renderHotels(hotels) {
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
 
     card.innerHTML = `
-      <img src="${imageUrl}" alt="${hotelName}"
+      <img src="${imageUrl.replace(/\.auto$/, '.jpg')}" alt="${hotelName}"
            class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
            loading="lazy"
            referrerpolicy="no-referrer"
