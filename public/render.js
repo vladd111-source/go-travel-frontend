@@ -262,7 +262,7 @@ export function renderHotels(hotels) {
 const photoPath = match?.[1];
 
 if (photoPath) {
-  imageUrl = `https://go-travel-backend.vercel.app/api/image-proxy?photoId=${photoPath}`;
+  imageUrl = `https://go-travel-backend.vercel.app/api/image-proxy?photoId=${encodeURIComponent(photoPath)}`;
 }
     }
 
