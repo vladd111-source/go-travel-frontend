@@ -311,6 +311,25 @@ card.innerHTML = `
 
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
+
+  
+  // 🔗 Кнопка "Смотреть все отели на Booking.com"
+const bookingAll = document.createElement("div");
+bookingAll.className = "text-center mt-6";
+
+const bookingCity = document.getElementById("hotelCity")?.value || hotelCity;
+const guestsCount = document.getElementById("guests")?.value || 1;
+
+const bookingAllUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(bookingCity)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guestsCount}&group_children=0&no_rooms=1`;
+
+bookingAll.innerHTML = `
+  <a href="${bookingAllUrl}" target="_blank"
+     class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-6 rounded shadow">
+     🔍 Смотреть все отели на Booking.com
+  </a>
+`;
+
+container.appendChild(bookingAll);
 }
 
 //Места
