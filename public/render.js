@@ -311,10 +311,10 @@ card.innerHTML = `
 
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
+}
 
 
-
-  // 🔗 Кнопка "Смотреть все в Booking"
+ // 🔗 Кнопка "Смотреть все в Booking"
 const bookingButton = document.createElement("div");
 bookingButton.className = "text-center mt-6";
 
@@ -333,7 +333,6 @@ bookingButton.innerHTML = `
 `;
 
 container.appendChild(bookingButton);
-}
 
 
 //Места
