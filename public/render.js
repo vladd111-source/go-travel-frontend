@@ -311,7 +311,30 @@ card.innerHTML = `
 
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
+
+
+
+  // 🔗 Кнопка "Смотреть все в Booking"
+const bookingButton = document.createElement("div");
+bookingButton.className = "text-center mt-6";
+
+const city = document.getElementById("hotelCity")?.value || "City";
+const checkIn = document.getElementById("checkIn")?.value;
+const checkOut = document.getElementById("checkOut")?.value;
+const guests = document.getElementById("guests")?.value || 1;
+
+const bookingUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(city)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guests}&group_children=0&no_rooms=1`;
+
+bookingButton.innerHTML = `
+  <a href="${bookingUrl}" target="_blank"
+     class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-6 rounded shadow">
+     🔍 Смотреть все отели на Booking.com
+  </a>
+`;
+
+container.appendChild(bookingButton);
 }
+
 
 //Места
 export function renderPlaces(places = []) {
