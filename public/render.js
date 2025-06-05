@@ -276,7 +276,7 @@ export function renderHotels(hotels) {
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
 
-   const isFav = checkFavoriteHotel(hotel); // Функция определяет, в избранном ли отель
+   const isFav = checkFavoriteHotel(hotel); // 👈 используем check-функцию
 
 card.innerHTML = `
   <img src="${imageUrl}" alt="${hotelName}"
@@ -285,10 +285,12 @@ card.innerHTML = `
        referrerpolicy="no-referrer"
        crossorigin="anonymous"
        onerror="this.onerror=null;this.src='https://placehold.co/800x520?text=No+Image';" />
+
   <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
   <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
   <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
   <p class="text-sm text-gray-600 mb-1">💵 Всего за период: ${totalPrice}</p>
+
   <div class="flex justify-between items-center mt-2">
     <a href="${bookingUrl}" target="_blank"
        class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center">
@@ -297,6 +299,7 @@ card.innerHTML = `
     <button 
       onclick="toggleFavoriteHotelFromEncoded('${encodeURIComponent(JSON.stringify(hotel))}', this)" 
       class="text-xl ml-2"
+      data-hotel-id="${encodeURIComponent(JSON.stringify(hotel))}"
     >
       ${isFav ? "💙" : "🤍"}
     </button>
