@@ -383,5 +383,19 @@ export function renderPlaces(places = []) {
   animateCards("#placesResult .card");
 }
 
+function checkFavoriteHotel(hotel) {
+  const favs = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  return favs.some(h => h.name === hotel.name && h.city === hotel.city);
+}
+
+window.toggleFavoriteHotelFromEncoded = function(encoded, btn) {
+  try {
+    const hotel = JSON.parse(decodeURIComponent(encoded));
+    window.toggleFavoriteItem("hotels", hotel, btn);
+  } catch (e) {
+    console.error("❌ Ошибка при декодировании отеля:", e);
+  }
+};
+
 // Сделать функции глобально доступными
 window.generateAviasalesLink = generateAviasalesLink;
