@@ -7,7 +7,7 @@ export async function searchHotels(city, checkIn, checkOut) {
   try {
     const query = new URLSearchParams({ city, checkIn, checkOut });
 
-    const res = await fetch(`https://go-travel-backend.vercel.app/api/hotels?${query.toString()}`);
+    const res = await fetch(`https://go-travel-backend-86i8.onrender.com/api/hotels?${query.toString()}`);
 
     if (!res.ok) {
       const errText = await res.text();
