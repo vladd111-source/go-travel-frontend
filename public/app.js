@@ -518,7 +518,9 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
 
   resultBlock.classList.remove("visible");
   resultBlock.innerHTML = "";
-
+  
+  showLoading(); // 👈 ДО начала загрузки
+  
   try {
     const gptRaw = await askGptAdvisor(`
 Ты тревел-ассистент Go Travel. Подбери 3 уникальных, атмосферных и редких места для насыщенного дня в городе "${city}" под настроение "${mood}".
@@ -603,6 +605,8 @@ for (const p of parsedPlaces) {
   } catch (err) {
     console.warn("❌ GPT карточки мест не получены:", err);
     resultBlock.innerHTML = `<p class="text-sm text-gray-500">Не удалось получить рекомендации. Попробуйте позже.</p>`;
+   } finally {
+    hideLoading(); // ✅ обязательно, в любом случае
   }
 
   resultBlock.classList.add("visible");
