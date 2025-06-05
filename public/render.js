@@ -256,15 +256,13 @@ export function renderHotels(hotels) {
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
     // 🔁 Прокси через photoId (извлекаем только ID из image URL)
-    let imageUrl = "https://placehold.co/800x520?text=No+Image";
-    if (hotel.image && typeof hotel.image === "string") {
-   const match = hotel.image?.match(/\/image_v2\/limit\/(.+)$/);
-const photoPath = match?.[1];
+   let imageUrl = hotel.image && typeof hotel.image === "string"
+  ? hotel.image
+  : "https://placehold.co/800x520?text=No+Image";
 
-if (photoPath) {
-  imageUrl = `https://go-travel-backend.vercel.app/api/image-proxy/${photoPath}`;
-}
-    }
+
+
+    
 
     console.log("🏨 HOTEL", hotelName, imageUrl);
 
