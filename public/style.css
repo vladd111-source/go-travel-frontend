@@ -359,20 +359,20 @@ hr {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: linear-gradient(to right, #3b82f6, #6366f1);
+  background-color: #3b82f6; /* Насыщенный синий */
+  color: white;
+  font-size: 24px;
   border: none;
-  border-radius: 9999px;
+  border-radius: 50%;
   width: 52px;
   height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  z-index: 9999;
-  transition: transform 0.2s ease;
+  z-index: 1000;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 #supportButton:hover {
-  transform: scale(1.08);
+  background-color: #2563eb;
+  transform: scale(1.1);
 }
