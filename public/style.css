@@ -360,20 +360,19 @@ hr {
   bottom: 20px;
   right: 20px;
   background: linear-gradient(to right, #3b82f6, #6366f1);
-  color: white;
   border: none;
-  border-radius: 50%;
+  border-radius: 9999px;
   width: 52px;
   height: 52px;
-  font-size: 24px;
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  transition: transform 0.2s ease, background 0.3s ease;
   z-index: 9999;
+  transition: transform 0.2s ease;
 }
 
 #supportButton:hover {
   transform: scale(1.08);
-  background: linear-gradient(to right, #2563eb, #4f46e5);
 }
