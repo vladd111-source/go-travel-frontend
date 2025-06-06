@@ -359,19 +359,21 @@ hr {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #facc15; /* жёлтая */
-  color: #000;
+  background: linear-gradient(to right, #3b82f6, #6366f1);
+  color: white;
   border: none;
-  border-radius: 9999px;
-  width: 48px;
-  height: 48px;
+  border-radius: 50%;
+  width: 52px;
+  height: 52px;
   font-size: 24px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
   z-index: 9999;
-  transition: transform 0.2s ease;
 }
 
 #supportButton:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
+  background: linear-gradient(to right, #2563eb, #4f46e5);
 }
