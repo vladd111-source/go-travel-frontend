@@ -354,3 +354,24 @@ hr {
     box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
   }
 }
+/* ===== Кнопка поддержки внизу справа ===== */
+#supportButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #facc15; /* жёлтая */
+  color: #000;
+  border: none;
+  border-radius: 9999px;
+  width: 48px;
+  height: 48px;
+  font-size: 24px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 9999;
+  transition: transform 0.2s ease;
+}
+
+#supportButton:hover {
+  transform: scale(1.1);
+}
