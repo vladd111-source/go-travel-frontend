@@ -288,10 +288,11 @@
   </div>
 </div>
 
-  <button 
-  onclick="Telegram.WebApp.openTelegramLink('https://t.me/GoTravelSupportBot')" 
+ <button
+  onclick="Telegram.WebApp.openTelegramLink('https://t.me/GoTravelSupportBot?start=user_' + Telegram.WebApp.initDataUnsafe.user.id)"
   id="supportButton"
   aria-label="Поддержка"
+  title="Поддержка"
 >
   ❓
 </button>
