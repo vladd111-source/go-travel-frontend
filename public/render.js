@@ -313,7 +313,7 @@ card.innerHTML = `
   animateCards("#hotelsResult .card");
 
   
-  // 🔗 Кнопка "Смотреть все отели на Booking.com"
+  // 🔗 Кнопка "Смотреть на Booking.com"
 const bookingAll = document.createElement("div");
 bookingAll.className = "text-center mt-6";
 
@@ -325,7 +325,7 @@ const bookingAllUrl = `https://www.booking.com/searchresults.html?ss=${encodeURI
 bookingAll.innerHTML = `
   <a href="${bookingAllUrl}" target="_blank" rel="noopener"
    class="block w-full sm:w-auto mx-auto mt-6 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition duration-300">
-  🔍 Смотреть все отели на Booking.com
+  🔍 Смотреть на Booking.com
 </a>
 `;
 
