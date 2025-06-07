@@ -325,7 +325,7 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
 
   const isHotOnly = document.getElementById("hotOnly")?.checked;
 
- if (isHotOnly) {
+if (isHotOnly) {
   const fromInput = document.getElementById("from");
   const from = fromInput?.value.trim().toUpperCase();
 
@@ -334,7 +334,7 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     return;
   }
 
-  // ⛔️ Отключаем "Туда и обратно", чтобы избежать конфликтов
+  // 🔧 Безопасно отключаем "Туда и обратно"
   const roundTrip = document.getElementById("roundTrip");
   const returnDateInput = document.getElementById("returnDate");
   const returnDateWrapper = document.getElementById("returnDateWrapper");
@@ -344,23 +344,19 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
     localStorage.setItem("roundTripChecked", "0");
 
     if (returnDateInput) {
+      // 💥 Ключ: сначала удаляем required и name
       returnDateInput.removeAttribute("required");
       returnDateInput.removeAttribute("name");
-      returnDateInput.setAttribute("disabled", "true");
       returnDateInput.value = "";
-
-      // 💥 Ключевой момент — полностью убираем фокусируемость
-      returnDateInput.style.display = "none";
+      returnDateInput.disabled = true;
     }
 
     if (returnDateWrapper) {
       returnDateWrapper.classList.add("hidden");
     }
 
-    // 👇 Безопасно обновляем отображение
-    if (typeof window.updateReturnDateVisibility === "function") {
-      window.updateReturnDateVisibility();
-    }
+    // Обновляем UI
+    window.updateReturnDateVisibility?.();
   }
 
   localStorage.setItem("lastFrom", from);
