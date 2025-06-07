@@ -334,17 +334,27 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
       return;
     }
 
-    // ⛔️ Отключаем "Туда и обратно", чтобы избежать конфликтов
-    const roundTrip = document.getElementById("roundTrip");
-    if (roundTrip && roundTrip.checked) {
-      roundTrip.checked = false;
-      updateReturnDateVisibility(); // скрываем returnDate
-      localStorage.setItem("roundTripChecked", "0");
-    }
+   // ⛔️ Отключаем "Туда и обратно", чтобы избежать конфликтов
+const roundTrip = document.getElementById("roundTrip");
+const returnDateInput = document.getElementById("returnDate");
 
-    localStorage.setItem("lastFrom", from);
-    await loadHotDeals(); // уже должен быть у тебя
-    return;
+if (roundTrip && roundTrip.checked) {
+  roundTrip.checked = false;
+  updateReturnDateVisibility(); // скрываем returnDate
+  localStorage.setItem("roundTripChecked", "0");
+
+  // 💡 Удаляем атрибуты, чтобы returnDate не мешал
+  if (returnDateInput) {
+    returnDateInput.removeAttribute("required");
+    returnDateInput.removeAttribute("name");
+    returnDateInput.setAttribute("disabled", "true");
+    returnDateInput.value = ""; // сбрасываем значение
+  }
+}
+
+localStorage.setItem("lastFrom", from);
+await loadHotDeals(); // уже должен быть у тебя
+return;
   }
   
   const fromInput = document.getElementById("from");
