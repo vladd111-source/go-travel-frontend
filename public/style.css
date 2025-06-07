@@ -376,35 +376,3 @@ hr {
   background-color: #2563eb;
   transform: scale(1.1);
 }
-
-
-.card.flight-card {
-  background-color: #ffffff;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card.flight-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-}
-
-.card.flight-card h3 {
-  font-size: 1.25rem;
-  margin-bottom: 8px;
-  color: #1f2937; /* gray-800 */
-}
-
-.card.flight-card .text-sm {
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.card.flight-card .price {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #111827; /* gray-900 */
-}
