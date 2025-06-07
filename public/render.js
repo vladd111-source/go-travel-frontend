@@ -138,10 +138,10 @@ export async function renderFlights(
     const isHot = flight.highlight || price < 60;
 
     const card = document.createElement("div");
-   card.className = `
-  card flight-card opacity-0 scale-95 transform transition-all duration-300
-  ${isHot ? 'bg-yellow-100 border border-yellow-300' : ''}
-`.trim();
+    card.className = `
+      card border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300
+      ${isHot ? 'bg-yellow-100 border-yellow-300' : 'bg-white'}
+    `.trim();
     
 const t = window.translations[lang];
     
@@ -151,9 +151,9 @@ const t = window.translations[lang];
     ${isHot ? `<span class="text-lg font-bold text-orange-600">🔥 ${t.hotDeal || "Горячее предложение"}</span>` : ""}
   </div>
   <div class="text-sm font-semibold text-gray-700 mb-1">🛫 ${from} → 🛬 ${to}</div>
- <div class="text-sm text-gray-600 mb-2">
-  📅 ${date} • ⏰ ${departureTime} — ${arrivalTime} • 🕒 ${durationText}
-</div>
+  <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
+  <div class="text-sm text-gray-600 mb-1">⏰ ${t.time || "Время"}: ${departureTime} — ${arrivalTime}</div>
+  <div class="text-sm text-gray-600 mb-1">🕒 ${t.duration || "В пути"}: ${durationText}</div>
   <div class="text-lg font-bold text-gray-800 mb-1">💰 $${price}</div>
   <div class="flex justify-between items-center gap-2 mt-2">
     <a href="${link}" target="_blank"
