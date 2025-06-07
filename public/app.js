@@ -316,12 +316,13 @@ const hotels = hotelsRaw
 });
 }
 
-
 // ✅ Поиск рейсов (включая "Туда и обратно")
 document.getElementById("search-form")?.addEventListener("submit", async (e) => {
-   e.preventDefault();
+  e.preventDefault();
+
   // Обновляем видимость и доступность returnDate перед валидацией
-window.updateReturnDateVisibility?.();
+  window.updateReturnDateVisibility?.();
+
   const isHotOnly = document.getElementById("hotOnly")?.checked;
 
   if (isHotOnly) {
@@ -333,10 +334,19 @@ window.updateReturnDateVisibility?.();
       return;
     }
 
+    // ⛔️ Отключаем "Туда и обратно", чтобы избежать конфликтов
+    const roundTrip = document.getElementById("roundTrip");
+    if (roundTrip && roundTrip.checked) {
+      roundTrip.checked = false;
+      updateReturnDateVisibility(); // скрываем returnDate
+      localStorage.setItem("roundTripChecked", "0");
+    }
+
     localStorage.setItem("lastFrom", from);
     await loadHotDeals(); // уже должен быть у тебя
     return;
   }
+  
   const fromInput = document.getElementById("from");
   const toInput = document.getElementById("to");
   const departureInput = document.getElementById("departureDate");
