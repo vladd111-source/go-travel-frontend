@@ -260,10 +260,6 @@ export function renderHotels(hotels) {
   ? hotel.image
   : "https://placehold.co/800x520?text=No+Image";
 
-
-
-    
-
     console.log("🏨 HOTEL", hotelName, imageUrl);
 
     const baseUrl = hotelId
@@ -280,28 +276,60 @@ export function renderHotels(hotels) {
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
 
-    card.innerHTML = `
-      <img src="${imageUrl}" alt="${hotelName}"
-           class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
-           loading="lazy"
-           referrerpolicy="no-referrer"
-           crossorigin="anonymous"
-           onerror="this.onerror=null;this.src='https://placehold.co/800x520?text=No+Image';" />
-      <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
-      <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
-      <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
-      <p class="text-sm text-gray-600 mb-1">💵 Всего за период: ${totalPrice}</p>
-      <a href="${bookingUrl}" target="_blank"
-         class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center mt-2">
-         🔗 Забронировать
-      </a>
-    `;
+   const isFav = checkFavoriteHotel(hotel); // 👈 используем check-функцию
+
+card.innerHTML = `
+  <img src="${imageUrl}" alt="${hotelName}"
+       class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
+       loading="lazy"
+       referrerpolicy="no-referrer"
+       crossorigin="anonymous"
+       onerror="this.onerror=null;this.src='https://placehold.co/800x520?text=No+Image';" />
+
+  <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
+  <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
+  <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
+  <p class="text-sm text-gray-600 mb-1">💵 Всего за период: ${totalPrice}</p>
+
+  <div class="flex justify-between items-center mt-2">
+    <a href="${bookingUrl}" target="_blank"
+       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center">
+       🔗 Забронировать
+    </a>
+    <button 
+      onclick="toggleFavoriteHotelFromEncoded('${encodeURIComponent(JSON.stringify(hotel))}', this)" 
+      class="text-xl ml-2"
+      data-hotel-id="${encodeURIComponent(JSON.stringify(hotel))}"
+    >
+      ${isFav ? "💙" : "🤍"}
+    </button>
+  </div>
+`;
 
     container.appendChild(card);
   });
 
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
+
+  
+  // 🔗 Кнопка "Смотреть все отели на Booking.com"
+const bookingAll = document.createElement("div");
+bookingAll.className = "text-center mt-6";
+
+const bookingCity = document.getElementById("hotelCity")?.value || hotelCity;
+const guestsCount = document.getElementById("guests")?.value || 1;
+
+const bookingAllUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(bookingCity)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guestsCount}&group_children=0&no_rooms=1`;
+
+bookingAll.innerHTML = `
+  <a href="${bookingAllUrl}" target="_blank"
+     class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-6 rounded shadow">
+     🔍 Смотреть все отели на Booking.com
+  </a>
+`;
+
+container.appendChild(bookingAll);
 }
 
 //Места
@@ -376,6 +404,20 @@ export function renderPlaces(places = []) {
 
   animateCards("#placesResult .card");
 }
+
+function checkFavoriteHotel(hotel) {
+  const favs = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+  return favs.some(h => h.name === hotel.name && h.city === hotel.city);
+}
+
+window.toggleFavoriteHotelFromEncoded = function(encoded, btn) {
+  try {
+    const hotel = JSON.parse(decodeURIComponent(encoded));
+    window.toggleFavoriteItem("hotels", hotel, btn);
+  } catch (e) {
+    console.error("❌ Ошибка при декодировании отеля:", e);
+  }
+};
 
 // Сделать функции глобально доступными
 window.generateAviasalesLink = generateAviasalesLink;
