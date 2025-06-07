@@ -325,45 +325,48 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
 
   const isHotOnly = document.getElementById("hotOnly")?.checked;
 
-  if (isHotOnly) {
-    const fromInput = document.getElementById("from");
-    const from = fromInput?.value.trim().toUpperCase();
+ if (isHotOnly) {
+  const fromInput = document.getElementById("from");
+  const from = fromInput?.value.trim().toUpperCase();
 
-    if (!from) {
-      alert("Укажите город отправления.");
-      return;
+  if (!from) {
+    alert("Укажите город отправления.");
+    return;
+  }
+
+  // ⛔️ Отключаем "Туда и обратно", чтобы избежать конфликтов
+  const roundTrip = document.getElementById("roundTrip");
+  const returnDateInput = document.getElementById("returnDate");
+  const returnDateWrapper = document.getElementById("returnDateWrapper");
+
+  if (roundTrip?.checked) {
+    roundTrip.checked = false;
+    localStorage.setItem("roundTripChecked", "0");
+
+    if (returnDateInput) {
+      returnDateInput.removeAttribute("required");
+      returnDateInput.removeAttribute("name");
+      returnDateInput.setAttribute("disabled", "true");
+      returnDateInput.value = "";
+
+      // 💥 Ключевой момент — полностью убираем фокусируемость
+      returnDateInput.style.display = "none";
     }
 
-// ⛔️ Отключаем "Туда и обратно", чтобы избежать конфликтов
-const roundTrip = document.getElementById("roundTrip");
-const returnDateInput = document.getElementById("returnDate");
-const returnDateWrapper = document.getElementById("returnDateWrapper");
+    if (returnDateWrapper) {
+      returnDateWrapper.classList.add("hidden");
+    }
 
-if (roundTrip && roundTrip.checked) {
-  roundTrip.checked = false;
-  localStorage.setItem("roundTripChecked", "0");
-
-  if (returnDateInput) {
-    returnDateInput.removeAttribute("required");
-    returnDateInput.removeAttribute("name");
-    returnDateInput.setAttribute("disabled", "true");
-    returnDateInput.value = ""; // сбрасываем значение
+    // 👇 Безопасно обновляем отображение
+    if (typeof window.updateReturnDateVisibility === "function") {
+      window.updateReturnDateVisibility();
+    }
   }
 
-  if (returnDateWrapper) {
-    returnDateWrapper.classList.add("hidden");
-  }
-
-  // 👇 Безопасно обновляем отображение
-  if (typeof window.updateReturnDateVisibility === "function") {
-    window.updateReturnDateVisibility();
-  }
+  localStorage.setItem("lastFrom", from);
+  await loadHotDeals();
+  return;
 }
-
-localStorage.setItem("lastFrom", from);
-await loadHotDeals();
-return;
-  }
   
   const fromInput = document.getElementById("from");
   const toInput = document.getElementById("to");
