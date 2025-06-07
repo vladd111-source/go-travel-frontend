@@ -392,6 +392,17 @@ try {
   const resOut = await retryFetch(urlOut);
   if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
   flightsOut = await resOut.json();
+
+
+
+
+
+  alert(JSON.stringify(flightsOut, null, 2));
+
+
+
+
+  
   await renderFlights(flightsOut, from, to, "Рейсы туда", "hotDeals", true); // очищаем контейнер
 
   // 🔁 Запрос рейсов обратно
