@@ -334,7 +334,7 @@ if (isHotOnly) {
     return;
   }
 
-  // 🔧 Безопасно отключаем "Туда и обратно"
+  // ⛔️ Вырубаем "Туда и обратно", чтобы избежать валидации скрытого поля
   const roundTrip = document.getElementById("roundTrip");
   const returnDateInput = document.getElementById("returnDate");
   const returnDateWrapper = document.getElementById("returnDateWrapper");
@@ -344,7 +344,7 @@ if (isHotOnly) {
     localStorage.setItem("roundTripChecked", "0");
 
     if (returnDateInput) {
-      // 💥 Ключ: сначала удаляем required и name
+      // КРИТИЧЕСКИЙ ПОРЯДОК: сначала required → name → value → disable
       returnDateInput.removeAttribute("required");
       returnDateInput.removeAttribute("name");
       returnDateInput.value = "";
@@ -355,9 +355,11 @@ if (isHotOnly) {
       returnDateWrapper.classList.add("hidden");
     }
 
-    // Обновляем UI
     window.updateReturnDateVisibility?.();
   }
+
+  // 💥 КРИТИЧНО: Убираем фокус перед сабмитом
+  document.activeElement?.blur?.();
 
   localStorage.setItem("lastFrom", from);
   await loadHotDeals();
