@@ -334,26 +334,34 @@ document.getElementById("search-form")?.addEventListener("submit", async (e) => 
       return;
     }
 
-   // ⛔️ Отключаем "Туда и обратно", чтобы избежать конфликтов
+// ⛔️ Отключаем "Туда и обратно", чтобы избежать конфликтов
 const roundTrip = document.getElementById("roundTrip");
 const returnDateInput = document.getElementById("returnDate");
+const returnDateWrapper = document.getElementById("returnDateWrapper");
 
 if (roundTrip && roundTrip.checked) {
   roundTrip.checked = false;
-  updateReturnDateVisibility(); // скрываем returnDate
   localStorage.setItem("roundTripChecked", "0");
 
-  // 💡 Удаляем атрибуты, чтобы returnDate не мешал
   if (returnDateInput) {
     returnDateInput.removeAttribute("required");
     returnDateInput.removeAttribute("name");
     returnDateInput.setAttribute("disabled", "true");
     returnDateInput.value = ""; // сбрасываем значение
   }
+
+  if (returnDateWrapper) {
+    returnDateWrapper.classList.add("hidden");
+  }
+
+  // 👇 Безопасно обновляем отображение
+  if (typeof window.updateReturnDateVisibility === "function") {
+    window.updateReturnDateVisibility();
+  }
 }
 
 localStorage.setItem("lastFrom", from);
-await loadHotDeals(); // уже должен быть у тебя
+await loadHotDeals();
 return;
   }
   
