@@ -323,10 +323,12 @@ const guestsCount = document.getElementById("guests")?.value || 1;
 const bookingAllUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(bookingCity)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guestsCount}&group_children=0&no_rooms=1`;
 
 bookingAll.innerHTML = `
+ <div class="pb-20 sm:pb-10">
   <a href="${bookingAllUrl}" target="_blank" rel="noopener"
-   class="block w-full sm:w-auto mx-auto mt-6 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition duration-300">
-  🔍 Смотреть на Booking.com
-</a>
+     class="block w-full sm:w-auto mx-auto mt-6 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition duration-300">
+    🔍 Смотреть на Booking.com
+  </a>
+</div>
 `;
 
 container.appendChild(bookingAll);
