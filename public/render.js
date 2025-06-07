@@ -186,238 +186,52 @@ const t = window.translations[lang];
   }
 }
 
-console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
-
-
-//Отели
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
-  if (!container) {
-    console.error("❌ Элемент #hotelsResult не найден в DOM");
-    return;
-  }
-
   container.innerHTML = "";
 
-  if (!Array.isArray(hotels) || hotels.length === 0) {
+  if (!hotels || !hotels.length) {
     container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены</div>`;
     return;
   }
 
-  const propertyTypeFilter = document.getElementById("propertyTypeFilter");
-  const priceRange = document.getElementById("priceRange");
-
-  let maxPrice = 500;
-  if (priceRange) {
-    const parsed = parseFloat(priceRange.value);
-    if (!isNaN(parsed)) maxPrice = parsed;
-  }
-
-  const checkIn = document.getElementById("checkIn")?.value;
-  const checkOut = document.getElementById("checkOut")?.value;
-
-  let nights = 1;
-  if (checkIn && checkOut) {
-    const dateIn = new Date(checkIn);
-    const dateOut = new Date(checkOut);
-    nights = Math.max(1, (dateOut - dateIn) / (1000 * 60 * 60 * 24));
-  }
-
   hotels.forEach(hotel => {
-    const fallbackPrice = hotel.priceFrom || hotel.fullPrice || 0;
-    hotel.fullPrice = fallbackPrice;
-    hotel.pricePerNight = nights > 0 ? fallbackPrice / nights : fallbackPrice;
-  });
-
-  hotels = hotels.filter(hotel => {
-    const selectedType = propertyTypeFilter?.value || "all";
-    const rawType = (hotel.property_type || "hotel").toLowerCase();
-
-    const matchesType =
-      selectedType === "all" ||
-      (selectedType === "hotel" && rawType.includes("hotel")) ||
-      (selectedType === "apartment" && rawType.includes("apartment"));
-
-    const matchesPrice =
-      !isNaN(hotel.pricePerNight) &&
-      hotel.pricePerNight > 0 &&
-      hotel.pricePerNight <= maxPrice;
-
-    return matchesType && matchesPrice;
-  });
-
-  hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
-
-  hotels.forEach(hotel => {
-    const hotelId = hotel.hotelId || hotel.id;
-    const hotelName = hotel.name || "Без названия";
-    const hotelCity = hotel.city || "Город неизвестен";
-    const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
-    const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
-
-    // 🔁 Прокси через photoId (извлекаем только ID из image URL)
-   let imageUrl = hotel.image && typeof hotel.image === "string"
-  ? hotel.image
-  : "https://placehold.co/800x520?text=No+Image";
-
-    console.log("🏨 HOTEL", hotelName, imageUrl);
-
-    const baseUrl = hotelId
-      ? `https://search.hotellook.com/?hotelId=${hotelId}`
-      : `https://search.hotellook.com/?location=${encodeURIComponent(hotelCity)}&name=${encodeURIComponent(hotelName)}`;
-
-    const dateParams =
-      checkIn && checkOut
-        ? `&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}`
-        : "";
-
-    const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
-
     const card = document.createElement("div");
-    card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
-
-   const isFav = checkFavoriteHotel(hotel); // 👈 используем check-функцию
-
-card.innerHTML = `
-  <img src="${imageUrl}" alt="${hotelName}"
-       class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
-       loading="lazy"
-       referrerpolicy="no-referrer"
-       crossorigin="anonymous"
-       onerror="this.onerror=null;this.src='https://placehold.co/800x520?text=No+Image';" />
-
-  <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
-  <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
-  <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
-  <p class="text-sm text-gray-600 mb-1">💵 Всего за период: ${totalPrice}</p>
-
-  <div class="flex justify-between items-center mt-2">
-    <a href="${bookingUrl}" target="_blank"
-       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center">
-       🔗 Забронировать
-    </a>
-    <button 
-      onclick="toggleFavoriteHotelFromEncoded('${encodeURIComponent(JSON.stringify(hotel))}', this)" 
-      class="text-xl ml-2"
-      data-hotel-id="${encodeURIComponent(JSON.stringify(hotel))}"
-    >
-      ${isFav ? "💙" : "🤍"}
-    </button>
-  </div>
-`;
-
-    container.appendChild(card);
-  });
-
-  container.classList.add("visible");
-  animateCards("#hotelsResult .card");
-
-  
-  // 🔗 Кнопка "Смотреть все отели на Booking.com"
-const bookingAll = document.createElement("div");
-bookingAll.className = "text-center mt-6";
-
-const bookingCity = document.getElementById("hotelCity")?.value || hotelCity;
-const guestsCount = document.getElementById("guests")?.value || 1;
-
-const bookingAllUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(bookingCity)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guestsCount}&group_children=0&no_rooms=1`;
-
-bookingAll.innerHTML = `
-  <a href="${bookingAllUrl}" target="_blank"
-     class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-6 rounded shadow">
-     🔍 Смотреть все отели на Booking.com
-  </a>
-`;
-
-container.appendChild(bookingAll);
-}
-
-//Места
-export function renderPlaces(places = []) {
-  const container = document.getElementById("placesResult");
-  container.innerHTML = "";
-
-  if (!places.length) {
-    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Ничего не найдено</div>`;
-    return;
-  }
-
-  const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-
-  places.forEach(place => {
-    const card = document.createElement("div");
-    card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
-
-    const name = place.name || "Без названия";
-    const description = place.description || "Описание отсутствует.";
-    const address = place.address || "Адрес не указан";
-    const city = place.city || "";
-    const mood = place.mood || "";
-
-    const isFav = favPlaces.some(fav => fav.name === name && fav.city === city);
-
-    // 🧼 Картинка (проверка и fallback на Unsplash)
-    let imageUrl = (place.image || "").trim();
-    if (
-      !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(imageUrl) ||
-      imageUrl.includes("example.com") ||
-      imageUrl.includes("bit.ly") ||
-      imageUrl.includes("wikipedia") ||
-      imageUrl.includes("wikimedia") ||
-      imageUrl.includes("pixabay")
-    ) {
-      const query = `${name} ${city}`.replace(/[^\w\s]/gi, '').replace(/[а-яА-ЯёЁ]/g, '').replace(/\s+/g, ',');
-      imageUrl = `https://source.unsplash.com/600x400/?${query || "travel"}`;
-    }
-
-    const mapLink = place.address
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address)}`
-      : "#";
+    card.className = "card bg-white p-4 rounded-xl shadow mb-4";
 
     card.innerHTML = `
-      <img 
-        src="${imageUrl}" 
-        alt="${name}" 
-        class="w-full h-40 object-cover rounded-md mb-3 bg-gray-100"
-        referrerpolicy="no-referrer"
-        loading="lazy"
-        onerror="this.onerror=null;this.src='https://placehold.co/300x180?text=No+Image';"
-      />
-      <h3 class="text-lg font-semibold mb-1">${name}</h3>
-      <p class="text-sm text-gray-600 mb-1">${description}</p>
-      <a href="${mapLink}" target="_blank" class="text-sm text-blue-600 underline">${address}</a>
-      <div class="flex justify-between items-center mt-2">
-        <a href="${mapLink}" target="_blank" class="btn mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded">
-          📍 Подробнее
-        </a>
-        <button 
-          onclick="toggleFavoritePlaceFromEncoded('${encodeURIComponent(JSON.stringify({ ...place, city, mood }))}', this)" 
-          class="text-xl ml-2"
-        >
-          ${isFav ? "💙" : "🤍"}
-        </button>
-      </div>
+      <h3 class="text-lg font-semibold mb-1">${hotel.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">📍 ${hotel.city}</p>
+      <p class="text-sm text-gray-600 mb-1">⭐ Рейтинг: ${hotel.rating}</p>
+      <p class="text-sm text-gray-600 mb-1">💰 Цена: $${hotel.price}</p>
     `;
 
     container.appendChild(card);
   });
-
-  animateCards("#placesResult .card");
 }
 
-function checkFavoriteHotel(hotel) {
-  const favs = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
-  return favs.some(h => h.name === hotel.name && h.city === hotel.city);
-}
+export function renderPlaces(places) {
+  const container = document.getElementById("placesResult");
+  container.innerHTML = "";
 
-window.toggleFavoriteHotelFromEncoded = function(encoded, btn) {
-  try {
-    const hotel = JSON.parse(decodeURIComponent(encoded));
-    window.toggleFavoriteItem("hotels", hotel, btn);
-  } catch (e) {
-    console.error("❌ Ошибка при декодировании отеля:", e);
+  if (!places || !places.length) {
+    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Ничего не найдено</div>`;
+    return;
   }
-};
 
+  places.forEach(place => {
+    const card = document.createElement("div");
+    card.className = "card bg-white p-4 rounded-xl shadow mb-4";
+
+    card.innerHTML = `
+      <h3 class="text-lg font-semibold mb-1">${place.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">📍 ${place.city}</p>
+      <p class="text-sm text-gray-600 mb-1">🗂️ Категория: ${place.category}</p>
+      <p class="text-sm text-gray-600 mb-1">📝 ${place.description}</p>
+    `;
+
+    container.appendChild(card);
+  });
+}
 // Сделать функции глобально доступными
 window.generateAviasalesLink = generateAviasalesLink;
