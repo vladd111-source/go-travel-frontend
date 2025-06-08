@@ -2,6 +2,8 @@ import { renderHotels, renderFlights, renderPlaces } from './render.js';
 import { fetchPlaces, showLoading, hideLoading, askGptAdvisor } from './globals.js';
 import { parsePlacesFromGpt } from './globals.js';
 import { getUnsplashImage } from './globals.js';
+import { getPrompt } from './globals.js';
+
 
 export async function searchHotels(city, checkIn, checkOut) {
   try {
@@ -542,56 +544,40 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
   const city = placeCityInput.value.trim().toLowerCase();
   const mood = placeMoodSelect.value;
 
+  // 🔍 Получаем режим гида
+  const gptMode = document.getElementById("gptMode")?.value || "basic";
+  const isAdvanced = gptMode === "pro";
+
   localStorage.setItem("placeCity", city);
   localStorage.setItem("placeMood", mood);
 
   resultBlock.classList.remove("visible");
   resultBlock.innerHTML = "";
-  
-  showLoading(); // 👈 ДО начала загрузки
-  
-  try {
-    const gptRaw = await askGptAdvisor(`
-Ты тревел-ассистент Go Travel. Подбери 3 уникальных, атмосферных и редких места для насыщенного дня в городе "${city}" под настроение "${mood}".
 
-Добавь:
-— топовые маршруты,
-— скрытые локации,
-— интересные события (если есть).
-
-⚠️ Формат строго такой:
-
-Название: ...
-Описание: ...
-Адрес (в формате названия места на английском, как в Google Maps): ...
-
-❌ Не добавляй дефисы перед полями.
-❌ Не нумеруй карточки.
-❌ Не пиши лишний текст.
-✅ Только 3 карточки — и строго в этом формате.
-`);
-    
-const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
-const gptCardsArr = [];
-
-for (const p of parsedPlaces) {
-  const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
-  const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
-
-  let imageUrl = "https://placehold.co/300x180?text=No+Image";
-  let photoAuthorName = "";
-  let photoAuthorLink = "";
+  showLoading();
 
   try {
-    const res = await fetch(`https://go-travel-backend-86i8.onrender.com/api/image?query=${encodeURIComponent(p.name)}`);
-    const data = await res.json();
-    imageUrl = data.url || imageUrl;
-    
-    console.log("📸 Картинка с Unsplash:", imageUrl);
-  } catch (err) {
-    console.warn("❌ Ошибка загрузки фото:", err);
-  }
+    // ✅ Получаем prompt в зависимости от режима
+    const prompt = getPrompt(city, mood, isAdvanced);
+    const gptRaw = await askGptAdvisor(prompt);
 
+    const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
+    const gptCardsArr = [];
+
+    for (const p of parsedPlaces) {
+      const favPlaces = JSON.parse(localStorage.getItem("favorites_places") || "[]");
+      const isFav = favPlaces.some(fav => fav.name === p.name && fav.city === city);
+
+      let imageUrl = "https://placehold.co/300x180?text=No+Image";
+
+      try {
+        const res = await fetch(`https://go-travel-backend-86i8.onrender.com/api/image?query=${encodeURIComponent(p.name)}`);
+        const data = await res.json();
+        imageUrl = data.url || imageUrl;
+        console.log("📸 Картинка с Unsplash:", imageUrl);
+      } catch (err) {
+        console.warn("❌ Ошибка загрузки фото:", err);
+      }
 
       const mapLink = p.address
         ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`
