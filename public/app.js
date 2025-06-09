@@ -561,7 +561,10 @@ document.getElementById("placeForm")?.addEventListener("submit", async (e) => {
     const prompt = getPrompt(city, mood, isAdvanced);
     const gptRaw = await askGptAdvisor(prompt);
 
-    const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3);
+    const parsedPlaces = parsePlacesFromGpt(gptRaw).slice(0, 3).map(p => ({
+  ...p,
+  category: mood // 👈 добавляем выбранную категорию
+}));
     const gptCardsArr = [];
 
     for (const p of parsedPlaces) {
