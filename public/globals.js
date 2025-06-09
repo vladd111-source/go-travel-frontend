@@ -536,7 +536,6 @@ window.formatDetails = function(type, item) {
     `,
     hotels: h => `
       ${t.city || 'Город'}: ${h.city}<br>
-      ${t.ratingMin || 'Рейтинг'}: ${h.rating}<br>
       ${t.priceTo || 'Цена'}: $${h.price}
     `,
     places: p => `
