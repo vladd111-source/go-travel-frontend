@@ -227,6 +227,7 @@ export function renderHotels(hotels) {
     const fallbackPrice = hotel.priceFrom || hotel.fullPrice || 0;
     hotel.fullPrice = fallbackPrice;
     hotel.pricePerNight = nights > 0 ? fallbackPrice / nights : fallbackPrice;
+    hotel.price = Math.floor(hotel.pricePerNight); // 👈 добавить это
   });
 
   hotels = hotels.filter(hotel => {
