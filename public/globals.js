@@ -661,7 +661,6 @@ window.showDetails = function(type, index) {
         <h2 class="text-xl font-bold mb-2">${h.name}</h2>
         <p class="text-sm text-gray-500">Город: ${h.city}</p>
         <p class="text-sm text-gray-500">Цена: $${h.price}</p>
-        <p class="text-sm text-gray-500">Рейтинг: ${h.rating}</p>
       `
     },
     places: {
