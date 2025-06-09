@@ -87,7 +87,7 @@ export async function getUnsplashImage(query) {
 }
 
 export function getPrompt(city, mood, isAdvanced = false) {
-  const baseRules = `
+ const baseRules = `
 ⚠️ Формат строго такой:
 
 Название: ...
@@ -98,6 +98,8 @@ export function getPrompt(city, mood, isAdvanced = false) {
 — Название: до 60 символов
 — Описание: до 300 символов
 — Адрес: до 100 символов
+
+⚠️ Даже если не знаешь точный адрес — укажи примерное название места на английском (как в Google Maps).
 
 ❌ Не используй дефисы, нумерацию, списки или вводный текст.
 ✅ Только 3 карточки строго в указанном формате.
