@@ -171,19 +171,22 @@ export async function askGptAdvisor(question) {
 
 export function parsePlacesFromGpt(rawText) {
   const blocks = rawText
-    .split(/\n(?=Название:\s*)/i) // 🆕 разделение по полю Название:
+    .split(/\n(?=Название:\s*)/i)
     .map(block => block.trim())
     .filter(Boolean)
     .slice(0, 3); // максимум 3 карточки
+
+  const truncate = (text, maxLen) => {
+    if (!text) return "";
+    return text.length > maxLen ? text.slice(0, maxLen).trim() + "…" : text;
+  };
 
   const places = blocks.map(block => {
     const nameMatch = block.match(/Название:\s*(.+)/i);
     const descriptionMatch = block.match(/Описание:\s*(.+)/i);
     const addressMatch = block.match(/Адрес:\s*(.+)/i);
-
     const imageMatch = block.match(/Фото\s*:\s*(https?:\/\/[^\s]+)/i);
 
-    // 🖼 картинка: чистим левое
     let image = imageMatch?.[1]?.trim() || "";
     if (
       !/^https?:\/\/.*\.(jpe?g|png|webp)$/i.test(image) ||
@@ -195,17 +198,19 @@ export function parsePlacesFromGpt(rawText) {
       image = "https://placehold.co/300x180?text=No+Image";
     }
 
-    // 📍 карта: по адресу, а не координатам
-    const address = addressMatch?.[1]?.trim() || "Адрес не указан";
+    const name = truncate(nameMatch?.[1]?.trim() || "Без названия", 60);
+    const description = truncate(descriptionMatch?.[1]?.trim() || "Описание отсутствует.", 300);
+    const address = truncate(addressMatch?.[1]?.trim() || "Адрес не указан", 100);
+
     const map = address !== "Адрес не указан"
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
       : "#";
 
     return {
-      name: nameMatch?.[1]?.trim() || "Без названия",
-      description: descriptionMatch?.[1]?.trim() || "Описание отсутствует.",
+      name,
+      description,
       address,
-      coords: "", // теперь не используем координаты
+      coords: "",
       map,
       image
     };
