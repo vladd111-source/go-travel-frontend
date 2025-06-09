@@ -209,13 +209,14 @@ export function parsePlacesFromGpt(rawText) {
       : "#";
 
     return {
-      name,
-      description,
-      address,
-      coords: "",
-      map,
-      image
-    };
+  name,
+  description,
+  address,
+  coords: "",
+  map,
+  image,
+  category: "" // 👈 добавляем поле, чтобы не было undefined
+};
   });
 
   return places;
