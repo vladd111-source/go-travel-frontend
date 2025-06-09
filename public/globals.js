@@ -571,8 +571,12 @@ const aviaLink = (type === "flights" && hasValidDate)
       <div class="flex justify-between sm:justify-start gap-2 mt-3 flex-wrap">
         ${
           type === "flights"
-            ? `<a href="${aviaLink}" target="_blank" class="btn btn-blue">🔗 Подробнее</a>`
-            : `<button class="btn btn-blue" onclick="showDetails('${type}', ${index})">📄 Подробнее</button>`
+  ? `<a href="${aviaLink}" target="_blank" class="btn btn-blue">🔗 Подробнее</a>`
+  : type === "places"
+    ? `<a href="${item.map}" target="_blank" class="btn btn-blue">📍 Подробнее</a>`
+  : type === "hotels" && item.link
+    ? `<a href="${item.link}" target="_blank" class="btn btn-blue">🏨 Подробнее</a>`
+  : `<button class="btn btn-blue" onclick="showDetails('${type}', ${index})">📄 Подробнее</button>`
         }
         <button 
           class="btn btn-delete"
