@@ -272,7 +272,7 @@ export function renderHotels(hotels) {
         : "";
 
     const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
-
+hotel.link = bookingUrl;
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
 
