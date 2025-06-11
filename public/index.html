@@ -71,19 +71,16 @@
     <input type="text" name="to" id="to" class="input" required data-i18n-placeholder="toCity" />
   </div>
 
- <label for="flightClass" class="block text-sm font-medium text-gray-900 mb-1">Класс перелёта</label>
-<div class="relative">
-  <select id="flightClass" name="flightClass"
-    class="w-full pl-4 pr-10 py-2 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+ <div class="form-group">
+  <label for="flightClass" class="label">Класс перелёта</label>
+  <select
+    id="flightClass"
+    name="flightClass"
+    class="input w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+  >
     <option value="Y">Эконом</option>
     <option value="C">Бизнес</option>
   </select>
-  <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
-      viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-    </svg>
-  </div>
 </div>
     
     
