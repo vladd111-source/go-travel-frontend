@@ -72,16 +72,23 @@
   </div>
 
  <div class="mb-4">
-  <label for="flightClass" class="block text-sm font-medium text-gray-700 mb-1">
-    Класс перелёта
-  </label>
-  <select id="flightClass"
-          name="flightClass"
-          class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition">
-    <option value="Y">Эконом</option>
-    <option value="C">Бизнес</option>
-  </select>
+  <label for="flightClass" class="block text-sm font-medium text-gray-700 mb-1">Класс перелёта</label>
+  <div class="relative">
+    <select id="flightClass" name="flightClass"
+      class="block w-full appearance-none bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+      <option value="Y">Эконом</option>
+      <option value="C">Бизнес</option>
+    </select>
+    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+      <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+        viewBox="0 0 20 20" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M7 7l3-3 3 3m0 6l-3 3-3-3" />
+      </svg>
+    </div>
+  </div>
 </div>
+    
     
 <!-- 📦 Блок с датами -->
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
