@@ -285,7 +285,9 @@ const nights = Math.max(1, (dateOut - dateIn) / (1000 * 60 * 60 * 24));
 
 
     
-const hotels = hotelsRaw
+const useFilters = document.getElementById("toggleFilters")?.checked;
+
+let hotels = hotelsRaw
   .map(h => {
     const hotelId = h.hotelId || h.id;
     if (!hotelId) return null;
@@ -301,10 +303,16 @@ const hotels = hotelsRaw
       pricePerNight: nights > 0 ? Math.floor(rawPrice / nights) : rawPrice,
       rating: h.rating || (h.stars ? h.stars * 2 : 0),
       property_type: h.property_type || "",
-      image: h.image || "" // ✅ добавь вот это!
+      image: h.image || ""
     };
   })
   .filter(h => h && h.fullPrice > 0);
+
+// ✅ Применяем фильтр по цене только если включен чекбокс
+if (useFilters) {
+  const maxPrice = parseInt(document.getElementById("priceRange")?.value || "500", 10);
+  hotels = hotels.filter(h => h.fullPrice <= maxPrice);
+}
 
 
     
