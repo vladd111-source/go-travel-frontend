@@ -419,7 +419,8 @@ if (isHotOnly) {
 
 try {
   // ✈️ Запрос рейсов туда
-  const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${encode(from)}&to=${encode(to)}&date=${departureDate}`;
+  const flightClass = document.getElementById("flightClass")?.value || "Y";
+  const urlOut = `https://go-travel-backend.vercel.app/api/flights?from=${encode(from)}&to=${encode(to)}&date=${departureDate}&class=${flightClass}`;
   const resOut = await retryFetch(urlOut);
   if (!resOut.ok) throw new Error(`Ошибка рейсов туда: ${resOut.status}`);
   flightsOut = await resOut.json();
@@ -429,7 +430,7 @@ try {
   if (isRoundTrip && returnDate) {
     await new Promise(r => setTimeout(r, 1200)); // небольшая задержка
 
-    const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${encode(to)}&to=${encode(from)}&date=${returnDate}`;
+    const urlBack = `https://go-travel-backend.vercel.app/api/flights?from=${encode(to)}&to=${encode(from)}&date=${returnDate}&class=${flightClass}`;
     const resBack = await retryFetch(urlBack);
     if (!resBack.ok) throw new Error(`Ошибка рейсов обратно: ${resBack.status}`);
     flightsBack = await resBack.json();
