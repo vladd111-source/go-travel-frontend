@@ -60,8 +60,14 @@ export function generateAviasalesLink(flight) {
     console.warn("❌ Невалидные IATA коды:", { fromCode, toCode });
     return "#";
   }
+    const flightClass = document.getElementById("flightClass")?.value || "Y";
 
-  return `https://www.aviasales.ru/search/${fromCode}${formattedDate}${toCode}1?marker=618281`;
+  const searchParams = new URLSearchParams({
+  marker: "618281",
+  travel_class: flightClass
+});
+
+return `https://www.aviasales.ru/search/${fromCode}${formattedDate}${toCode}1?${searchParams.toString()}`;
 }
 
 export async function renderFlights(
