@@ -311,7 +311,7 @@ let hotels = hotelsRaw
 // ✅ Применяем фильтр по цене только если включен чекбокс
 if (useFilters) {
   const maxPrice = parseInt(document.getElementById("priceRange")?.value || "500", 10);
-  hotels = hotels.filter(h => h.fullPrice <= maxPrice);
+  hotels = hotels.filter(h => h.pricePerNight <= maxPrice);
 }
 
 
