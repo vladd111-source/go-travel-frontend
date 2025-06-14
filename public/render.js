@@ -242,18 +242,17 @@ export function renderHotels(hotels) {
 
 
   
- hotels = hotels.filter(hotel => {
+const skipRoomsFilter = true;
+
+hotels = hotels.filter(hotel => {
   const selectedType = propertyTypeFilter?.value || "all";
   const rawType = (hotel.property_type || "hotel").toLowerCase();
 
   const hasAvailableRooms =
-    Array.isArray(hotel.rooms) &&
-    hotel.rooms.length > 0 &&
-    hotel.rooms.some(room => room.options?.available > 0);
-
-  if (!Array.isArray(hotel.rooms)) {
-    console.warn("⚠️ Отель без rooms:", hotel.name || hotel.id);
-  }
+    skipRoomsFilter ||
+    (Array.isArray(hotel.rooms) &&
+     hotel.rooms.length > 0 &&
+     hotel.rooms.some(room => room.options?.available > 0));
 
   const matchesType =
     selectedType === "all" ||
