@@ -296,24 +296,26 @@ let hotels = hotelsRaw
     if (!Array.isArray(h.rooms) || !h.rooms.some(r => r.options?.available > 0)) return false;
     return true;
   })
-  .map(h => {
-    const hotelId = h.hotelId || h.id;
+  
+ .map(h => {
+  const hotelId = h.hotelId || h.id;
 
-    const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
+  const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
 
-    return {
-      id: hotelId,
-      hotelId,
-      name: h.hotelName || h.name || "Без названия",
-      city: h.city || h.location?.name || city || "Город неизвестен",
-      fullPrice: rawPrice,
-      pricePerNight: nights > 0 ? Math.floor(rawPrice / nights) : rawPrice,
-      rating: h.rating || (h.stars ? h.stars * 2 : 0),
-      property_type: h.property_type || "",
-      image: h.image || "",
-      rooms: h.rooms // 🧷 оставляем rooms — пригодится
-    };
-  });
+  return {
+    id: hotelId,
+    hotelId,
+    name: h.hotelName || h.name || "Без названия",
+    city: h.city || h.location?.name || city || "Город неизвестен",
+    fullPrice: rawPrice,
+    pricePerNight: nights > 0 ? Math.floor(rawPrice / nights) : rawPrice,
+    rating: h.rating || (h.stars ? h.stars * 2 : 0),
+    property_type: h.property_type || "",
+    image: h.image || "",
+    rooms: h.rooms || [] // ✅ обязательно rooms — без него фильтр пустой
+  };
+})
+.filter(h => h && h.fullPrice > 0);
     
 // ✅ Применяем фильтр по цене только если включен чекбокс
 if (useFilters) {
