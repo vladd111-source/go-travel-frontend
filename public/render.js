@@ -239,15 +239,18 @@ export function renderHotels(hotels) {
   const selectedType = propertyTypeFilter?.value || "all";
   const rawType = (hotel.property_type || "hotel").toLowerCase();
 
-  const hasAvailableRooms =
-    Array.isArray(hotel.rooms) &&
-    hotel.rooms.length > 0 &&
-    hotel.rooms.some(room =>
-      room.options?.available > 0 &&
-      typeof room.price === "number" &&
-      room.price > 0
-    );
+  const skipRoomsCheck = false; // 👉 для отладки можно включить true
 
+const hasAvailableRooms = skipRoomsCheck || (
+  Array.isArray(hotel.rooms) &&
+  hotel.rooms.length > 0 &&
+  hotel.rooms.some(room =>
+    room.options?.available > 0 &&
+    typeof room.price === "number" &&
+    room.price > 0
+  )
+);
+   
   const matchesType =
     selectedType === "all" ||
     (selectedType === "hotel" && rawType.includes("hotel")) ||
