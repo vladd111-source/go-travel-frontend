@@ -196,9 +196,6 @@ export async function renderFlights(
 }
 //}
 
-console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
-
-
 //Отели
 export function renderHotels(hotels) {
   const container = document.getElementById("hotelsResult");
@@ -207,12 +204,9 @@ export function renderHotels(hotels) {
     return;
   }
 
-  container.innerHTML = "";
+  console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
 
-  if (!Array.isArray(hotels) || hotels.length === 0) {
-    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены</div>`;
-    return;
-  }
+  container.innerHTML = "";
 
   const propertyTypeFilter = document.getElementById("propertyTypeFilter");
   const priceRange = document.getElementById("priceRange");
@@ -237,39 +231,41 @@ export function renderHotels(hotels) {
     const fallbackPrice = hotel.priceFrom || hotel.fullPrice || 0;
     hotel.fullPrice = fallbackPrice;
     hotel.pricePerNight = nights > 0 ? fallbackPrice / nights : fallbackPrice;
-    hotel.price = Math.floor(hotel.pricePerNight); // 👈 добавить это
+    hotel.price = Math.floor(hotel.pricePerNight);
   });
 
+  const skipRoomsFilter = true;
 
-  
-const skipRoomsFilter = true;
+  hotels = hotels.filter(hotel => {
+    const selectedType = propertyTypeFilter?.value || "all";
+    const rawType = (hotel.property_type || "hotel").toLowerCase();
 
-hotels = hotels.filter(hotel => {
-  const selectedType = propertyTypeFilter?.value || "all";
-  const rawType = (hotel.property_type || "hotel").toLowerCase();
+    const hasAvailableRooms =
+      skipRoomsFilter ||
+      (Array.isArray(hotel.rooms) &&
+        hotel.rooms.length > 0 &&
+        hotel.rooms.some(room => room.options?.available > 0));
 
-  const hasAvailableRooms =
-    skipRoomsFilter ||
-    (Array.isArray(hotel.rooms) &&
-     hotel.rooms.length > 0 &&
-     hotel.rooms.some(room => room.options?.available > 0));
+    const matchesType =
+      selectedType === "all" ||
+      (selectedType === "hotel" && rawType.includes("hotel")) ||
+      (selectedType === "apartment" && rawType.includes("apartment"));
 
-  const matchesType =
-    selectedType === "all" ||
-    (selectedType === "hotel" && rawType.includes("hotel")) ||
-    (selectedType === "apartment" && rawType.includes("apartment"));
+    const matchesPrice =
+      !isNaN(hotel.pricePerNight) &&
+      hotel.pricePerNight > 0 &&
+      hotel.pricePerNight <= maxPrice;
 
-  const matchesPrice =
-    !isNaN(hotel.pricePerNight) &&
-    hotel.pricePerNight > 0 &&
-    hotel.pricePerNight <= maxPrice;
+    return hasAvailableRooms && matchesType && matchesPrice;
+  });
 
-  return hasAvailableRooms && matchesType && matchesPrice;
-});
+  console.log("🧪 Отели после фильтрации:", hotels.length, hotels);
 
+  if (!Array.isArray(hotels) || hotels.length === 0) {
+    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены</div>`;
+    return;
+  }
 
-  
-  
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
 
   hotels.forEach(hotel => {
@@ -279,10 +275,9 @@ hotels = hotels.filter(hotel => {
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
-    // 🔁 Прокси через photoId (извлекаем только ID из image URL)
-   let imageUrl = hotel.image && typeof hotel.image === "string"
-  ? hotel.image
-  : "https://placehold.co/800x520?text=No+Image";
+    let imageUrl = hotel.image && typeof hotel.image === "string"
+      ? hotel.image
+      : "https://placehold.co/800x520?text=No+Image";
 
     console.log("🏨 HOTEL", hotelName, imageUrl);
 
@@ -296,39 +291,40 @@ hotels = hotels.filter(hotel => {
         : "";
 
     const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
-hotel.link = bookingUrl;
+
+    hotel.link = bookingUrl;
+
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
 
-   const isFav = checkFavoriteHotel(hotel); // 👈 используем check-функцию
+    const isFav = checkFavoriteHotel(hotel);
 
-card.innerHTML = `
-  <img src="${imageUrl}" alt="${hotelName}"
-       class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
-       loading="lazy"
-       referrerpolicy="no-referrer"
-       crossorigin="anonymous"
-       onerror="this.onerror=null;this.src='https://placehold.co/800x520?text=No+Image';" />
+    card.innerHTML = `
+      <img src="${imageUrl}" alt="${hotelName}"
+          class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          crossorigin="anonymous"
+          onerror="this.onerror=null;this.src='https://placehold.co/800x520?text=No+Image';" />
 
-  <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
-  <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
-  <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
-  <p class="text-sm text-gray-600 mb-1">💵 Всего за период: ${totalPrice}</p>
+      <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
+      <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
+      <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
+      <p class="text-sm text-gray-600 mb-1">💵 Всего за период: ${totalPrice}</p>
 
-  <div class="flex justify-between items-center mt-2">
-    <a href="${bookingUrl}" target="_blank"
-       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center">
-       🔗 Забронировать
-    </a>
-    <button 
-      onclick="toggleFavoriteHotelFromEncoded('${encodeURIComponent(JSON.stringify(hotel))}', this)" 
-      class="text-xl ml-2"
-      data-hotel-id="${encodeURIComponent(JSON.stringify(hotel))}"
-    >
-      ${isFav ? "💙" : "🤍"}
-    </button>
-  </div>
-`;
+      <div class="flex justify-between items-center mt-2">
+        <a href="${bookingUrl}" target="_blank"
+          class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center">
+          🔗 Забронировать
+        </a>
+        <button 
+          onclick="toggleFavoriteHotelFromEncoded('${encodeURIComponent(JSON.stringify(hotel))}', this)" 
+          class="text-xl ml-2"
+          data-hotel-id="${encodeURIComponent(JSON.stringify(hotel))}">
+          ${isFav ? "💙" : "🤍"}
+        </button>
+      </div>
+    `;
 
     container.appendChild(card);
   });
@@ -336,27 +332,26 @@ card.innerHTML = `
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
 
-  
-  // 🔗 Кнопка "Смотреть на Booking.com"
-const bookingAll = document.createElement("div");
-bookingAll.className = "text-center mt-6";
+  const bookingAll = document.createElement("div");
+  bookingAll.className = "text-center mt-6";
 
-const bookingCity = document.getElementById("hotelCity")?.value || hotelCity;
-const guestsCount = document.getElementById("guests")?.value || 1;
+  const bookingCity = document.getElementById("hotelCity")?.value || hotelCity;
+  const guestsCount = document.getElementById("guests")?.value || 1;
 
-const bookingAllUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(bookingCity)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guestsCount}&group_children=0&no_rooms=1`;
+  const bookingAllUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(bookingCity)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guestsCount}&group_children=0&no_rooms=1`;
 
-bookingAll.innerHTML = `
- <div class="pb-20 sm:pb-10">
-  <a href="${bookingAllUrl}" target="_blank" rel="noopener"
-     class="block w-full sm:w-auto mx-auto mt-6 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition duration-300">
-    🔍 Смотреть на Booking.com
-  </a>
-</div>
-`;
+  bookingAll.innerHTML = `
+   <div class="pb-20 sm:pb-10">
+    <a href="${bookingAllUrl}" target="_blank" rel="noopener"
+      class="block w-full sm:w-auto mx-auto mt-6 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition duration-300">
+      🔍 Смотреть на Booking.com
+    </a>
+  </div>
+  `;
 
-container.appendChild(bookingAll);
+  container.appendChild(bookingAll);
 }
+
 
 //Места
 export function renderPlaces(places = []) {
