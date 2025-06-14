@@ -239,7 +239,7 @@ export function renderHotels(hotels) {
   const selectedType = propertyTypeFilter?.value || "all";
   const rawType = (hotel.property_type || "hotel").toLowerCase();
 
-  const skipRoomsCheck = false; // 👉 для отладки можно включить true
+  const skipRoomsCheck = true; // 👉 для отладки можно включить true
 
 const hasAvailableRooms = skipRoomsCheck || (
   Array.isArray(hotel.rooms) &&
