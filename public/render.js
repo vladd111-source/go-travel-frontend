@@ -240,23 +240,28 @@ export function renderHotels(hotels) {
     hotel.price = Math.floor(hotel.pricePerNight); // 👈 добавить это
   });
 
-  hotels = hotels.filter(hotel => {
-    const selectedType = propertyTypeFilter?.value || "all";
-    const rawType = (hotel.property_type || "hotel").toLowerCase();
+ hotels = hotels.filter(hotel => {
+  const selectedType = propertyTypeFilter?.value || "all";
+  const rawType = (hotel.property_type || "hotel").toLowerCase();
 
-    const matchesType =
-      selectedType === "all" ||
-      (selectedType === "hotel" && rawType.includes("hotel")) ||
-      (selectedType === "apartment" && rawType.includes("apartment"));
+  const hasAvailableRooms =
+    Array.isArray(hotel.rooms) &&
+    hotel.rooms.length > 0 &&
+    hotel.rooms.some(room => room.options?.available > 0);
 
-    const matchesPrice =
-      !isNaN(hotel.pricePerNight) &&
-      hotel.pricePerNight > 0 &&
-      hotel.pricePerNight <= maxPrice;
+  const matchesType =
+    selectedType === "all" ||
+    (selectedType === "hotel" && rawType.includes("hotel")) ||
+    (selectedType === "apartment" && rawType.includes("apartment"));
 
-    return matchesType && matchesPrice;
-  });
+  const matchesPrice =
+    !isNaN(hotel.pricePerNight) &&
+    hotel.pricePerNight > 0 &&
+    hotel.pricePerNight <= maxPrice;
 
+  return hasAvailableRooms && matchesType && matchesPrice;
+});
+  
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
 
   hotels.forEach(hotel => {
