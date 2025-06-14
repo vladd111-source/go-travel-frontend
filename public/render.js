@@ -240,6 +240,8 @@ export function renderHotels(hotels) {
     hotel.price = Math.floor(hotel.pricePerNight); // 👈 добавить это
   });
 
+
+  
  hotels = hotels.filter(hotel => {
   const selectedType = propertyTypeFilter?.value || "all";
   const rawType = (hotel.property_type || "hotel").toLowerCase();
@@ -248,6 +250,10 @@ export function renderHotels(hotels) {
     Array.isArray(hotel.rooms) &&
     hotel.rooms.length > 0 &&
     hotel.rooms.some(room => room.options?.available > 0);
+
+  if (!Array.isArray(hotel.rooms)) {
+    console.warn("⚠️ Отель без rooms:", hotel.name || hotel.id);
+  }
 
   const matchesType =
     selectedType === "all" ||
@@ -261,6 +267,9 @@ export function renderHotels(hotels) {
 
   return hasAvailableRooms && matchesType && matchesPrice;
 });
+
+
+  
   
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
 
