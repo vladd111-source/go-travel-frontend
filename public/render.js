@@ -79,6 +79,8 @@ export async function renderFlights(
   clear = true
 ) {
   const container = document.getElementById(containerId);
+  if (!container) return;
+
   if (clear) container.innerHTML = "";
 
   if (title) {
@@ -88,19 +90,18 @@ export async function renderFlights(
     container.appendChild(heading);
   }
 
-  if (!flights || !flights.length) {
+  if (!Array.isArray(flights) || !flights.length) {
     container.innerHTML += `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
     return;
   }
 
+  const sortedFlights = [...flights].sort(
+    (a, b) => (a.price || a.value || 0) - (b.price || b.value || 0)
+  );
+
   const favorites = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
-  const lang = localStorage.getItem("lang") || "ru";
 
-  const topDeals = [...flights]
-    .sort((a, b) => (a.price || a.value || 0) - (b.price || b.value || 0))
-    .slice(0, 10);
-
-  for (const flight of topDeals) {
+  for (const flight of sortedFlights) {
     const fromCode = flight.from || flight.origin || "—";
     const toCode = flight.to || flight.destination || "—";
 
@@ -111,7 +112,6 @@ export async function renderFlights(
     const date = rawDate.split("T")[0] || "—";
     const departureTime = window.formatTime(flight.departure_at);
 
-    // ✅ Унифицированный duration (из API или вручную)
     let duration = flight.duration || flight.duration_to || flight.duration_minutes;
     if (!duration && flight.return_at && flight.departure_at) {
       const dep = new Date(flight.departure_at);
@@ -119,7 +119,6 @@ export async function renderFlights(
       duration = Math.round((ret - dep) / 60000);
     }
 
-    // 🔧 Расчет времени прибытия вручную
     let arrivalTime = "—";
     if (flight.departure_at && duration) {
       const departure = new Date(flight.departure_at);
@@ -148,32 +147,30 @@ export async function renderFlights(
       card border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300
       ${isHot ? 'bg-yellow-100 border-yellow-300' : 'bg-white'}
     `.trim();
-    
-const t = window.translations[lang];
-    
-  card.innerHTML = `
-  <div class="flex items-center gap-2 mb-1">
-    <h3 class="text-xl font-bold">${airline}</h3>
-    ${isHot ? `<span class="text-lg font-bold text-orange-600">🔥 ${t.hotDeal || "Горячее предложение"}</span>` : ""}
-  </div>
-  <div class="text-sm font-semibold text-gray-700 mb-1">🛫 ${from} → 🛬 ${to}</div>
-  <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
-  <div class="text-sm text-gray-600 mb-1">⏰ ${t.time || "Время"}: ${departureTime} — ${arrivalTime}</div>
-  <div class="text-sm text-gray-600 mb-1">🕒 ${t.duration || "В пути"}: ${durationText}</div>
-  <div class="text-lg font-bold text-gray-800 mb-1">💰 $${price}</div>
-  <div class="flex justify-between items-center gap-2 mt-2">
-    <a href="${link}" target="_blank"
-       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition text-center">
-       ${t.bookNow || "Перейти к бронированию"}
-    </a>
-    <button 
-      onclick="toggleFavoriteFlight('${dealId}', this)" 
-      class="text-2xl text-center text-gray-600 hover:text-blue-600 transition"
-      data-flight-id="${dealId}">
-      ${isFav ? "💙" : "🤍"}
-    </button>
-  </div>
-`;
+
+    card.innerHTML = `
+      <div class="flex items-center gap-2 mb-1">
+        <h3 class="text-xl font-bold">${airline}</h3>
+        ${isHot ? `<span class="text-lg font-bold text-orange-600">🔥 ${t.hotDeal}</span>` : ""}
+      </div>
+      <div class="text-sm font-semibold text-gray-700 mb-1">🛫 ${from} → 🛬 ${to}</div>
+      <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
+      <div class="text-sm text-gray-600 mb-1">⏰ ${t.time}: ${departureTime} — ${arrivalTime}</div>
+      <div class="text-sm text-gray-600 mb-1">🕒 ${t.duration}: ${durationText}</div>
+      <div class="text-lg font-bold text-gray-800 mb-1">💰 $${price}</div>
+      <div class="flex justify-between items-center gap-2 mt-2">
+        <a href="${link}" target="_blank"
+          class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition text-center">
+          ${t.bookNow}
+        </a>
+        <button 
+          onclick="toggleFavoriteFlight('${dealId}', this)" 
+          class="text-2xl text-center text-gray-600 hover:text-blue-600 transition"
+          data-flight-id="${dealId}">
+          ${isFav ? "💙" : "🤍"}
+        </button>
+      </div>
+    `;
 
     container.appendChild(card);
 
@@ -185,12 +182,13 @@ const t = window.translations[lang];
       moreBtn.className = "btn bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-4 rounded transition w-full text-center block mt-2";
       card.appendChild(moreBtn);
     }
+  }
 
-    if (typeof animateCards === "function") {
-      animateCards(`#${container.id} .card`);
-    }
+  if (typeof animateCards === "function") {
+    animateCards(`#${containerId} .card`);
   }
 }
+//}
 
 console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
 
