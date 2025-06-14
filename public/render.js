@@ -90,18 +90,25 @@ export async function renderFlights(
     container.appendChild(heading);
   }
 
-  if (!Array.isArray(flights) || !flights.length) {
+  if (!Array.isArray(flights) || flights.length === 0) {
     container.innerHTML += `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
     return;
   }
 
-  const sortedFlights = [...flights].sort(
-    (a, b) => (a.price || a.value || 0) - (b.price || b.value || 0)
-  );
+  console.log(`✈️ Всего рейсов получено: ${flights.length}`);
+
+  const sortedFlights = [...flights]
+    .filter(f => f.price || f.value) // отфильтровываем "пустые" предложения
+    .sort((a, b) => (a.price || a.value || 0) - (b.price || b.value || 0));
+
+  if (sortedFlights.length === 0) {
+    container.innerHTML += `<div class="text-center text-gray-500 mt-4">Нет подходящих предложений</div>`;
+    return;
+  }
 
   const favorites = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
 
-  for (const flight of sortedFlights) {
+  for (const [i, flight] of sortedFlights.entries()) {
     const fromCode = flight.from || flight.origin || "—";
     const toCode = flight.to || flight.destination || "—";
 
@@ -128,9 +135,7 @@ export async function renderFlights(
 
     const durationText = window.formatDuration(duration);
     const airline = flight.airline || "Авиакомпания";
-    const rawPrice = flight.price || flight.value || 0;
-    const price = parseFloat(rawPrice);
-
+    const price = parseFloat(flight.price || flight.value || 0);
     const link = generateAviasalesLink(flight);
 
     const dealData = { from: fromCode, to: toCode, date, price };
@@ -174,6 +179,7 @@ export async function renderFlights(
 
     container.appendChild(card);
 
+    // ✅ Отдельная кнопка для избранного блока
     if (container.id === "favContent-flights") {
       const moreBtn = document.createElement("a");
       moreBtn.textContent = "Подробнее";
