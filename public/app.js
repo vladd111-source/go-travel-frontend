@@ -288,45 +288,26 @@ const nights = Math.max(1, (dateOut - dateIn) / (1000 * 60 * 60 * 24));
 const useFilters = document.getElementById("toggleFilters")?.checked;
 
 let hotels = hotelsRaw
-  .filter(h => {
-  if (!h || (!h.hotelId && !h.id)) return false;
-  const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
-  if (rawPrice <= 0) return false;
+  .map(h => {
+    const hotelId = h.hotelId || h.id;
+    if (!hotelId) return null;
 
- // if (
-//   !Array.isArray(h.rooms) ||
-//   !h.rooms.some(r =>
-//     r &&
-//     typeof r === "object" &&
-//     r.options?.available > 0 &&
-//     typeof r.price === "number" &&
-//     r.price > 0
-//   )
-// ) return false;
+    const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
 
-  return true;
-})
+    return {
+      id: hotelId,
+      hotelId,
+      name: h.hotelName || h.name || "Без названия",
+      city: h.city || h.location?.name || city || "Город неизвестен",
+      fullPrice: rawPrice,
+      pricePerNight: nights > 0 ? Math.floor(rawPrice / nights) : rawPrice,
+      rating: h.rating || (h.stars ? h.stars * 2 : 0),
+      property_type: h.property_type || "",
+      image: h.image || ""
+    };
+  })
+  .filter(h => h && h.fullPrice > 0);
 
- .map(h => {
-  const hotelId = h.hotelId || h.id;
-
-  const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
-
-  return {
-    id: hotelId,
-    hotelId,
-    name: h.hotelName || h.name || "Без названия",
-    city: h.city || h.location?.name || city || "Город неизвестен",
-    fullPrice: rawPrice,
-    pricePerNight: nights > 0 ? Math.floor(rawPrice / nights) : rawPrice,
-    rating: h.rating || (h.stars ? h.stars * 2 : 0),
-    property_type: h.property_type || "",
-    image: h.image || "",
-    rooms: h.rooms || [] // ✅ обязательно rooms — без него фильтр пустой
-  };
-})
-.filter(h => h && h.fullPrice > 0);
-    
 // ✅ Применяем фильтр по цене только если включен чекбокс
 if (useFilters) {
   const maxPrice = parseInt(document.getElementById("priceRange")?.value || "500", 10);
@@ -334,7 +315,7 @@ if (useFilters) {
 }
 
 
-console.log("📊 Перед рендером отелей:", hotels.length, hotels);    
+    
     renderHotels(hotels);
   } catch (err) {
     console.error('❌ Ошибка поиска отелей:', err);
