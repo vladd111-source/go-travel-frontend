@@ -289,14 +289,13 @@ const useFilters = document.getElementById("toggleFilters")?.checked;
 
 let hotels = hotelsRaw
   .filter(h => {
-    // ✅ Убираем пустые, без цен и без доступных номеров
     if (!h || !h.hotelId && !h.id) return false;
     const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
     if (rawPrice <= 0) return false;
     if (!Array.isArray(h.rooms) || !h.rooms.some(r => r.options?.available > 0)) return false;
     return true;
   })
-  
+  console.log("🛏️ После базового фильтра по rooms:", hotelsRaw.length, hotelsRaw);
  .map(h => {
   const hotelId = h.hotelId || h.id;
 
