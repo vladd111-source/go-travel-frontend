@@ -79,8 +79,6 @@ export async function renderFlights(
   clear = true
 ) {
   const container = document.getElementById(containerId);
-  if (!container) return;
-
   if (clear) container.innerHTML = "";
 
   if (title) {
@@ -90,25 +88,19 @@ export async function renderFlights(
     container.appendChild(heading);
   }
 
-  if (!Array.isArray(flights) || flights.length === 0) {
+  if (!flights || !flights.length) {
     container.innerHTML += `<div class="text-center text-gray-500 mt-4">Рейсы не найдены</div>`;
     return;
   }
 
-  console.log(`✈️ Всего рейсов получено: ${flights.length}`);
-
-  const sortedFlights = [...flights]
-    .filter(f => f.price || f.value) // отфильтровываем "пустые" предложения
-    .sort((a, b) => (a.price || a.value || 0) - (b.price || b.value || 0));
-
-  if (sortedFlights.length === 0) {
-    container.innerHTML += `<div class="text-center text-gray-500 mt-4">Нет подходящих предложений</div>`;
-    return;
-  }
-
   const favorites = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+  const lang = localStorage.getItem("lang") || "ru";
 
-  for (const [i, flight] of sortedFlights.entries()) {
+  const topDeals = [...flights]
+    .sort((a, b) => (a.price || a.value || 0) - (b.price || b.value || 0))
+    .slice(0, 10);
+
+  for (const flight of topDeals) {
     const fromCode = flight.from || flight.origin || "—";
     const toCode = flight.to || flight.destination || "—";
 
@@ -119,6 +111,7 @@ export async function renderFlights(
     const date = rawDate.split("T")[0] || "—";
     const departureTime = window.formatTime(flight.departure_at);
 
+    // ✅ Унифицированный duration (из API или вручную)
     let duration = flight.duration || flight.duration_to || flight.duration_minutes;
     if (!duration && flight.return_at && flight.departure_at) {
       const dep = new Date(flight.departure_at);
@@ -126,6 +119,7 @@ export async function renderFlights(
       duration = Math.round((ret - dep) / 60000);
     }
 
+    // 🔧 Расчет времени прибытия вручную
     let arrivalTime = "—";
     if (flight.departure_at && duration) {
       const departure = new Date(flight.departure_at);
@@ -135,7 +129,9 @@ export async function renderFlights(
 
     const durationText = window.formatDuration(duration);
     const airline = flight.airline || "Авиакомпания";
-    const price = parseFloat(flight.price || flight.value || 0);
+    const rawPrice = flight.price || flight.value || 0;
+    const price = parseFloat(rawPrice);
+
     const link = generateAviasalesLink(flight);
 
     const dealData = { from: fromCode, to: toCode, date, price };
@@ -152,34 +148,35 @@ export async function renderFlights(
       card border p-4 rounded-xl mb-2 opacity-0 scale-95 transform transition-all duration-300
       ${isHot ? 'bg-yellow-100 border-yellow-300' : 'bg-white'}
     `.trim();
-
-    card.innerHTML = `
-      <div class="flex items-center gap-2 mb-1">
-        <h3 class="text-xl font-bold">${airline}</h3>
-        ${isHot ? `<span class="text-lg font-bold text-orange-600">🔥 ${t.hotDeal}</span>` : ""}
-      </div>
-      <div class="text-sm font-semibold text-gray-700 mb-1">🛫 ${from} → 🛬 ${to}</div>
-      <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
-      <div class="text-sm text-gray-600 mb-1">⏰ ${t.time}: ${departureTime} — ${arrivalTime}</div>
-      <div class="text-sm text-gray-600 mb-1">🕒 ${t.duration}: ${durationText}</div>
-      <div class="text-lg font-bold text-gray-800 mb-1">💰 $${price}</div>
-      <div class="flex justify-between items-center gap-2 mt-2">
-        <a href="${link}" target="_blank"
-          class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition text-center">
-          ${t.bookNow}
-        </a>
-        <button 
-          onclick="toggleFavoriteFlight('${dealId}', this)" 
-          class="text-2xl text-center text-gray-600 hover:text-blue-600 transition"
-          data-flight-id="${dealId}">
-          ${isFav ? "💙" : "🤍"}
-        </button>
-      </div>
-    `;
+    
+const t = window.translations[lang];
+    
+  card.innerHTML = `
+  <div class="flex items-center gap-2 mb-1">
+    <h3 class="text-xl font-bold">${airline}</h3>
+    ${isHot ? `<span class="text-lg font-bold text-orange-600">🔥 ${t.hotDeal || "Горячее предложение"}</span>` : ""}
+  </div>
+  <div class="text-sm font-semibold text-gray-700 mb-1">🛫 ${from} → 🛬 ${to}</div>
+  <div class="text-sm text-gray-600 mb-1">📅 ${date}</div>
+  <div class="text-sm text-gray-600 mb-1">⏰ ${t.time || "Время"}: ${departureTime} — ${arrivalTime}</div>
+  <div class="text-sm text-gray-600 mb-1">🕒 ${t.duration || "В пути"}: ${durationText}</div>
+  <div class="text-lg font-bold text-gray-800 mb-1">💰 $${price}</div>
+  <div class="flex justify-between items-center gap-2 mt-2">
+    <a href="${link}" target="_blank"
+       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition text-center">
+       ${t.bookNow || "Перейти к бронированию"}
+    </a>
+    <button 
+      onclick="toggleFavoriteFlight('${dealId}', this)" 
+      class="text-2xl text-center text-gray-600 hover:text-blue-600 transition"
+      data-flight-id="${dealId}">
+      ${isFav ? "💙" : "🤍"}
+    </button>
+  </div>
+`;
 
     container.appendChild(card);
 
-    // ✅ Отдельная кнопка для избранного блока
     if (container.id === "favContent-flights") {
       const moreBtn = document.createElement("a");
       moreBtn.textContent = "Подробнее";
@@ -188,13 +185,15 @@ export async function renderFlights(
       moreBtn.className = "btn bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-4 rounded transition w-full text-center block mt-2";
       card.appendChild(moreBtn);
     }
-  }
 
-  if (typeof animateCards === "function") {
-    animateCards(`#${containerId} .card`);
+    if (typeof animateCards === "function") {
+      animateCards(`#${container.id} .card`);
+    }
   }
 }
-//}
+
+console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
+
 
 //Отели
 export function renderHotels(hotels) {
@@ -204,9 +203,12 @@ export function renderHotels(hotels) {
     return;
   }
 
-  console.log("➡️ Вызов renderHotels, перед фильтрацией:", hotels);
-
   container.innerHTML = "";
+
+  if (!Array.isArray(hotels) || hotels.length === 0) {
+    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены</div>`;
+    return;
+  }
 
   const propertyTypeFilter = document.getElementById("propertyTypeFilter");
   const priceRange = document.getElementById("priceRange");
@@ -231,46 +233,25 @@ export function renderHotels(hotels) {
     const fallbackPrice = hotel.priceFrom || hotel.fullPrice || 0;
     hotel.fullPrice = fallbackPrice;
     hotel.pricePerNight = nights > 0 ? fallbackPrice / nights : fallbackPrice;
-    hotel.price = Math.floor(hotel.pricePerNight);
+    hotel.price = Math.floor(hotel.pricePerNight); // 👈 добавить это
   });
 
-  
- hotels = hotels.filter(hotel => {
-  const selectedType = propertyTypeFilter?.value || "all";
-  const rawType = (hotel.property_type || "hotel").toLowerCase();
+  hotels = hotels.filter(hotel => {
+    const selectedType = propertyTypeFilter?.value || "all";
+    const rawType = (hotel.property_type || "hotel").toLowerCase();
 
-  const skipRoomsCheck = true; // 👉 для отладки можно включить true
+    const matchesType =
+      selectedType === "all" ||
+      (selectedType === "hotel" && rawType.includes("hotel")) ||
+      (selectedType === "apartment" && rawType.includes("apartment"));
 
-const hasAvailableRooms = skipRoomsCheck || (
-  Array.isArray(hotel.rooms) &&
-  hotel.rooms.length > 0 &&
-  hotel.rooms.some(room =>
-    room.options?.available > 0 &&
-    typeof room.price === "number" &&
-    room.price > 0
-  )
-);
-   
-  const matchesType =
-    selectedType === "all" ||
-    (selectedType === "hotel" && rawType.includes("hotel")) ||
-    (selectedType === "apartment" && rawType.includes("apartment"));
+    const matchesPrice =
+      !isNaN(hotel.pricePerNight) &&
+      hotel.pricePerNight > 0 &&
+      hotel.pricePerNight <= maxPrice;
 
-  const matchesPrice =
-    !isNaN(hotel.pricePerNight) &&
-    hotel.pricePerNight > 0 &&
-    hotel.pricePerNight <= maxPrice;
-
-  return hasAvailableRooms && matchesType && matchesPrice;
-});
-  
-
-  console.log("🧪 Отели после фильтрации:", hotels.length, hotels);
-
-  if (!Array.isArray(hotels) || hotels.length === 0) {
-    container.innerHTML = `<div class="text-center text-gray-500 mt-4">Отели не найдены</div>`;
-    return;
-  }
+    return matchesType && matchesPrice;
+  });
 
   hotels.sort((a, b) => a.pricePerNight - b.pricePerNight);
 
@@ -281,9 +262,10 @@ const hasAvailableRooms = skipRoomsCheck || (
     const hotelPrice = `$${Math.floor(hotel.pricePerNight)}`;
     const totalPrice = `$${Math.floor(hotel.fullPrice || 0)}`;
 
-    let imageUrl = hotel.image && typeof hotel.image === "string"
-      ? hotel.image
-      : "https://placehold.co/800x520?text=No+Image";
+    // 🔁 Прокси через photoId (извлекаем только ID из image URL)
+   let imageUrl = hotel.image && typeof hotel.image === "string"
+  ? hotel.image
+  : "https://placehold.co/800x520?text=No+Image";
 
     console.log("🏨 HOTEL", hotelName, imageUrl);
 
@@ -297,40 +279,39 @@ const hasAvailableRooms = skipRoomsCheck || (
         : "";
 
     const bookingUrl = `https://tp.media/r?marker=618281&trs=402148&p=4115&u=${encodeURIComponent(baseUrl + dateParams)}&campaign_id=101`;
-
-    hotel.link = bookingUrl;
-
+hotel.link = bookingUrl;
     const card = document.createElement("div");
     card.className = "card bg-white p-4 rounded-xl shadow mb-4 opacity-0 scale-95 transition-all duration-300";
 
-    const isFav = checkFavoriteHotel(hotel);
+   const isFav = checkFavoriteHotel(hotel); // 👈 используем check-функцию
 
-    card.innerHTML = `
-      <img src="${imageUrl}" alt="${hotelName}"
-          class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
-          loading="lazy"
-          referrerpolicy="no-referrer"
-          crossorigin="anonymous"
-          onerror="this.onerror=null;this.src='https://placehold.co/800x520?text=No+Image';" />
+card.innerHTML = `
+  <img src="${imageUrl}" alt="${hotelName}"
+       class="rounded-lg mb-3 w-full h-48 object-cover bg-gray-200"
+       loading="lazy"
+       referrerpolicy="no-referrer"
+       crossorigin="anonymous"
+       onerror="this.onerror=null;this.src='https://placehold.co/800x520?text=No+Image';" />
 
-      <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
-      <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
-      <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
-      <p class="text-sm text-gray-600 mb-1">💵 Всего за период: ${totalPrice}</p>
+  <h3 class="text-lg font-semibold mb-1">${hotelName}</h3>
+  <p class="text-sm text-gray-600 mb-1">📍 ${hotelCity}</p>
+  <p class="text-sm text-gray-600 mb-1">💰 Цена за ночь: ${hotelPrice}</p>
+  <p class="text-sm text-gray-600 mb-1">💵 Всего за период: ${totalPrice}</p>
 
-      <div class="flex justify-between items-center mt-2">
-        <a href="${bookingUrl}" target="_blank"
-          class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center">
-          🔗 Забронировать
-        </a>
-        <button 
-          onclick="toggleFavoriteHotelFromEncoded('${encodeURIComponent(JSON.stringify(hotel))}', this)" 
-          class="text-xl ml-2"
-          data-hotel-id="${encodeURIComponent(JSON.stringify(hotel))}">
-          ${isFav ? "💙" : "🤍"}
-        </button>
-      </div>
-    `;
+  <div class="flex justify-between items-center mt-2">
+    <a href="${bookingUrl}" target="_blank"
+       class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded block text-center">
+       🔗 Забронировать
+    </a>
+    <button 
+      onclick="toggleFavoriteHotelFromEncoded('${encodeURIComponent(JSON.stringify(hotel))}', this)" 
+      class="text-xl ml-2"
+      data-hotel-id="${encodeURIComponent(JSON.stringify(hotel))}"
+    >
+      ${isFav ? "💙" : "🤍"}
+    </button>
+  </div>
+`;
 
     container.appendChild(card);
   });
@@ -338,26 +319,27 @@ const hasAvailableRooms = skipRoomsCheck || (
   container.classList.add("visible");
   animateCards("#hotelsResult .card");
 
-  const bookingAll = document.createElement("div");
-  bookingAll.className = "text-center mt-6";
+  
+  // 🔗 Кнопка "Смотреть на Booking.com"
+const bookingAll = document.createElement("div");
+bookingAll.className = "text-center mt-6";
 
-  const bookingCity = document.getElementById("hotelCity")?.value || hotelCity;
-  const guestsCount = document.getElementById("guests")?.value || 1;
+const bookingCity = document.getElementById("hotelCity")?.value || hotelCity;
+const guestsCount = document.getElementById("guests")?.value || 1;
 
-  const bookingAllUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(bookingCity)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guestsCount}&group_children=0&no_rooms=1`;
+const bookingAllUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(bookingCity)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=${guestsCount}&group_children=0&no_rooms=1`;
 
-  bookingAll.innerHTML = `
-   <div class="pb-20 sm:pb-10">
-    <a href="${bookingAllUrl}" target="_blank" rel="noopener"
-      class="block w-full sm:w-auto mx-auto mt-6 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition duration-300">
-      🔍 Смотреть на Booking.com
-    </a>
-  </div>
-  `;
+bookingAll.innerHTML = `
+ <div class="pb-20 sm:pb-10">
+  <a href="${bookingAllUrl}" target="_blank" rel="noopener"
+     class="block w-full sm:w-auto mx-auto mt-6 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition duration-300">
+    🔍 Смотреть на Booking.com
+  </a>
+</div>
+`;
 
-  container.appendChild(bookingAll);
+container.appendChild(bookingAll);
 }
-
 
 //Места
 export function renderPlaces(places = []) {
