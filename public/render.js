@@ -212,6 +212,7 @@ export function renderHotels(hotels) {
 
   const propertyTypeFilter = document.getElementById("propertyTypeFilter");
   const priceRange = document.getElementById("priceRange");
+  const filtersEnabled = document.getElementById("toggleFilters")?.checked;
 
   let maxPrice = 500;
   if (priceRange) {
@@ -246,9 +247,11 @@ export function renderHotels(hotels) {
       (selectedType === "apartment" && rawType.includes("apartment"));
 
     const matchesPrice =
+    !filtersEnabled || (
       !isNaN(hotel.pricePerNight) &&
       hotel.pricePerNight > 0 &&
-      hotel.pricePerNight <= maxPrice;
+      hotel.pricePerNight <= maxPrice
+    );
 
     return matchesType && matchesPrice;
   });
