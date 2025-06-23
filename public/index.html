@@ -152,7 +152,19 @@
       </div>
     </div>
     
-     <div>
+    
+
+    <div class="mt-4">
+      <label for="toggleFilters" class="label flex items-center gap-2">
+        <input type="checkbox" id="toggleFilters" class="checkbox" />
+        <span>Фильтры</span>
+      </label>
+    </div>
+
+    <div id="hotelFilters" class="hidden mt-2">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+         <div>
   <label class="label" for="guests">Гости</label>
   <input
     type="number"
@@ -169,16 +181,7 @@
     oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/^0+/, '')"
   />
 </div>
-
-    <div class="mt-4">
-      <label for="toggleFilters" class="label flex items-center gap-2">
-        <input type="checkbox" id="toggleFilters" class="checkbox" />
-        <span>Фильтры</span>
-      </label>
-    </div>
-
-    <div id="hotelFilters" class="hidden mt-2">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
       
 <!-- 💰 Ползунок с tooltip -->
 <div class="col-span-2 mt-4 mb-6">
