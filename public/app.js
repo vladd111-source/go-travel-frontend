@@ -293,16 +293,16 @@ let hotels = hotelsRaw
   const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
   if (rawPrice <= 0) return false;
 
-  if (
-    !Array.isArray(h.rooms) ||
-    !h.rooms.some(r =>
-      r &&
-      typeof r === "object" &&
-      r.options?.available > 0 &&
-      typeof r.price === "number" &&
-      r.price > 0
-    )
-  ) return false;
+ // if (
+//   !Array.isArray(h.rooms) ||
+//   !h.rooms.some(r =>
+//     r &&
+//     typeof r === "object" &&
+//     r.options?.available > 0 &&
+//     typeof r.price === "number" &&
+//     r.price > 0
+//   )
+// ) return false;
 
   return true;
 })
