@@ -295,7 +295,7 @@ let hotels = hotelsRaw
    if (!Array.isArray(h.rooms) /* || !h.rooms.some(r => r.options?.available > 0) */) return false;
     return true;
   })
-  console.log("🛏️ После базового фильтра по rooms:", hotelsRaw.length, hotelsRaw);
+
  .map(h => {
   const hotelId = h.hotelId || h.id;
 
