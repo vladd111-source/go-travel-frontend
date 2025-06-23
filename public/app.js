@@ -289,12 +289,23 @@ const useFilters = document.getElementById("toggleFilters")?.checked;
 
 let hotels = hotelsRaw
   .filter(h => {
-    if (!h || !h.hotelId && !h.id) return false;
-    const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
-    if (rawPrice <= 0) return false;
-   if (!Array.isArray(h.rooms) /* || !h.rooms.some(r => r.options?.available > 0) */) return false;
-    return true;
-  })
+  if (!h || (!h.hotelId && !h.id)) return false;
+  const rawPrice = h.priceFrom || h.fullPrice || h.minPrice || 0;
+  if (rawPrice <= 0) return false;
+
+  if (
+    !Array.isArray(h.rooms) ||
+    !h.rooms.some(r =>
+      r &&
+      typeof r === "object" &&
+      r.options?.available > 0 &&
+      typeof r.price === "number" &&
+      r.price > 0
+    )
+  ) return false;
+
+  return true;
+})
 
  .map(h => {
   const hotelId = h.hotelId || h.id;
