@@ -102,6 +102,8 @@ async function getIataCode(cityName) {
 // ✅ DOMContentLoaded и инициализация приложения
 document.addEventListener("DOMContentLoaded", () => {
   try {
+     cleanOldFlights();
+    cleanOldHotels();
     // ✅ Telegram init
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
