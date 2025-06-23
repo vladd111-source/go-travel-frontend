@@ -4,6 +4,33 @@ import { parsePlacesFromGpt } from './globals.js';
 import { getUnsplashImage } from './globals.js';
 import { getPrompt } from './globals.js';
 
+// ✅ Удаление устаревших избранных перелётов
+function cleanOldFlights() {
+  const now = new Date().setHours(0, 0, 0, 0);
+  const saved = JSON.parse(localStorage.getItem("favorites_flights") || "[]");
+
+  const valid = saved.filter(f => {
+    if (!f.date) return true;
+    const flightDate = new Date(f.date).setHours(0, 0, 0, 0);
+    return flightDate >= now;
+  });
+
+  localStorage.setItem("favorites_flights", JSON.stringify(valid));
+}
+
+// ✅ Удаление устаревших избранных отелей
+function cleanOldHotels() {
+  const now = new Date().setHours(0, 0, 0, 0);
+  const saved = JSON.parse(localStorage.getItem("favorites_hotels") || "[]");
+
+  const valid = saved.filter(h => {
+    if (!h.checkIn) return true;
+    const checkInDate = new Date(h.checkIn).setHours(0, 0, 0, 0);
+    return checkInDate >= now;
+  });
+
+  localStorage.setItem("favorites_hotels", JSON.stringify(valid));
+}
 
 export async function searchHotels(city, checkIn, checkOut) {
   try {
