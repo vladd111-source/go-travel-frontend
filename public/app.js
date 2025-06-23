@@ -323,7 +323,7 @@ if (useFilters) {
 }
 
 
-    
+console.log("📊 Перед рендером отелей:", hotels.length, hotels);    
     renderHotels(hotels);
   } catch (err) {
     console.error('❌ Ошибка поиска отелей:', err);
